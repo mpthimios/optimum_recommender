@@ -121,7 +121,10 @@ public class calculate_message_utilities {
     private  static boolean NiceWeather(String city) throws Exception {
 
         OwmClient owm = new OwmClient ();
-        WeatherStatusResponse currentWeather = owm.currentWeatherAroundPoint (38.059016f,23.755915f,1);
+        
+        Float lat = 38.059016f;
+        Float lon = 23.755915f;
+        WeatherStatusResponse currentWeather = owm.currentWeatherAtCity (lat,lon,1);
 
         if (currentWeather.hasWeatherStatus ()) {
 
