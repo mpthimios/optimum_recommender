@@ -3,5 +3,16 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>Archetype Created Web Application</display-name>
+  <display-name>Optimum Recommender</display-name>
+  
+	<servlet>
+		<servlet-name>RouteRecommender</servlet-name>
+		<servlet-class>imu.recommender.Recommender</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>RouteRecommender</servlet-name>
+		<url-pattern>/route_recommender</url-pattern>
+	</servlet-mapping>
+  
 </web-app>

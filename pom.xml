@@ -36,11 +36,41 @@
             <artifactId>json</artifactId>
             <version>20090211</version>
         </dependency>
+        
+        <!-- Mongo -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>2.10.1</version>
         </dependency>
+        
+        <!-- Servlet -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+		
+		<!-- Fluidtime Dependencies -->
+		
+		<dependency>
+	        <groupId>fluidtime</groupId>
+	        <artifactId>brivel_json</artifactId>
+	        <version>0.0.4-SNAPSHOT</version>        
+	    </dependency>
+        
     </dependencies>
     <build>
         <finalName>recommender</finalName>

@@ -1,6 +1,8 @@
+package imu.recommender;
+
 import com.mongodb.*;
 import com.mongodb.util.JSON;
-import com.sun.xml.internal.fastinfoset.util.StringArray;
+//import com.sun.xml.internal.fastinfoset.util.StringArray;
 import org.bitpipeline.lib.owm.OwmClient;
 import org.bitpipeline.lib.owm.WeatherData;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
@@ -12,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class calculate_message_utilities {
+public class CalculateMessageUtilities {
     public static void main(String[] args) throws Exception {
         //Connect to mongodb
         MongoClient mongo = new MongoClient("euprojects.net",3368);

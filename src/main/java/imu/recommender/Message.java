@@ -1,4 +1,4 @@
-
+package imu.recommender;
 
 public class Message {
 
