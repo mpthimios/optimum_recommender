@@ -9,13 +9,27 @@ import org.bitpipeline.lib.owm.WeatherStatusResponse;
 import sun.font.TrueTypeFont;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import com.fluidtime.library.model.json.JsonSegment;
+import com.fluidtime.library.model.json.JsonTrip;
+import com.fluidtime.library.model.json.FeatureTypes.JsonFeature;
+import com.fluidtime.library.model.json.request.RequestGetRoute;
+import com.fluidtime.library.model.json.response.route.JsonResponseRoute;
+import com.fluidtime.brivel.route.json.AttributeListKeys;
+import com.fluidtime.brivel.route.json.RouteParser;
 
 
 public class CalculateMessageUtilities {
-    public static void main(String[] args) throws Exception {
+    public static String calculate(JsonResponseRoute route, JsonTrip trip) throws Exception {
+        //Get trip properties
+        Integer route_distance=trip.getDistanceMeter();
+        String city = route.getAttribute("city");
+        Object cord = route.getLocationFrom().getGeometry().getCoordinates();
+        Integer duration = trip.getDurationMinutes();
+
         //Connect to mongodb
         MongoClient mongo = new MongoClient("euprojects.net",3368);
         //Print all database names
@@ -30,7 +44,13 @@ public class CalculateMessageUtilities {
         List<String> contextList = new ArrayList<String>();
         contextList.add("noContext");
 
-        int route_distance=500;
+        System.out.println(route.getLocationFrom());
+        System.out.println(route.getLocationTo());
+        System.out.println(route.getAttribute("city"));
+        System.out.println(route.getAttributes());
+
+
+
         //Check if the distance of route is walking
         if(withinWalkingDistance(route_distance)){
             System.out.println("Walking Distance");
@@ -42,7 +62,7 @@ public class CalculateMessageUtilities {
             contextList.add("BikeDistance");
 
         }
-        String city = "Athens";
+
         //Check if the weather is nice
         if(NiceWeather(city)){
             System.out.println("Nice Weather");
@@ -57,11 +77,16 @@ public class CalculateMessageUtilities {
         if (tooManyCarRoutes("user")){
             contextList.add("TooManyCarRoutes");
         }
-        if (CostComparetoDriving("transport", "drive")){
-            contextList.add("Cost");
-        }
-        if (DurationComparetoDriving("transport", "drive")){
-            contextList.add("Duration");
+        JsonTrip carTrip = CarTrip(route);
+        if ( carTrip!= null && trip.getModality().equals("pt")) {
+            Integer driving_distance = carTrip.getDistanceMeter();
+            if (CostComparetoDriving("transport", "drive")) {
+                contextList.add("Cost");
+            }
+            Integer driving_duration = carTrip.getDurationMinutes();
+            if (DurationComparetoDriving(duration, driving_duration)) {
+                contextList.add("Duration");
+            }
         }
 
         /*
@@ -110,6 +135,7 @@ public class CalculateMessageUtilities {
         for(String coll : tables){
             System.out.println(coll);
         } */
+        return selected_message_text;
 
     }
 
@@ -123,10 +149,9 @@ public class CalculateMessageUtilities {
     private  static boolean NiceWeather(String city) throws Exception {
 
         OwmClient owm = new OwmClient ();
-        
-        Float lat = 38.059016f;
-        Float lon = 23.755915f;
-        WeatherStatusResponse currentWeather = owm.currentWeatherAtCity (lat,lon,1);
+
+        //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity (lat,lon,1);
+        WeatherStatusResponse currentWeather = owm.currentWeatherAtCity(city);
 
         if (currentWeather.hasWeatherStatus ()) {
 
@@ -173,10 +198,8 @@ public class CalculateMessageUtilities {
 
     }
 
-    private static boolean DurationComparetoDriving(String transport_route, String driving_route) {
-        //get duration from routes
-        Integer transport_duration = 20;
-        Integer driving_duration = 5;
+    private static boolean DurationComparetoDriving(Integer transport_duration, Integer driving_duration) {
+
         return transport_duration - driving_duration <=5;
 
     }
@@ -191,6 +214,17 @@ public class CalculateMessageUtilities {
 
         return purpose.equals("Leisure") || purpose.equals("Shopping");
 
+    }
+
+    private static JsonTrip CarTrip(JsonResponseRoute route){
+        JsonTrip cartrip = null;
+        for (int i = 0; i < route.getTrips().size(); i++) {
+            if (route.getTrips().get(i).getModality().equals("car")) {
+                cartrip = route.getTrips().get(i);
+            }
+
+        }
+        return cartrip;
     }
 
 

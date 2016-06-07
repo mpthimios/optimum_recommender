@@ -70,7 +70,7 @@
 	        <artifactId>brivel_json</artifactId>
 	        <version>0.0.4-SNAPSHOT</version>        
 	    </dependency>
-        
+
     </dependencies>
     <build>
         <finalName>recommender</finalName>
