@@ -20,6 +20,9 @@ import static imu.recommender.CalculateMessageUtilities.calculate;
 
 
 public class Recommender extends HttpServlet{
+	
+	private static boolean PRINT_JSON = true;
+	
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 		
@@ -30,14 +33,25 @@ public class Recommender extends HttpServlet{
 	    // Allocate a output writer to write the response message into the network socket
 	    PrintWriter out = response.getWriter();
 	 
-	    // Write the response message, in an HTML page
-	    try {
-	    	out.println(route.toString());
+	    if (PRINT_JSON){
+	    	try {
+	    		String routeResponseStr = RouteParser.routeToJson(route);
+		    	out.println("thimios");
+		    	out.println(routeResponseStr);
+		    }
+		    finally {
 
+		    }	    	
 	    }
-	    finally {
+	    else{
+	    	try {	    		
+		    	out.println("error");		    	
+		    }
+		    finally {
 
+		    }
 	    }
+	    
 	}
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -55,69 +69,75 @@ public class Recommender extends HttpServlet{
 
 	 
 	    // Write the response message, in an HTML page
-	    try {
-	    	out.println("<!DOCTYPE html>");
-	        out.println("<html><head>");
-	        out.println("<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>");
-	        out.println("<title>Echo Servlet</title></head>");
-			out.println("<h3>Alternatives Routes from "+route.getLocationFrom().getProperties().getTitle()
-					+" to "+route.getLocationTo().getProperties().getTitle()+":</h3>");
+	    if (PRINT_JSON){
+	    	String routeResponseStr = RouteParser.routeToJson(route);	    	
+	    	out.println(routeResponseStr);
+	    }
+	    else{
+	    	try {
+		    	out.println("<!DOCTYPE html>");
+		        out.println("<html><head>");
+		        out.println("<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>");
+		        out.println("<title>Echo Servlet</title></head>");
+				out.println("<h3>Alternatives Routes from "+route.getLocationFrom().getProperties().getTitle()
+						+" to "+route.getLocationTo().getProperties().getTitle()+":</h3>");
 
-			try {
-				//filter route
-				JsonResponseRoute response_route = filtering(route);
-				for (int i = 0; i < response_route.getTrips().size(); i++) {
-					JsonTrip trip = response_route.getTrips().get(i);
+				try {
+					//filter route
+					JsonResponseRoute response_route = filtering(route);
+					for (int i = 0; i < response_route.getTrips().size(); i++) {
+						JsonTrip trip = response_route.getTrips().get(i);
 
-					if (trip.getModality().equals("car") ){
-						mes = "No message";
-					}
-					else {
-						mes = calculate(route, trip);
-						response_route.getTrips().get(i).addAttribute("message", mes);
+						if (trip.getModality().equals("car") ){
+							mes = "No message";
+						}
+						else {
+							mes = calculate(route, trip);
+							response_route.getTrips().get(i).addAttribute("message", mes);
+
+						}
+
+						if (mes != "No message"){
+							out.println("<p>"+mes+"</p>");
+						}
+						if (trip.getModality().equals("pt")) {
+							out.println("<p>Choice " + (i + 1) + ":<span style='padding-left:68px;'>" +
+									"</span> Transit <span style='padding-left:68px;'></span>"
+									+ trip.getDurationMinutes() + "min</p>");
+						}
+						if (trip.getModality().equals("car")) {
+							out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
+									"</span> Car <span style='padding-left:68px;'></span>"
+									+ trip.getDurationMinutes() + "min</p>");
+						}
+						if (trip.getModality().equals("walk")) {
+							out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
+									"</span> Walk <span style='padding-left:68px;'></span>"
+									+ trip.getDurationMinutes() + "min</p>");
+						}
+						if (trip.getModality().equals("bike")) {
+							out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
+									"</span> Bike <span style='padding-left:68px;'></span>"
+									+ trip.getDurationMinutes() + "min</p>");
+						}
+						if (trip.getModality().equals("par")) {
+							out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
+									"</span>  Par  <span style='padding-left:68px;'></span> "
+									+ trip.getDurationMinutes() + "min</p>");
+						}
+						//out.println("<p>Choice "+(i+1)+": "+mes+"</p>");
 
 					}
 
-					if (mes != "No message"){
-						out.println("<p>"+mes+"</p>");
-					}
-					if (trip.getModality().equals("pt")) {
-						out.println("<p>Choice " + (i + 1) + ":<span style='padding-left:68px;'>" +
-								"</span> Transit <span style='padding-left:68px;'></span>"
-								+ trip.getDurationMinutes() + "min</p>");
-					}
-					if (trip.getModality().equals("car")) {
-						out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
-								"</span> Car <span style='padding-left:68px;'></span>"
-								+ trip.getDurationMinutes() + "min</p>");
-					}
-					if (trip.getModality().equals("walk")) {
-						out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
-								"</span> Walk <span style='padding-left:68px;'></span>"
-								+ trip.getDurationMinutes() + "min</p>");
-					}
-					if (trip.getModality().equals("bike")) {
-						out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
-								"</span> Bike <span style='padding-left:68px;'></span>"
-								+ trip.getDurationMinutes() + "min</p>");
-					}
-					if (trip.getModality().equals("par")) {
-						out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
-								"</span>  Par  <span style='padding-left:68px;'></span> "
-								+ trip.getDurationMinutes() + "min</p>");
-					}
-					//out.println("<p>Choice "+(i+1)+": "+mes+"</p>");
-
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-	    }
-	    finally {
-	    	
-	    }
+		    }
+		    finally {
+		    	
+		    }
+	    }	    
 	}
 	
 	public static String getBody(HttpServletRequest request) throws IOException {
