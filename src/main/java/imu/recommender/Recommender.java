@@ -8,12 +8,20 @@ import java.util.Map;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import com.fluidtime.brivel.route.json.response.JsonResponseData;
-import com.fluidtime.library.model.json.JsonTrip;
-import com.fluidtime.library.model.json.request.RequestTimeRoute;
-import com.fluidtime.library.model.json.response.route.JsonResponseRoute;
-import com.fluidtime.brivel.route.json.RouteParser;
-import com.google.gson.Gson;
+import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
+import at.ac.ait.ariadne.routeformat.Sproute.Status;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+
+import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import sun.font.TrueTypeFont;
 
 import static imu.recommender.CalculateMessageUtilities.calculate;
@@ -26,7 +34,10 @@ public class Recommender extends HttpServlet{
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 		
-		JsonResponseRoute route = RouteParser.routeFromJson(getBody(request));
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new Jdk8Module());
+		
+		RouteFormatRoot rootTest = mapper.readValue(getBody(request), RouteFormatRoot.class);
 
 		// Set the response message's MIME type
 	    response.setContentType("text/html; charset=UTF-8");
