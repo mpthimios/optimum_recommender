@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.bitpipeline.lib:owm-lib:2.1.3-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/bitpipeline/lib/owm-lib/2.1.3-SNAPSHOT/owm-lib-2.1.3-20151129.081229-1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/bitpipeline/lib/owm-lib/2.1.3-SNAPSHOT/owm-lib-2.1.3-20151129.081229-1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/bitpipeline/lib/owm-lib/2.1.3-SNAPSHOT/owm-lib-2.1.3-20151129.081229-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

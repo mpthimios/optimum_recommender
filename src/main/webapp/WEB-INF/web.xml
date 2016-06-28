@@ -5,7 +5,7 @@
 <web-app>
   <display-name>Optimum Recommender</display-name>
   
-	<servlet>
+   <servlet>
 		<servlet-name>RouteRecommender</servlet-name>
 		<servlet-class>imu.recommender.Recommender</servlet-class>
 	</servlet>

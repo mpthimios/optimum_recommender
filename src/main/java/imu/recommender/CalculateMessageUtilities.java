@@ -1,5 +1,8 @@
 package imu.recommender;
 
+import at.ac.ait.ariadne.routeformat.Route;
+import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
+import at.ac.ait.ariadne.routeformat.RoutingRequest;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 //import com.sun.xml.internal.fastinfoset.util.StringArray;
@@ -10,25 +13,23 @@ import sun.font.TrueTypeFont;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import com.fluidtime.library.model.json.JsonSegment;
-import com.fluidtime.library.model.json.JsonTrip;
-import com.fluidtime.library.model.json.FeatureTypes.JsonFeature;
-import com.fluidtime.library.model.json.request.RequestGetRoute;
-import com.fluidtime.library.model.json.response.route.JsonResponseRoute;
-import com.fluidtime.brivel.route.json.AttributeListKeys;
-import com.fluidtime.brivel.route.json.RouteParser;
 
 
 public class CalculateMessageUtilities {
-    public static String calculate(JsonResponseRoute route, JsonTrip trip) throws Exception {
+
+    public static String calculate(RouteFormatRoot route, Route trip) throws Exception {
         //Get trip properties
-        Integer route_distance=trip.getDistanceMeter();
-        String city = route.getAttribute("city");
-        Object cord = route.getLocationFrom().getGeometry().getCoordinates();
-        Integer duration = trip.getDurationMinutes();
+        Integer route_distance=trip.getDistanceMeters();
+        //String city = route.getAttribute("city");
+        String city = route.getCoordinateReferenceSystem();
+        //Object cord = route.getRequest
+        BigDecimal lat = trip.getFrom().getCoordinate().geometry.coordinates.get(0);
+        BigDecimal lon = trip.getFrom().getCoordinate().geometry.coordinates.get(1);
+        Integer duration = trip.getDurationSeconds();
 
         //Connect to mongodb
         MongoClient mongo = new MongoClient("euprojects.net",3368);
@@ -44,10 +45,10 @@ public class CalculateMessageUtilities {
         List<String> contextList = new ArrayList<String>();
         contextList.add("noContext");
 
-        System.out.println(route.getLocationFrom());
+        /*System.out.println(route.getLocationFrom());
         System.out.println(route.getLocationTo());
         System.out.println(route.getAttribute("city"));
-        System.out.println(route.getAttributes());
+        System.out.println(route.getAttributes());*/
 
 
 
@@ -77,27 +78,22 @@ public class CalculateMessageUtilities {
         if (tooManyCarRoutes("user")){
             contextList.add("TooManyCarRoutes");
         }
-        JsonTrip carTrip = CarTrip(route);
+        /*JsonTrip carTrip = CarTrip(route);
         if ( carTrip!= null && trip.getModality().equals("pt")) {
             Integer driving_distance = carTrip.getDistanceMeter();
             if (CostComparetoDriving("transport", "drive")) {
                 contextList.add("Cost");
             }
-            Integer driving_duration = carTrip.getDurationMinutes();
+            Integer driving_duration = carTrip.getDurationSeconds();
             if (DurationComparetoDriving(duration, driving_duration)) {
                 contextList.add("Duration");
             }
-        }
+        }*/
 
         /*
         if (EmissionComparetoOthers("user")){
             contextList.add("EmissionComparetoOthers");
         } */
-
-        if (LeisurePurpose("Leisure")){
-            contextList.add("LeisurePurpose");
-            System.out.println("LeisurePurpose");
-        }
         searchQuery.append("context",new BasicDBObject("$in", contextList));
 
         //Find all messages after filtering
@@ -150,7 +146,7 @@ public class CalculateMessageUtilities {
 
         OwmClient owm = new OwmClient ();
 
-        //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity (lat,lon,1);
+        //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity(lat ,lon,1);
         WeatherStatusResponse currentWeather = owm.currentWeatherAtCity(city);
 
         if (currentWeather.hasWeatherStatus ()) {
@@ -210,13 +206,7 @@ public class CalculateMessageUtilities {
 
     }
 
-    private static boolean LeisurePurpose(String purpose) {
-
-        return purpose.equals("Leisure") || purpose.equals("Shopping");
-
-    }
-
-    private static JsonTrip CarTrip(JsonResponseRoute route){
+    /*private static JsonTrip CarTrip(JsonResponseRoute route){
         JsonTrip cartrip = null;
         for (int i = 0; i < route.getTrips().size(); i++) {
             if (route.getTrips().get(i).getModality().equals("car")) {
@@ -225,7 +215,7 @@ public class CalculateMessageUtilities {
 
         }
         return cartrip;
-    }
+    }*/
 
 
 }
