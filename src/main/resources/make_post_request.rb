@@ -14,7 +14,8 @@ require 'net/http'
 #file = File.new("body_14_07_2013.txt", "r")
 #file = File.new("body_23_06_2014.txt", "r")
 #file = File.new("dublin_route.txt", "r")
-file = File.new("body_23_06_2014.txt", "r")
+#file = File.new("body_23_06_2014.txt", "r")
+file = File.new("sproute.txt", "r")
 while (line = file.gets)
     @body = @body + "#{line}"    
 end

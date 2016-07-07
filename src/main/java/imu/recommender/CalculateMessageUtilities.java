@@ -24,11 +24,9 @@ public class CalculateMessageUtilities {
     public static String calculate(RouteFormatRoot route, Route trip) throws Exception {
         //Get trip properties
         Integer route_distance=trip.getDistanceMeters();
-        //String city = route.getAttribute("city");
-        String city = route.getCoordinateReferenceSystem();
-        //Object cord = route.getRequest
-        BigDecimal lat = trip.getFrom().getCoordinate().geometry.coordinates.get(0);
-        BigDecimal lon = trip.getFrom().getCoordinate().geometry.coordinates.get(1);
+        Float lat = trip.getFrom().getCoordinate().geometry.coordinates.get(0).floatValue();
+        Float lon = trip.getFrom().getCoordinate().geometry.coordinates.get(1).floatValue();
+        String city = trip.getFrom().getAddress().get().getCity().get();
         Integer duration = trip.getDurationSeconds();
 
         //Connect to mongodb
@@ -45,13 +43,6 @@ public class CalculateMessageUtilities {
         List<String> contextList = new ArrayList<String>();
         contextList.add("noContext");
 
-        /*System.out.println(route.getLocationFrom());
-        System.out.println(route.getLocationTo());
-        System.out.println(route.getAttribute("city"));
-        System.out.println(route.getAttributes());*/
-
-
-
         //Check if the distance of route is walking
         if(withinWalkingDistance(route_distance)){
             System.out.println("Walking Distance");
@@ -64,10 +55,12 @@ public class CalculateMessageUtilities {
 
         }
 
-        //Check if the weather is nice
-        if(NiceWeather(city)){
-            System.out.println("Nice Weather");
-            contextList.add("Nice Weather");
+        //Check the weather if withinBikeDistance or withinWalkingDistance is True
+        if(withinWalkingDistance(route_distance) || withinBikeDistance(route_distance) ) {
+            if (NiceWeather(lat, lon, city)) {
+                System.out.println("Nice Weather");
+                contextList.add("Nice Weather");
+            }
         }
         /*if (emissionsIncreasing("user")){
             searchQuery.append("context", "emissionsIncreasing");
@@ -142,12 +135,11 @@ public class CalculateMessageUtilities {
     private static boolean withinBikeDistance(int distance) {
         return(distance<3000);
     }
-    private  static boolean NiceWeather(String city) throws Exception {
+    private  static boolean NiceWeather(Float lat, Float lon, String city) throws Exception {
 
         OwmClient owm = new OwmClient ();
-
-        //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity(lat ,lon,1);
-        WeatherStatusResponse currentWeather = owm.currentWeatherAtCity(city);
+        WeatherStatusResponse currentWeather = owm.currentWeatherAtCity(lat ,lon,1);
+        //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity("Wien");
 
         if (currentWeather.hasWeatherStatus ()) {
 

@@ -11,6 +11,7 @@ import at.ac.ait.ariadne.routeformat.Sproute.Status;
 import at.ac.ait.ariadne.routeformat.geojson.GeoJSONFeature;
 import at.ac.ait.ariadne.routeformat.geojson.GeoJSONFeatureCollection;
 import at.ac.ait.ariadne.routeformat.geojson.GeoJSONLineString;
+import at.ac.ait.ariadne.routeformat.geojson.GeoJSONPolygon;
 import at.ac.ait.ariadne.routeformat.location.Address;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -23,11 +24,16 @@ import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 
 import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
-import com.google.common.base.Optional;
+
+import java.util.Optional;
+
+import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
+import javafx.geometry.BoundingBox;
 import org.apache.http.impl.client.RoutedRequest;
 import org.bitpipeline.lib.owm.WeatherForecastResponse;
 import sun.font.TrueTypeFont;
 
+import static com.sun.xml.internal.ws.policy.sourcemodel.wspolicy.XmlToken.Optional;
 import static imu.recommender.CalculateMessageUtilities.calculate;
 import static java.lang.System.out;
 
@@ -55,9 +61,19 @@ public class Recommender extends HttpServlet{
 
 	    		RouteFormatRoot response_route = filtering(routes);
 				String mes = null;
+				List<Route> Trips = new ArrayList<Route>();
 				for (int i = 0; i < response_route.getRoutes().size(); i++) {
 					Route route = response_route.getRoutes().get(i);
-					//mes = calculate(routes, route);
+					try {
+						mes = calculate(response_route, route);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+					additionalInfoRouteRequest.put("message", mes);
+					Route r = Route.builder().withFrom(route.getFrom()).withTo(route.getTo()).withOptimizedFor(route.getOptimizedFor().get()).withAdditionalInfo(additionalInfoRouteRequest).withDepartureTime(route.getDepartureTime()).withArrivalTime(route.getArrivalTime()).withDistanceMeters(route.getDistanceMeters()).withDurationSeconds(route.getDurationSeconds()).withSegments(route.getSegments()).build();
+					addTrip(r, Trips);
+
 					//response_route.getRoutes().get(i).addAttribute("message", mes);
 
 					/*if (route.getModality().equals == "car") {
@@ -73,8 +89,12 @@ public class Recommender extends HttpServlet{
 
 					}*/
 				}
-				String routeResponseStr = response_route.toString();
+				Integer min=response_route.getRequest().get().getAcceptedDelayMinutes().get();
+
+				RouteFormatRoot final_route = RouteFormatRoot.builder().withRequestId(response_route.getRequestId()).withRouteFormatVersion(response_route.getRouteFormatVersion()).withProcessedTime(response_route.getProcessedTime()).withStatus(response_route.getStatus()).withCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem()).withRequest(response_route.getRequest().get()).withRoutes(Trips).build();
+				String routeResponseStr = final_route.toString();
 		    	out.println("thimios");
+
 		    	out.println(routeResponseStr);
 		    }
 		    finally {
@@ -1435,24 +1455,31 @@ public class Recommender extends HttpServlet{
 		        out.println("<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>");
 		        out.println("<title>Echo Servlet</title></head>");
 				Route route1 = routes.getRoutes().get(0);
-				Optional<Address> address;
-				//address=route1.getFrom().getAddress();
-				/*Optional<Address> address= route1.getFrom().getAddress();
+				Optional<Address> address =route1.getFrom().getAddress();
 				if (address.isPresent()){
 					java.util.Optional<String> city = address.get().getCity();
 					address.get().getStreetName();
-				}*/
+				}
+				Optional<Address> address_dest=route1.getTo().getAddress();
 
-
-				out.println("<h3>Alternatives Routes from "+ route1.getFrom().getAddress()+" to "+route1.getFrom().getAddress()+ "					:</h3>");
-				//out.println("<h3>Alter<natives Routes from "+route.getTo().getCoordinate().geometry.coordinates.get(0)+":</h3>");
-
+				if (address.isPresent() && address_dest.isPresent()) {
+					out.println("<h3>Alternatives Routes from " + address.get().getStreetName().get() + " to " + address_dest.get().getStreetName().get() + "					:</h3>");
+				}
 				try {
 					//filter route
 					RouteFormatRoot response_route = filtering(routes);
+					List<Route> Trips = new ArrayList<Route>();
 					for (int i = 0; i < response_route.getRoutes().size(); i++) {
 						Route route = response_route.getRoutes().get(i);
-
+						mes = calculate(response_route, route);
+						Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+						additionalInfoRouteRequest.put("message", mes);
+						Route r = Route.builder().withFrom(route.getFrom()).withTo(route.getTo()).withOptimizedFor(route.getOptimizedFor().get()).withAdditionalInfo(additionalInfoRouteRequest).withDepartureTime(route.getDepartureTime()).withArrivalTime(route.getArrivalTime()).withDistanceMeters(route.getDistanceMeters()).withDurationSeconds(route.getDurationSeconds()).withSegments(route.getSegments()).build();
+						out.println("<p>"+r.getAdditionalInfo().get("message")+"</p>");
+						out.println("<p>Choice " + (i + 1) + ":<span style='padding-left:68px;'>" +
+								"</span> Mode <span style='padding-left:68px;'></span>"
+									+ route.getDurationSeconds() + "sec</p>");
+						addTrip(r, Trips);
 //						if (trip.getModality().equals("car") ){
 //							mes = "No message";
 //						}
@@ -1493,6 +1520,10 @@ public class Recommender extends HttpServlet{
 //						//out.println("<p>Choice "+(i+1)+": "+mes+"</p>");
 
 					}
+					Integer min=response_route.getRequest().get().getAcceptedDelayMinutes().get();
+					//RoutingRequest request = RoutingRequest.builder().withAcceptedDelayMinutes(min).build();
+
+					RouteFormatRoot final_route = RouteFormatRoot.builder().withRequestId(response_route.getRequestId()).withRouteFormatVersion(response_route.getRouteFormatVersion()).withProcessedTime(response_route.getProcessedTime()).withStatus(response_route.getStatus()).withCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem()).withRequest(response_route.getRequest().get()).withRoutes(Trips).build();
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -1587,18 +1618,16 @@ public class Recommender extends HttpServlet{
 		}
 		//filtered_route.setTrips(Trips);
 
+		Integer min=routes.getRequest().get().getAcceptedDelayMinutes().get();
+		//RoutingRequest request = RoutingRequest.builder().withAcceptedDelayMinutes(min).build();
 
-
-		RoutingRequest request = RoutingRequest.builder().withAcceptedDelayMinutes(9).build();
-
-		RouteFormatRoot filtered_route = RouteFormatRoot.builder().withRouteFormatVersion(routes.getRouteFormatVersion()).withRequestId(routes.getRequestId()).withProcessedTime(routes.getProcessedTime()).withStatus(routes.getStatus()).withCoordinateReferenceSystem(routes.getCoordinateReferenceSystem()).withRequest(request).withRoutes(Trips).build();
+		RouteFormatRoot filtered_route = RouteFormatRoot.builder().withRequestId(routes.getRequestId()).withRouteFormatVersion(routes.getRouteFormatVersion()).withProcessedTime(routes.getProcessedTime()).withStatus(routes.getStatus()).withCoordinateReferenceSystem(routes.getCoordinateReferenceSystem()).withRequest(routes.getRequest().get()).withRoutes(Trips).build();
 		//.withOptimizedFor(trip.getOptimizedFor().toString())
 		return filtered_route;
 
 	}
 	public void addTrip(Route trip, List<Route> Trips) {
-		Trips.add(Route.builder().withFrom(trip.getFrom()).withTo(trip.getTo()).withDistanceMeters(trip.getDistanceMeters()).withDurationSeconds(trip.getDurationSeconds()).withDepartureTime(trip.getDepartureTime()).withArrivalTime(trip.getArrivalTime()).withSegments(trip.getSegments()).build());
-		//.withOptimizedFor(trip.getOptimizedFor().toString())
+		Trips.add(Route.builder().withFrom(trip.getFrom()).withOptimizedFor(trip.getOptimizedFor().get()).withTo(trip.getTo()).withDistanceMeters(trip.getDistanceMeters()).withDurationSeconds(trip.getDurationSeconds()).withDepartureTime(trip.getDepartureTime()).withArrivalTime(trip.getArrivalTime()).withSegments(trip.getSegments()).build());
 	}
 
 
