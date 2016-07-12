@@ -39,6 +39,11 @@ public class CalculateMessageUtilities {
         BasicDBObject searchQuery = new BasicDBObject();
 
         //searchQuery.append("persuasive_strategy", "Reward");
+        List<String> targetList = new ArrayList<String>();
+        //Select the messages that the target of message is the same with the mode of route
+        targetList.add("all");
+        targetList.add(trip.getAdditionalInfo().get("mode").toString());
+        searchQuery.append("target",new BasicDBObject("$in", targetList));
 
         List<String> contextList = new ArrayList<String>();
         contextList.add("noContext");
@@ -71,9 +76,9 @@ public class CalculateMessageUtilities {
         if (tooManyCarRoutes("user")){
             contextList.add("TooManyCarRoutes");
         }
-        /*JsonTrip carTrip = CarTrip(route);
-        if ( carTrip!= null && trip.getModality().equals("pt")) {
-            Integer driving_distance = carTrip.getDistanceMeter();
+        Route carTrip = CarTrip(route);
+        if ( carTrip!= null && trip.getAdditionalInfo().get("mode").equals("pt")) {
+            Integer driving_distance = carTrip.getDistanceMeters();
             if (CostComparetoDriving("transport", "drive")) {
                 contextList.add("Cost");
             }
@@ -81,7 +86,7 @@ public class CalculateMessageUtilities {
             if (DurationComparetoDriving(duration, driving_duration)) {
                 contextList.add("Duration");
             }
-        }*/
+        }
 
         /*
         if (EmissionComparetoOthers("user")){
@@ -198,16 +203,16 @@ public class CalculateMessageUtilities {
 
     }
 
-    /*private static JsonTrip CarTrip(JsonResponseRoute route){
-        JsonTrip cartrip = null;
-        for (int i = 0; i < route.getTrips().size(); i++) {
-            if (route.getTrips().get(i).getModality().equals("car")) {
-                cartrip = route.getTrips().get(i);
+    private static Route CarTrip(RouteFormatRoot route){
+        Route cartrip = null;
+        for (int i = 0; i < route.getRoutes().size(); i++) {
+            if (route.getRoutes().get(i).getAdditionalInfo().get("mode").equals("car")) {
+                cartrip = route.getRoutes().get(i);
             }
 
         }
         return cartrip;
-    }*/
+    }
 
 
 }

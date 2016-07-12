@@ -1,10 +1,20 @@
 package imu.recommender;
 
 import java.io.*;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
+import javax.swing.text.Segment;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
 import at.ac.ait.ariadne.routeformat.*;
 import at.ac.ait.ariadne.routeformat.Sproute.Status;
 
@@ -28,9 +38,17 @@ import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import java.util.Optional;
 
 import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
+import com.mongodb.util.JSON;
 import javafx.geometry.BoundingBox;
 import org.apache.http.impl.client.RoutedRequest;
 import org.bitpipeline.lib.owm.WeatherForecastResponse;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import sun.font.TrueTypeFont;
 
 import static com.sun.xml.internal.ws.policy.sourcemodel.wspolicy.XmlToken.Optional;
@@ -1467,57 +1485,26 @@ public class Recommender extends HttpServlet{
 				}
 				try {
 					//filter route
+					calculatePercentages("luka");
 					RouteFormatRoot response_route = filtering(routes);
 					List<Route> Trips = new ArrayList<Route>();
 					for (int i = 0; i < response_route.getRoutes().size(); i++) {
 						Route route = response_route.getRoutes().get(i);
-						mes = calculate(response_route, route);
+						if (response_route.getRoutes().get(i).getAdditionalInfo().get("mode")=="car"){
+							mes =  "";
+						}
+						else{
+							mes = calculate(response_route, route);
+						}
 						Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+						additionalInfoRouteRequest.put("mode", response_route.getRoutes().get(i).getAdditionalInfo().get("mode"));
 						additionalInfoRouteRequest.put("message", mes);
 						Route r = Route.builder().withFrom(route.getFrom()).withTo(route.getTo()).withOptimizedFor(route.getOptimizedFor().get()).withAdditionalInfo(additionalInfoRouteRequest).withDepartureTime(route.getDepartureTime()).withArrivalTime(route.getArrivalTime()).withDistanceMeters(route.getDistanceMeters()).withDurationSeconds(route.getDurationSeconds()).withSegments(route.getSegments()).build();
+						addTrip(r, Trips);
 						out.println("<p>"+r.getAdditionalInfo().get("message")+"</p>");
 						out.println("<p>Choice " + (i + 1) + ":<span style='padding-left:68px;'>" +
-								"</span> Mode <span style='padding-left:68px;'></span>"
-									+ route.getDurationSeconds() + "sec</p>");
-						addTrip(r, Trips);
-//						if (trip.getModality().equals("car") ){
-//							mes = "No message";
-//						}
-//						else {
-//							mes = calculate(route, trip);
-//							response_route.getTrips().get(i).addAttribute("message", mes);
-//
-//						}
-//
-//						if (mes != "No message"){
-//							out.println("<p>"+mes+"</p>");
-//						}
-//						if (trip.getModality().equals("pt")) {
-//							out.println("<p>Choice " + (i + 1) + ":<span style='padding-left:68px;'>" +
-//									"</span> Transit <span style='padding-left:68px;'></span>"
-//									+ trip.getDurationMinutes() + "min</p>");
-//						}
-//						if (trip.getModality().equals("car")) {
-//							out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
-//									"</span> Car <span style='padding-left:68px;'></span>"
-//									+ trip.getDurationMinutes() + "min</p>");
-//						}
-//						if (trip.getModality().equals("walk")) {
-//							out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
-//									"</span> Walk <span style='padding-left:68px;'></span>"
-//									+ trip.getDurationMinutes() + "min</p>");
-//						}
-//						if (trip.getModality().equals("bike")) {
-//							out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
-//									"</span> Bike <span style='padding-left:68px;'></span>"
-//									+ trip.getDurationMinutes() + "min</p>");
-//						}
-//						if (trip.getModality().equals("par")) {
-//							out.println("<p>Choice " + (i + 1) + ": <span style='padding-left:68px;'>" +
-//									"</span>  Par  <span style='padding-left:68px;'></span> "
-//									+ trip.getDurationMinutes() + "min</p>");
-//						}
-//						//out.println("<p>Choice "+(i+1)+": "+mes+"</p>");
+								"</span>"+ r.getAdditionalInfo().get("mode")+"<span style='padding-left:68px;'></span>"
+									+ r.getDurationSeconds() + "sec</p>");
 
 					}
 					Integer min=response_route.getRequest().get().getAcceptedDelayMinutes().get();
@@ -1572,7 +1559,6 @@ public class Recommender extends HttpServlet{
 
 	public RouteFormatRoot filtering(RouteFormatRoot routes){
 		List<Route> Trips = new ArrayList<Route>();
-		//We need to change these so that they comply to the new format
 
 		for (int i = 0; i < routes.getRoutes().size(); i++) {
 			Route trip = routes.getRoutes().get(i);
@@ -1580,43 +1566,81 @@ public class Recommender extends HttpServlet{
 			boolean bike_owner = true;
 			System.out.println(trip.getFrom());
 			trip.getFrom().getCoordinate().geometry.coordinates.get(0);
-			//trip.getSegments().get(0).getModeOfTransport().getGeneralizedType();
+			//Find the mode of the route searching segments of the route
+			List<String> Modes = new ArrayList<String>();
+			for (int j=0; j< trip.getSegments().size(); j++) {
+				RouteSegment segment = trip.getSegments().get(j);
+				String mode = segment.getModeOfTransport().getGeneralizedType().toString();
+				if (!Modes.contains(mode)) {
+					Modes.add(mode);
+				}
+			}
+			String mode="";
+			System.out.println(Modes);
+			if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.size()==2){
+				mode="pt";
+			}
+			else if (Modes.contains("CAR") && Modes.contains("FOOT") && Modes.size()==2){
+				mode="car";
+			}
+			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.size()==3){
+				mode="park&ride";
+			}
+			else if (Modes.contains("BICYCLE") && Modes.contains("FOOT") && Modes.contains("PUBLIC_TRANSPORT") && Modes.size()==3){
+				mode="bike&ride";
+			}
+			else if (Modes.contains("FOOT") && Modes.size()==1 ){
+				mode="walk";
+			}
+			else if (Modes.contains("BICYCLE") && Modes.size()==1 ){
+				mode="walk";
+			}
+			else if (Modes.contains("CAR") && Modes.size()==1 ){
+				mode="car";
+			}
+			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.size()==1 ){
+				mode="pt";
+			}
+			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE") && Modes.size()==4 ){
+					mode="park&ride_with_bike";
+			}
+			else {
+				mode="unknown";
+			}
+			//System.out.println(Trips.get(0).getAdditionalInfo().get("mode"));
 			//Filter out routes
 			//Filter out car and park and ride modes for users that don’t own a car.
-			/*if(!car_owner){
-				if ( (trip.getModality().equals("car")) || (trip.getModality().equals("par"))){
- 				continue;
+			if(!car_owner) {
+				if (mode.equals("car") || mode.equals("park&ride")) {
+					continue;
+				} else {
+					addTrip(trip, Trips, mode);
+				}
+			}
+			//Filter out bike modes for users that don’t own a bike and for routes containing biking more than 3 Km
+			else if (mode.equals("bike")){
+				if((bike_owner) && (trip.getDistanceMeters()<3000)){
+					addTrip(trip,Trips, mode);
 				}
 				else{
-					//addTrip(trip,Trips);
-				}*/
+					continue;
+				}
+			}
+			//Filter out walk modes for routes containing walking more than 1 Km
+			else if(mode.equals("walk")){
+				if(trip.getDistanceMeters()<1000){
+					addTrip(trip,Trips,mode);
+				}
+				else{
+					continue;
+				}
+			}
+			else {
+				addTrip(trip,Trips);
+			}
 
-//			//Filter out bike modes for users that don’t own a bike and for routes containing biking more than 3 Km
-//			else if (trip.getModality().equals("bike")){
-//				if((bike_owner) && (trip.getDistanceMeter()<3000)){
-//					addTrip(trip,Trips);
-//				}
-//				else{
-//					continue;
-//				}
-//			}
-//			//Filter out walk modes for routes containing walking more than 1 Km
-//			else if(trip.getModality().equals("walk")){
-//				if(trip.getDistanceMeter()<1000){
-//					addTrip(trip,Trips);
-//				}
-//				else{
-//					continue;
-//				}
-//			}
-//			else {
-//				addTrip(trip,Trips);
-//			}
 
-//		}
-			addTrip(trip, Trips);
 		}
-		//filtered_route.setTrips(Trips);
 
 		Integer min=routes.getRequest().get().getAcceptedDelayMinutes().get();
 		//RoutingRequest request = RoutingRequest.builder().withAcceptedDelayMinutes(min).build();
@@ -1626,8 +1650,114 @@ public class Recommender extends HttpServlet{
 		return filtered_route;
 
 	}
+	public void addTrip(Route trip, List<Route> Trips, String mode) {
+		Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+		additionalInfoRouteRequest.put("mode", mode);
+		Trips.add(Route.builder().withAdditionalInfo(additionalInfoRouteRequest).withFrom(trip.getFrom()).withOptimizedFor(trip.getOptimizedFor().get()).withTo(trip.getTo()).withDistanceMeters(trip.getDistanceMeters()).withDurationSeconds(trip.getDurationSeconds()).withDepartureTime(trip.getDepartureTime()).withArrivalTime(trip.getArrivalTime()).withSegments(trip.getSegments()).build());
+	}
+
 	public void addTrip(Route trip, List<Route> Trips) {
-		Trips.add(Route.builder().withFrom(trip.getFrom()).withOptimizedFor(trip.getOptimizedFor().get()).withTo(trip.getTo()).withDistanceMeters(trip.getDistanceMeters()).withDurationSeconds(trip.getDurationSeconds()).withDepartureTime(trip.getDepartureTime()).withArrivalTime(trip.getArrivalTime()).withSegments(trip.getSegments()).build());
+		Trips.add(Route.builder().withAdditionalInfo(trip.getAdditionalInfo()).withFrom(trip.getFrom()).withOptimizedFor(trip.getOptimizedFor().get()).withTo(trip.getTo()).withDistanceMeters(trip.getDistanceMeters()).withDurationSeconds(trip.getDurationSeconds()).withDepartureTime(trip.getDepartureTime()).withArrivalTime(trip.getArrivalTime()).withSegments(trip.getSegments()).build());
+	}
+
+	 private static void calculatePercentages(String user) throws IOException {
+		String url = "http://traffic.ijs.si/NextPinDev/getActivities";
+
+		 URL obj = new URL("http://traffic.ijs.si/NextPinDev/getActivities");
+		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		 con.setRequestMethod("GET");
+
+
+		//add request header
+		con.setRequestProperty("token",user);
+
+		int responseCode = con.getResponseCode();
+		System.out.println("\nSending 'GET' request to URL : " + url);
+		System.out.println("Response Code : " + responseCode);
+
+		BufferedReader in = new BufferedReader(
+				new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null) {
+			response.append(inputLine);
+		}
+		in.close();
+		//print result
+		System.out.println(response.toString());
+		 //JSONObject jsonObj = new JSONObject(response);
+		 //Iterator<String> keys = jsonObj.keys();
+		 try {
+			 JSONObject jsonObj  = new JSONObject(response.toString());
+
+			 //JSONArray jsonarr= json.getJSONArray("address");
+			 //String address = jsonarr.getJSONObject(0).getString("addressLine1");
+			 System.out.println(jsonObj.getJSONArray("data"));
+			 JSONArray arr = jsonObj.getJSONArray("data");
+			 Integer n_car=0;
+			 Integer n_pt=0;
+			 Integer n_bike=0;
+			 Integer n_walk=0;
+			 System.out.println(arr);
+			 for (int i = 0; i < arr.length(); i++) {
+				 String [] all_modes = {"car", "pt", "bike", "walk"};
+				 Random random = new Random();
+
+				 // randomly selects an index from the arr
+				 int select = random.nextInt(all_modes.length);
+				 //Put the random selected mode to string
+				 arr.getJSONObject(i).put("mode", all_modes[select]);
+
+				 JSONObject object = arr.getJSONObject(i);
+				 String mode = object.get("mode").toString();
+				 //String a = objects.get("");
+				 if (mode.equals("car") ){
+					 n_car++;
+				 }
+				 if (mode.equals("pt") ){
+					 n_pt++;
+				 }
+				 if (mode.equals("bike") ){
+					 n_bike++;
+				 }
+				 if (mode.equals("walk") ){
+					 n_walk++;
+				 }
+				 //System.out.println(arr.getJSONObject(i).get("mode"));
+			 }
+			 //Calculate percentages
+			 double car_percent = ( (double)(n_car*100)/(double) arr.length());
+			 double pt_percent = ( (double)(n_pt*100)/(double) arr.length());
+			 double bike_percent = ( (double)(n_bike*100)/(double) arr.length());
+			 double walk_percent = ( (double)(n_walk*100)/(double) arr.length());
+			 //percentages should be saved to mongo
+			 System.out.println(car_percent);
+			 System.out.println(pt_percent);
+			 System.out.println(bike_percent);
+			 System.out.println(walk_percent);
+		 } catch (JSONException e) {
+			 e.printStackTrace();
+		 }
+
+
+	 }
+
+	private void CalculateOtherUserPercentages(){
+		//Connect to mongodb
+		MongoClient mongo = null;
+		try {
+			mongo = new MongoClient("euprojects.net",3368);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		//Print all database names
+		//System.out.println(mongo.getDatabaseNames());
+		DB db = mongo.getDB("Optimum");
+		DBCollection table = db.getCollection("OptimumUsers");
+		//Select the messages where persuasive strategy is Reward
+		BasicDBObject searchQuery = new BasicDBObject();
+
 	}
 
 
