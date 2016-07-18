@@ -77,43 +77,35 @@ public class Recommender extends HttpServlet{
 	    if (PRINT_JSON){
 	    	try {
 
-	    		RouteFormatRoot response_route = filtering(routes);
-				String mes = null;
+				calculatePercentages("luka");
+				RouteFormatRoot response_route = filtering(routes);
 				List<Route> Trips = new ArrayList<Route>();
 				for (int i = 0; i < response_route.getRoutes().size(); i++) {
 					Route route = response_route.getRoutes().get(i);
-					try {
-						mes = calculate(response_route, route);
-					} catch (Exception e) {
-						e.printStackTrace();
+					String mes="";
+					if (response_route.getRoutes().get(i).getAdditionalInfo().get("mode")=="car"){
+						mes =  "";
+					}
+					else{
+						try {
+							mes = calculate(response_route, route);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 					Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+					additionalInfoRouteRequest.put("mode", response_route.getRoutes().get(i).getAdditionalInfo().get("mode"));
 					additionalInfoRouteRequest.put("message", mes);
 					Route r = Route.builder().withFrom(route.getFrom()).withTo(route.getTo()).withOptimizedFor(route.getOptimizedFor().get()).withAdditionalInfo(additionalInfoRouteRequest).withDepartureTime(route.getDepartureTime()).withArrivalTime(route.getArrivalTime()).withDistanceMeters(route.getDistanceMeters()).withDurationSeconds(route.getDurationSeconds()).withSegments(route.getSegments()).build();
 					addTrip(r, Trips);
 
-					//response_route.getRoutes().get(i).addAttribute("message", mes);
-
-					/*if (route.getModality().equals == "car") {
-						mes = "No message";
-					} else {
-						try {
-							//???? mes = calculate(routes, route);
-							//???? response_route.getRoutes().get(i).addAttribute("message", mes);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						//???? response_route.getRoutes().get(i).addAttribute("message", mes);
-
-					}*/
 				}
 				Integer min=response_route.getRequest().get().getAcceptedDelayMinutes().get();
 
 				RouteFormatRoot final_route = RouteFormatRoot.builder().withRequestId(response_route.getRequestId()).withRouteFormatVersion(response_route.getRouteFormatVersion()).withProcessedTime(response_route.getProcessedTime()).withStatus(response_route.getStatus()).withCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem()).withRequest(response_route.getRequest().get()).withRoutes(Trips).build();
 				String routeResponseStr = final_route.toString();
-		    	out.println("thimios");
-
-		    	out.println(routeResponseStr);
+				String geoJson = mapper.writeValueAsString(final_route);
+				out.println(geoJson);
 		    }
 		    finally {
 
