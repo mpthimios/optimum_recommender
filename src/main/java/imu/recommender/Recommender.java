@@ -1642,6 +1642,7 @@ public class Recommender extends HttpServlet{
 		return filtered_route;
 
 	}
+
 	public void addTrip(Route trip, List<Route> Trips, String mode) {
 		Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
 		additionalInfoRouteRequest.put("mode", mode);
