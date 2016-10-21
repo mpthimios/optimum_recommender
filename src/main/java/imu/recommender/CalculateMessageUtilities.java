@@ -34,6 +34,9 @@ public class CalculateMessageUtilities {
         //Print all database names
         //System.out.println(mongo.getDatabaseNames());
         DB db = mongo.getDB("Optimum");
+        GetProperties properties = new GetProperties();
+        System.out.println(properties.getPasswordValues());
+        boolean auth =db.authenticate(properties.getUsernameValues(),properties.getPasswordValues().toCharArray());
         DBCollection table = db.getCollection("OptimumMessages");
         //Select the messages where persuasive strategy is Reward
         BasicDBObject searchQuery = new BasicDBObject();
@@ -54,6 +57,7 @@ public class CalculateMessageUtilities {
             contextList.add("WalkingDistance");
         }
 
+        //Check if the distance of route is biking
         if(withinBikeDistance(route_distance)){
             System.out.println("Bike Distance");
             contextList.add("BikeDistance");

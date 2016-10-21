@@ -43,6 +43,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
+import com.sun.xml.internal.ws.message.stream.StreamAttachment;
 import javafx.geometry.BoundingBox;
 import org.apache.http.impl.client.RoutedRequest;
 import org.bitpipeline.lib.owm.WeatherForecastResponse;
@@ -54,7 +55,6 @@ import sun.font.TrueTypeFont;
 import static com.sun.xml.internal.ws.policy.sourcemodel.wspolicy.XmlToken.Optional;
 import static imu.recommender.CalculateMessageUtilities.calculate;
 import static java.lang.System.out;
-
 
 public class Recommender extends HttpServlet{
 
@@ -78,6 +78,8 @@ public class Recommender extends HttpServlet{
 	    	try {
 
 				calculatePercentages("luka");
+				GetProperties properties = new GetProperties();
+				System.out.println(properties.getPasswordValues());
 				RouteFormatRoot response_route = filtering(routes);
 				List<Route> Trips = new ArrayList<Route>();
 				for (int i = 0; i < response_route.getRoutes().size(); i++) {
@@ -96,6 +98,8 @@ public class Recommender extends HttpServlet{
 					Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
 					additionalInfoRouteRequest.put("mode", response_route.getRoutes().get(i).getAdditionalInfo().get("mode"));
 					additionalInfoRouteRequest.put("message", mes);
+					double emissions = CalculateEmissions(route);
+					additionalInfoRouteRequest.put("emissions", emissions);
 					Route r = Route.builder().withFrom(route.getFrom()).withTo(route.getTo()).withOptimizedFor(route.getOptimizedFor().get()).withAdditionalInfo(additionalInfoRouteRequest).withDepartureTime(route.getDepartureTime()).withArrivalTime(route.getArrivalTime()).withDistanceMeters(route.getDistanceMeters()).withDurationSeconds(route.getDurationSeconds()).withSegments(route.getSegments()).build();
 					addTrip(r, Trips);
 
@@ -1491,9 +1495,12 @@ public class Recommender extends HttpServlet{
 						Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
 						additionalInfoRouteRequest.put("mode", response_route.getRoutes().get(i).getAdditionalInfo().get("mode"));
 						additionalInfoRouteRequest.put("message", mes);
+						double emissions = CalculateEmissions(route);
+						additionalInfoRouteRequest.put("emissions", emissions);
 						Route r = Route.builder().withFrom(route.getFrom()).withTo(route.getTo()).withOptimizedFor(route.getOptimizedFor().get()).withAdditionalInfo(additionalInfoRouteRequest).withDepartureTime(route.getDepartureTime()).withArrivalTime(route.getArrivalTime()).withDistanceMeters(route.getDistanceMeters()).withDurationSeconds(route.getDurationSeconds()).withSegments(route.getSegments()).build();
 						addTrip(r, Trips);
 						out.println("<p>"+r.getAdditionalInfo().get("message")+"</p>");
+						out.println("<p>"+r.getAdditionalInfo().get("emissions")+"</p>");
 						out.println("<p>Choice " + (i + 1) + ":<span style='padding-left:68px;'>" +
 								"</span>"+ r.getAdditionalInfo().get("mode")+"<span style='padding-left:68px;'></span>"
 									+ r.getDurationSeconds() + "sec</p>");
@@ -1548,7 +1555,7 @@ public class Recommender extends HttpServlet{
 	    body = stringBuilder.toString();
 	    return body;
 	}
-
+	//Filtering function
 	public RouteFormatRoot filtering(RouteFormatRoot routes){
 		List<Route> Trips = new ArrayList<Route>();
 
@@ -1653,7 +1660,7 @@ public class Recommender extends HttpServlet{
 		Trips.add(Route.builder().withAdditionalInfo(trip.getAdditionalInfo()).withFrom(trip.getFrom()).withOptimizedFor(trip.getOptimizedFor().get()).withTo(trip.getTo()).withDistanceMeters(trip.getDistanceMeters()).withDurationSeconds(trip.getDurationSeconds()).withDepartureTime(trip.getDepartureTime()).withArrivalTime(trip.getArrivalTime()).withSegments(trip.getSegments()).build());
 	}
 
-	 private static void calculatePercentages(String user) throws IOException {
+	private static void calculatePercentages(String user) throws IOException {
 		String url = "http://traffic.ijs.si/NextPinDev/getActivities";
 
 		 URL obj = new URL("http://traffic.ijs.si/NextPinDev/getActivities");
@@ -1750,6 +1757,47 @@ public class Recommender extends HttpServlet{
 		DBCollection table = db.getCollection("OptimumUsers");
 		//Select the messages where persuasive strategy is Reward
 		BasicDBObject searchQuery = new BasicDBObject();
+
+	}
+
+	//Calculate emissions of route
+	private double CalculateEmissions(Route trip) throws IOException {
+		double emissions = 0.0;
+		for (int j = 0; j < trip.getSegments().size(); j++) {
+			RouteSegment segment = trip.getSegments().get(j);
+			String mode = segment.getModeOfTransport().getGeneralizedType().toString();
+			String detailed_mode = segment.getModeOfTransport().getDetailedType().toString();
+			Integer distance = segment.getDistanceMeters();
+			emissions = emissions + CalculateSegmentsEmissions(distance, mode, detailed_mode);
+			}
+		return emissions;
+	}
+
+	private double CalculateSegmentsEmissions(Integer distance, String travel_mode, String detailed_mode) throws IOException {
+		double emissions=0.0;
+		if (travel_mode.equals("FOOT") ){
+			emissions = 0;
+		}
+		if (travel_mode.equals("BICYCLE") ){
+			emissions = 0;
+		}
+		if (travel_mode.equals("PUBLIC_TRANSPORT") ) {
+
+			if (detailed_mode.equals("SUBWAY")) {
+				emissions = ( (double)(distance*20)/1000 );
+			}
+			if (detailed_mode.equals("HEAVY_RAIL")) {
+				emissions = ( (double)(distance*50)/1000 );
+			}
+			if (detailed_mode.equals("BUS")) {
+				emissions = ( (distance*25.5)/1000 );
+			}
+		}
+		if (travel_mode.equals("CAR") ){
+			emissions = ( (double)(distance*110)/1000 );
+		}
+
+		return emissions;
 
 	}
 
