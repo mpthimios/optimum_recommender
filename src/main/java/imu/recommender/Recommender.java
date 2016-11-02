@@ -23,6 +23,11 @@ import at.ac.ait.ariadne.routeformat.geojson.GeoJSONFeatureCollection;
 import at.ac.ait.ariadne.routeformat.geojson.GeoJSONLineString;
 import at.ac.ait.ariadne.routeformat.geojson.GeoJSONPolygon;
 import at.ac.ait.ariadne.routeformat.location.Address;
+import imu.recommender.models.Demographics;
+import imu.recommender.models.OwnedVehicle;
+import imu.recommender.models.Personality;
+import imu.recommender.models.User;
+
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -43,16 +48,17 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
-import com.sun.xml.internal.ws.message.stream.StreamAttachment;
 import javafx.geometry.BoundingBox;
-import org.apache.http.impl.client.RoutedRequest;
 import org.bitpipeline.lib.owm.WeatherForecastResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
+
 import sun.font.TrueTypeFont;
 
-import static com.sun.xml.internal.ws.policy.sourcemodel.wspolicy.XmlToken.Optional;
 import static imu.recommender.CalculateMessageUtilities.calculate;
 import static java.lang.System.out;
 
@@ -142,22 +148,38 @@ public class Recommender extends HttpServlet{
 
 		RouteFormatRoot routes = mapper.readValue(new File(exampleFile), RouteFormatRoot.class);
 
-
 		String mes = null;
 
 		// Set the response message's MIME type
 	    response.setContentType("text/html; charset=UTF-8");
 	    // Allocate a output writer to write the response message into the network socket
 	    PrintWriter out = response.getWriter();
-		boolean PRINT_JSON = false;
+		boolean PRINT_JSON = true;
 
 
 	    // Write the response message, in an HTML page
 	    if (PRINT_JSON){
+	    	Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+	    	User newUser = new User(); 	    	
+	    	mongoDatastore.save(newUser);
+	    	System.out.println(newUser.getId());
+	    	
+	    	ArrayList<OwnedVehicle> userVehicles = new ArrayList<OwnedVehicle>();
+	    	OwnedVehicle newVehicle = new OwnedVehicle();
+	    	userVehicles.add(newVehicle);
+	    	
+	    	Query<User> query = mongoDatastore.createQuery(User.class).field("_id").equal(newUser.getId());
+	    	UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("owned_vehicles", userVehicles);
+
+	    	mongoDatastore.update(query, ops);
+	    
+	    	RouteFormatRoot routeFormat = new RouteFormatRoot();
+	    	System.out.println(routeFormat);
 	    	//String routeResponseStr = RouteParser.routeToJson(route);
 	    	//out.println(routeResponseStr);
 	    }
 	    else{
+
 	    	try {
 		    	out.println("<!DOCTYPE html>");
 		        out.println("<html><head>");
@@ -350,23 +372,14 @@ public class Recommender extends HttpServlet{
 		//Integer min=routes.getRequest().get().getAcceptedDelayMinutes().get();
 		//RoutingRequest request = RoutingRequest.builder().withAcceptedDelayMinutes(min).build();
 
+
 		RouteFormatRoot filtered_route = new RouteFormatRoot();
 				//.setRequestId(routes.getRequestId()).setRouteFormatVersion(routes.getRouteFormatVersion()).setProcessedTime(routes.getProcessedTime()).setStatus(routes.getStatus()).setCoordinateReferenceSystem(routes.getCoordinateReferenceSystem()).setRequest(routes.getRequest().get()).setRoutes(Trips);
 
 		//.withOptimizedFor(trip.getOptimizedFor().toString())
-		return filtered_route;
+		return null;//filtered_route;
 
 	}
-
-	/*public void addTrip(Route trip, List<Route> Trips, String mode) {
-		Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
-		additionalInfoRouteRequest.put("mode", "walk");
-		System.out.println(additionalInfoRouteRequest);
-		Route new_trip = new Route().setFrom(trip.getFrom()).setTo(trip.getTo()).setDistanceMeters(trip.getDistanceMeters()).setDurationSeconds(trip.getDurationSeconds()).setStartTime(trip.getStartTime()).setEndTime(trip.getEndTime());
-		//setAdditionalInfo(additionalInfoRouteRequest).
-		//trip.setAdditionalInfo(additionalInfoRouteRequest);
-		Trips.add(new_trip);
-	} */
 
 	public void addTrip(Route trip, List<Route> Trips) {
 		Trips.add(trip);
