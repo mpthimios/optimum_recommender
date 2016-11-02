@@ -50,6 +50,11 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>2.10.1</version>
         </dependency>
+        <dependency>
+              <groupId>org.mongodb.morphia</groupId>
+              <artifactId>morphia</artifactId>
+              <version>1.2.1</version>
+          </dependency>
         
         <!-- Servlet -->
 		<dependency>
@@ -87,7 +92,7 @@
         </dependency>
 
         <dependency>
-			<groupId>com.google.guava</groupId>
+        	<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
 		</dependency>
