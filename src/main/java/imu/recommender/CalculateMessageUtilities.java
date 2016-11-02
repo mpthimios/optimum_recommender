@@ -26,7 +26,8 @@ public class CalculateMessageUtilities {
         Integer route_distance=trip.getDistanceMeters();
         Float lat = trip.getFrom().getCoordinate().geometry.coordinates.get(0).floatValue();
         Float lon = trip.getFrom().getCoordinate().geometry.coordinates.get(1).floatValue();
-        String city = trip.getFrom().getAddress().get().getCity().get();
+        String city = "Vienna";
+        //String city = trip.getFrom().getAddress().get().getCity().get();
         Integer duration = trip.getDurationSeconds();
 
         //Connect to mongodb

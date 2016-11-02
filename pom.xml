@@ -72,13 +72,21 @@
 		
 		<!-- Ait sprout Dependencies -->
 		
-		<dependency>
+		<!-- <dependency>
 	        <groupId>ait</groupId>
 	        <artifactId>ariadne-json-route-format</artifactId>
 	        <version>0.13-SNAPSHOT</version>        
-	    </dependency>
-	    
-	    <dependency>
+	    </dependency> -->
+
+        <!-- Ait sprout-new version Dependencies -->
+
+         <dependency>
+            <groupId>ait</groupId>
+            <artifactId>ariadne-json-route-format</artifactId>
+            <version>0.16-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>

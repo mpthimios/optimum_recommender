@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: ait:ariadne-json-route-format:0.16-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/ait/ariadne-json-route-format/0.16-SNAPSHOT/ariadne-json-route-format-0.16-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/ait/ariadne-json-route-format/0.16-SNAPSHOT/ariadne-json-route-format-0.16-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/ait/ariadne-json-route-format/0.16-SNAPSHOT/ariadne-json-route-format-0.16-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
