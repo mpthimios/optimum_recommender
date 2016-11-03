@@ -1,0 +1,264 @@
+{
+	"routeFormatVersion" : "0.14-SNAPSHOT",
+	"requestId" : "1880",
+	"processedTime" : "2016-10-31T16:47:52.565+01:00[Europe/Vienna]",
+	"status" : "OK",
+	"coordinateReferenceSystem" : "EPSG:4326",
+	"request" : {
+		"serviceId" : "at.ac.ait.optimum",
+		"from" : {
+			"type" : "Location",
+			"coordinate" : {
+				"type" : "Feature",
+				"geometry" : {
+					"type" : "Point",
+					"coordinates" : [14.49019432067871, 46.03546678928622]
+				},
+				"properties" : {}
+			}
+		},
+		"to" : {
+			"type" : "Location",
+			"coordinate" : {
+				"type" : "Feature",
+				"geometry" : {
+					"type" : "Point",
+					"coordinates" : [14.53989028930664, 46.05721095297774]
+				},
+				"properties" : {}
+			}
+		},
+		"modesOfTransport" : [{
+				"type" : "RequestModeOfTransport",
+				"modeOfTransport" : {
+					"generalizedType" : "FOOT",
+					"detailedType" : "FOOT"
+				}
+			}, {
+				"type" : "RequestModeOfTransport",
+				"modeOfTransport" : {
+					"generalizedType" : "PUBLIC_TRANSPORT"
+				}
+			}
+		],
+		"optimizedFor" : "traveltime",
+		"departureTime" : "2016-10-31T16:47:52+01:00[Europe/Vienna]"
+	},
+	"routes" : [{
+			"from" : {
+				"type" : "Location",
+				"coordinate" : {
+					"type" : "Feature",
+					"geometry" : {
+						"type" : "Point",
+						"coordinates" : [14.4904818, 46.0355099]
+					},
+					"properties" : {}
+				}
+			},
+			"to" : {
+				"type" : "Location",
+				"coordinate" : {
+					"type" : "Feature",
+					"geometry" : {
+						"type" : "Point",
+						"coordinates" : [14.5398884, 46.0572492]
+					},
+					"properties" : {}
+				}
+			},
+			"distanceMeters" : 6703,
+			"durationSeconds" : 2469,
+			"startTime" : "2016-10-31T16:47:52+01:00[Europe/Vienna]",
+			"endTime" : "2016-10-31T17:29:01+01:00[Europe/Vienna]",
+			"boundingBox" : {
+				"type" : "Feature",
+				"geometry" : {
+					"type" : "Polygon",
+					"coordinates" : [[[14.4884422, 46.0355099], [14.4884422, 46.0584335], [14.5398884, 46.0584335], [14.5398884, 46.0355099], [14.4884422, 46.0355099]]]
+				},
+				"properties" : {}
+			},
+			"segments" : [{
+					"nr" : 1,
+					"from" : {
+						"type" : "Location",
+						"coordinate" : {
+							"type" : "Feature",
+							"geometry" : {
+								"type" : "Point",
+								"coordinates" : [14.4904818, 46.0355099]
+							},
+							"properties" : {}
+						}
+					},
+					"to" : {
+						"type" : "Location",
+						"coordinate" : {
+							"type" : "Feature",
+							"geometry" : {
+								"type" : "Point",
+								"coordinates" : [14.4896849, 46.0367157]
+							},
+							"properties" : {}
+						}
+					},
+					"distanceMeters" : 279,
+					"durationSeconds" : 205,
+					"modeOfTransport" : {
+						"generalizedType" : "FOOT",
+						"detailedType" : "FOOT"
+					},
+					"boardingSeconds" : 0,
+					"alightingSeconds" : 103,
+					"startTime" : "2016-10-31T16:47:52+01:00[Europe/Vienna]",
+					"endTime" : "2016-10-31T16:51:17+01:00[Europe/Vienna]",
+					"geometryGeoJson" : {
+						"type" : "Feature",
+						"geometry" : {
+							"type" : "LineString",
+							"coordinates" : [[14.4904818, 46.0355099], [14.4903011, 46.0360909], [14.4901381, 46.0365486], [14.4904737, 46.0366402], [14.4905586, 46.0366592], [14.4906931, 46.0366783], [14.4906244, 46.0369911], [14.4900866, 46.0368690], [14.4896849, 46.0367157]]
+						},
+						"properties" : {}
+					}
+				}, {
+					"nr" : 2,
+					"from" : {
+						"type" : "PublicTransportStop",
+						"coordinate" : {
+							"type" : "Feature",
+							"geometry" : {
+								"type" : "Point",
+								"coordinates" : [14.4896849, 46.0367157]
+							},
+							"properties" : {}
+						},
+						"name" : "Krimska"
+					},
+					"to" : {
+						"type" : "PublicTransportStop",
+						"coordinate" : {
+							"type" : "Feature",
+							"geometry" : {
+								"type" : "Point",
+								"coordinates" : [14.5042211, 46.0539323]
+							},
+							"properties" : {}
+						},
+						"name" : "Ajdovscina"
+					},
+					"distanceMeters" : 2679,
+					"durationSeconds" : 823,
+					"modeOfTransport" : {
+						"generalizedType" : "PUBLIC_TRANSPORT",
+						"detailedType" : "BUS",
+						"service" : {
+							"name" : "01"
+						}
+					},
+					"boardingSeconds" : 0,
+					"alightingSeconds" : 0,
+					"startTime" : "2016-10-31T16:51:17+01:00[Europe/Vienna]",
+					"endTime" : "2016-10-31T17:05+01:00[Europe/Vienna]",
+					"geometryGeoJson" : {
+						"type" : "Feature",
+						"geometry" : {
+							"type" : "LineString",
+							"coordinates" : [[14.4896849, 46.0367157], [14.4898870, 46.0407422], [14.4884422, 46.0436221], [14.4902892, 46.0459118], [14.4944646, 46.0469033], [14.4987157, 46.0467284], [14.5019478, 46.0490623], [14.5034508, 46.0522258], [14.5042211, 46.0539323]]
+						},
+						"properties" : {}
+					}
+				}, {
+					"nr" : 3,
+					"from" : {
+						"type" : "PublicTransportStop",
+						"coordinate" : {
+							"type" : "Feature",
+							"geometry" : {
+								"type" : "Point",
+								"coordinates" : [14.5042211, 46.0539323]
+							},
+							"properties" : {}
+						},
+						"name" : "Ajdovscina"
+					},
+					"to" : {
+						"type" : "PublicTransportStop",
+						"coordinate" : {
+							"type" : "Feature",
+							"geometry" : {
+								"type" : "Point",
+								"coordinates" : [14.5339333, 46.0556251]
+							},
+							"properties" : {}
+						},
+						"name" : "Trznica Moste"
+					},
+					"distanceMeters" : 2933,
+					"durationSeconds" : 840,
+					"modeOfTransport" : {
+						"generalizedType" : "PUBLIC_TRANSPORT",
+						"detailedType" : "BUS",
+						"service" : {
+							"name" : "09"
+						}
+					},
+					"boardingSeconds" : 120,
+					"alightingSeconds" : 0,
+					"startTime" : "2016-10-31T17:05+01:00[Europe/Vienna]",
+					"endTime" : "2016-10-31T17:19+01:00[Europe/Vienna]",
+					"geometryGeoJson" : {
+						"type" : "Feature",
+						"geometry" : {
+							"type" : "LineString",
+							"coordinates" : [[14.5042211, 46.0539323], [14.5054485, 46.0564306], [14.5109612, 46.0576361], [14.5167637, 46.0575942], [14.5191036, 46.0535857], [14.5209439, 46.0523898], [14.5289185, 46.0543760], [14.5339333, 46.0556251]]
+						},
+						"properties" : {}
+					}
+				}, {
+					"nr" : 4,
+					"from" : {
+						"type" : "Location",
+						"coordinate" : {
+							"type" : "Feature",
+							"geometry" : {
+								"type" : "Point",
+								"coordinates" : [14.5339333, 46.0556251]
+							},
+							"properties" : {}
+						}
+					},
+					"to" : {
+						"type" : "Location",
+						"coordinate" : {
+							"type" : "Feature",
+							"geometry" : {
+								"type" : "Point",
+								"coordinates" : [14.5398884, 46.0572492]
+							},
+							"properties" : {}
+						}
+					},
+					"distanceMeters" : 812,
+					"durationSeconds" : 601,
+					"modeOfTransport" : {
+						"generalizedType" : "FOOT",
+						"detailedType" : "FOOT"
+					},
+					"boardingSeconds" : 0,
+					"alightingSeconds" : 0,
+					"startTime" : "2016-10-31T17:19+01:00[Europe/Vienna]",
+					"endTime" : "2016-10-31T17:29:01+01:00[Europe/Vienna]",
+					"geometryGeoJson" : {
+						"type" : "Feature",
+						"geometry" : {
+							"type" : "LineString",
+							"coordinates" : [[14.5339333, 46.0556251], [14.5339527, 46.0556030], [14.5338707, 46.0557861], [14.5336466, 46.0562859], [14.5335579, 46.0564842], [14.5333948, 46.0568504], [14.5354366, 46.0572319], [14.5356331, 46.0572662], [14.5384741, 46.0582581], [14.5390291, 46.0584335], [14.5390081, 46.0575218], [14.5391541, 46.0572319], [14.5398884, 46.0572492]]
+						},
+						"properties" : {}
+					}
+				}
+			]
+		}
+	]
+}

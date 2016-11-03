@@ -141,11 +141,13 @@ public class Recommender extends HttpServlet{
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-		String exampleFile = "src/main/resources/route1.txt";
+		String exampleFile = "src/main/resources/route.txt";
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.findAndRegisterModules();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
+		RouteFormatRoot newroute = new RouteFormatRoot();
+		Route newr = new Route();
 		RouteFormatRoot routes = mapper.readValue(new File(exampleFile), RouteFormatRoot.class);
 
 		String mes = null;
@@ -177,67 +179,70 @@ public class Recommender extends HttpServlet{
 	    	System.out.println(routeFormat);
 	    	//String routeResponseStr = RouteParser.routeToJson(route);
 	    	//out.println(routeResponseStr);
-	    }
-	    else{
+			out.println("<!DOCTYPE html>");
+			out.println("<html><head>");
+			out.println("<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>");
+			out.println("<title>Echo Servlet</title></head>");
+			Route route1 = routes.getRoutes().get(0);
+			System.out.println(routes.getRoutes().get(0));
+			Optional<Address> address =route1.getFrom().getAddress();
+			if (address.isPresent()){
+				java.util.Optional<String> city = address.get().getCity();
+				address.get().getStreetName();
+			}
+			Optional<Address> address_dest=route1.getTo().getAddress();
 
-	    	try {
-		    	out.println("<!DOCTYPE html>");
-		        out.println("<html><head>");
-		        out.println("<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>");
-		        out.println("<title>Echo Servlet</title></head>");
-				Route route1 = routes.getRoutes().get(0);
-				Optional<Address> address =route1.getFrom().getAddress();
-				if (address.isPresent()){
-					java.util.Optional<String> city = address.get().getCity();
-					address.get().getStreetName();
-				}
-				Optional<Address> address_dest=route1.getTo().getAddress();
-
-				if (address.isPresent() && address_dest.isPresent()) {
-					out.println("<h3>Alternatives Routes from " + address.get().getStreetName().get() + " to " + address_dest.get().getStreetName().get() + "					:</h3>");
-				}
+			if (address.isPresent() && address_dest.isPresent()) {
+				out.println("<h3>Alternatives Routes from " + address.get().getStreetName().get() + " to " + address_dest.get().getStreetName().get() + "					:</h3>");
+			}
+			try {
+				//filter route
 				try {
-					//filter route
-					try {
-						calculatePercentages("luka");
-					}
-					catch (Exception e) {
-						e.printStackTrace();
-					}
-					RouteFormatRoot response_route = new RouteFormatRoot();//filtering(routes);
-					List<Route> Trips = new ArrayList<Route>();
-					for (int i = 0; i < response_route.getRoutes().size(); i++) {
-						Route route = response_route.getRoutes().get(i);
-						if (response_route.getRoutes().get(i).getAdditionalInfo().get("mode")=="car"){
-							mes =  "";
-						}
-						else{
-							mes = calculate(response_route, route);
-						}
-						Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
-						additionalInfoRouteRequest.put("mode", response_route.getRoutes().get(i).getAdditionalInfo().get("mode"));
-						additionalInfoRouteRequest.put("message", mes);
-						double emissions = CalculateEmissions(route);
-						additionalInfoRouteRequest.put("emissions", emissions);
-						response_route.getRoutes().get(i).setAdditionalInfo(additionalInfoRouteRequest);
-						//Route r = Route.builder().withFrom(route.getFrom()).withTo(route.getTo()).withOptimizedFor(route.getOptimizedFor().get()).withAdditionalInfo(additionalInfoRouteRequest).withDepartureTime(route.getStartTime()).withArrivalTime(route.getEndTime()).withDistanceMeters(route.getDistanceMeters()).withDurationSeconds(route.getDurationSeconds()).withSegments(route.getSegments()).build();
-						//addTrip(r, Trips);
-						out.println("<p>"+response_route.getRoutes().get(i).getAdditionalInfo().get("message")+"</p>");
-						out.println("<p>"+response_route.getRoutes().get(i).getAdditionalInfo().get("emissions")+"</p>");
-						out.println("<p>Choice " + (i + 1) + ":<span style='padding-left:68px;'>" +
-								"</span>"+ response_route.getRoutes().get(i).getAdditionalInfo().get("mode")+"<span style='padding-left:68px;'></span>"
-									+ response_route.getRoutes().get(i).getDurationSeconds() + "sec</p>");
-
-					}
-					//Integer min=response_route.getRequest().get().getAcceptedDelayMinutes().get();
-					//RoutingRequest request = RoutingRequest.builder().withAcceptedDelayMinutes(min).build();
-
-					//RouteFormatRoot final_route = RouteFormatRoot.builder().withRequestId(response_route.getRequestId()).withRouteFormatVersion(response_route.getRouteFormatVersion()).withProcessedTime(response_route.getProcessedTime()).withStatus(response_route.getStatus()).withCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem()).withRequest(response_route.getRequest().get()).withRoutes(Trips).build();
-
-				} catch (Exception e) {
+					calculatePercentages("luka");
+				}
+				catch (Exception e) {
 					e.printStackTrace();
 				}
+				System.out.println(routes);
+				RouteFormatRoot response_route = filtering(routes);
+				System.out.print(routes.getRoutes().size());
+				List<Route> Trips = new ArrayList<Route>();
+				for (int i = 0; i < response_route.getRoutes().size(); i++) {
+					Route route = response_route.getRoutes().get(i);
+					if (response_route.getRoutes().get(i).getAdditionalInfo().get("mode")=="car"){
+						mes =  "";
+					}
+					else{
+						mes = calculate(response_route, route);
+					}
+					Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+					additionalInfoRouteRequest.put("mode", response_route.getRoutes().get(i).getAdditionalInfo().get("mode"));
+					additionalInfoRouteRequest.put("message", mes);
+					double emissions = CalculateEmissions(route);
+					additionalInfoRouteRequest.put("emissions", emissions);
+					//Route r = new Route().setFrom(route.getFrom()).setTo(route.getTo()).setOptimizedFor(route.getOptimizedFor().get()).setAdditionalInfo(additionalInfoRouteRequest).setStartTime(route.getStartTime()).setEndTime(route.getEndTime()).setDistanceMeters(route.getDistanceMeters()).setDurationSeconds(route.getDurationSeconds()).setSegments(route.getSegments());
+							//.setRequestId(response_route.getRequestId()).setRouteFormatVersion(response_route.getRouteFormatVersion()).setProcessedTime(response_route.getProcessedTime()).setStatus(response_route.getStatus()).setCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem()).setRequest(response_route.getRequest().get()).setRoutes(Trips);
 
+					response_route.getRoutes().get(i).setAdditionalInfo(additionalInfoRouteRequest);
+					//Route r = Route.builder().withFrom(route.getFrom()).withTo(route.getTo()).withOptimizedFor(route.getOptimizedFor().get()).withAdditionalInfo(additionalInfoRouteRequest).withDepartureTime(route.getStartTime()).withArrivalTime(route.getEndTime()).withDistanceMeters(route.getDistanceMeters()).withDurationSeconds(route.getDurationSeconds()).withSegments(route.getSegments()).build();
+					//addTrip(r, Trips);
+					RouteFormatRoot final_route = new RouteFormatRoot().setRequestId(response_route.getRequestId()).setRouteFormatVersion(response_route.getRouteFormatVersion()).setProcessedTime(response_route.getProcessedTime()).setStatus(response_route.getStatus()).setCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem()).setRequest(response_route.getRequest().get()).setRoutes(response_route.getRoutes());
+
+					out.println("<p>"+final_route.getRoutes().get(i).getAdditionalInfo().get("message")+"</p>");
+					out.println("<p>"+final_route.getRoutes().get(i).getAdditionalInfo().get("emissions")+"</p>");
+					out.println("<p>Choice " + (i + 1) + ":<span style='padding-left:68px;'>" +
+							"</span>"+ final_route.getRoutes().get(i).getAdditionalInfo().get("mode")+"<span style='padding-left:68px;'></span>"
+							+ final_route.getRoutes().get(i).getDurationSeconds() + "sec</p>");
+
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	    }
+	    else{
+	    	try {
+				out.println("error");
 		    }
 		    finally {
 
@@ -281,7 +286,7 @@ public class Recommender extends HttpServlet{
 	//Filtering function
 	public RouteFormatRoot filtering(RouteFormatRoot routes){
 		List<Route> Trips = new ArrayList<Route>();
-
+		System.out.print(routes.getRoutes().size());
 		for (int i = 0; i < routes.getRoutes().size(); i++) {
 			Route trip = routes.getRoutes().get(i);
 			boolean car_owner = false;
@@ -294,24 +299,26 @@ public class Recommender extends HttpServlet{
 				RouteSegment segment = trip.getSegments().get(j);
 				String mode = segment.getModeOfTransport().toString();
 						//.getGeneralizedType().toString();
-				System.out.println(mode);
 				if (!Modes.contains(mode)) {
 					Modes.add(mode);
 				}
 			}
 			String mode="";
 			System.out.println(Modes);
-			if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.size()==2){
-				mode="pt";
+			if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE")  ){
+				mode="park&ride_with_bike";
 			}
-			else if (Modes.contains("CAR") && Modes.contains("FOOT") && Modes.size()==2){
-				mode="car";
-			}
-			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.size()==3){
+			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") ){
 				mode="park&ride";
 			}
-			else if (Modes.contains("BICYCLE") && Modes.contains("FOOT") && Modes.contains("PUBLIC_TRANSPORT") && Modes.size()==3){
+			else if (Modes.contains("BICYCLE") && Modes.contains("FOOT") && Modes.contains("PUBLIC_TRANSPORT") ){
 				mode="bike&ride";
+			}
+			else if (Modes.contains("PUBLIC_TRANSPORT-BUS 01") && Modes.contains("FOOT-FOOT") ){
+				mode="pt";
+			}
+			else if (Modes.contains("CAR") && Modes.contains("FOOT") ){
+				mode="car";
 			}
 			else if (Modes.contains("FOOT") && Modes.size()==1 ){
 				mode="walk";
@@ -325,28 +332,22 @@ public class Recommender extends HttpServlet{
 			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.size()==1 ){
 				mode="pt";
 			}
-			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE") && Modes.size()==4 ){
-					mode="park&ride_with_bike";
-			}
 			else {
 				mode="unknown";
 			}
-			//System.out.println(Trips.get(0).getAdditionalInfo().get("mode"));
 			//Filter out routes
 			//Filter out car and park and ride modes for users that don’t own a car.
 			if(!car_owner) {
 				if (mode.equals("car") || mode.equals("park&ride")) {
 					continue;
 				} else {
-					//addTrip(trip, Trips, mode);
-					addTrip(trip, Trips);
+					addTrip(trip, Trips, mode);
 				}
 			}
 			//Filter out bike modes for users that don’t own a bike and for routes containing biking more than 3 Km
 			else if (mode.equals("bike")){
 				if((bike_owner) && (trip.getDistanceMeters()<3000)){
-					//addTrip(trip,Trips, mode);
-					addTrip(trip, Trips);
+					addTrip(trip,Trips, mode);
 				}
 				else{
 					continue;
@@ -355,8 +356,7 @@ public class Recommender extends HttpServlet{
 			//Filter out walk modes for routes containing walking more than 1 Km
 			else if(mode.equals("walk")){
 				if(trip.getDistanceMeters()<1000){
-					//addTrip(trip,Trips,mode);
-					addTrip(trip, Trips);
+					addTrip(trip,Trips,mode);
 				}
 				else{
 					continue;
@@ -373,16 +373,24 @@ public class Recommender extends HttpServlet{
 		//RoutingRequest request = RoutingRequest.builder().withAcceptedDelayMinutes(min).build();
 
 
-		RouteFormatRoot filtered_route = new RouteFormatRoot();
-				//.setRequestId(routes.getRequestId()).setRouteFormatVersion(routes.getRouteFormatVersion()).setProcessedTime(routes.getProcessedTime()).setStatus(routes.getStatus()).setCoordinateReferenceSystem(routes.getCoordinateReferenceSystem()).setRequest(routes.getRequest().get()).setRoutes(Trips);
-
-		//.withOptimizedFor(trip.getOptimizedFor().toString())
-		return null;//filtered_route;
+		RouteFormatRoot filtered_route = new RouteFormatRoot().setRequestId(routes.getRequestId()).setRouteFormatVersion(routes.getRouteFormatVersion()).setProcessedTime(routes.getProcessedTime()).setStatus(routes.getStatus()).setCoordinateReferenceSystem(routes.getCoordinateReferenceSystem()).setRequest(routes.getRequest().get()).setRoutes(Trips);
+				//setOptimizedFor(trip.getOptimizedFor().toString())
+		System.out.println(filtered_route);
+		return filtered_route;
 
 	}
 
 	public void addTrip(Route trip, List<Route> Trips) {
 		Trips.add(trip);
+	}
+
+	public void addTrip(Route trip, List<Route> Trips, String mode) {
+		Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+		additionalInfoRouteRequest.put("mode", mode);
+		System.out.println(additionalInfoRouteRequest);
+		Route new_trip = new Route().setFrom(trip.getFrom()).setTo(trip.getTo()).setDistanceMeters(trip.getDistanceMeters()).setDurationSeconds(trip.getDurationSeconds()).setStartTime(trip.getStartTime()).setEndTime(trip.getEndTime()).setAdditionalInfo(additionalInfoRouteRequest);
+		addTrip(new_trip, Trips);
+		Trips.add(new_trip);
 	}
 
 	private static void calculatePercentages(String user) throws IOException {
