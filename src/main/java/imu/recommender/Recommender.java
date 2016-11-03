@@ -49,6 +49,8 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
 import javafx.geometry.BoundingBox;
+
+import org.apache.log4j.Logger;
 import org.bitpipeline.lib.owm.WeatherForecastResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,6 +67,7 @@ import static java.lang.System.out;
 public class Recommender extends HttpServlet{
 
 	private static boolean PRINT_JSON = true;
+	private Logger logger = Logger.getLogger(Recommender.class);
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -91,7 +94,7 @@ public class Recommender extends HttpServlet{
 					e.printStackTrace();
 				}
 				GetProperties properties = new GetProperties();
-				System.out.println(properties.getPasswordValues());
+				logger.debug(properties.getPasswordValues());
 				RouteFormatRoot response_route = filtering(routes);
 				List<Route> Trips = new ArrayList<Route>();
 				for (int i = 0; i < response_route.getRoutes().size(); i++) {
@@ -164,7 +167,7 @@ public class Recommender extends HttpServlet{
 	    	Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 	    	User newUser = new User(); 	    	
 	    	mongoDatastore.save(newUser);
-	    	System.out.println(newUser.getId());
+	    	logger.debug(newUser.getId());
 	    	
 	    	ArrayList<OwnedVehicle> userVehicles = new ArrayList<OwnedVehicle>();
 	    	OwnedVehicle newVehicle = new OwnedVehicle();
@@ -176,7 +179,7 @@ public class Recommender extends HttpServlet{
 	    	mongoDatastore.update(query, ops);
 	    
 	    	RouteFormatRoot routeFormat = new RouteFormatRoot();
-	    	System.out.println(routeFormat);
+	    	logger.debug(routeFormat);
 	    	//String routeResponseStr = RouteParser.routeToJson(route);
 	    	//out.println(routeResponseStr);
 			out.println("<!DOCTYPE html>");
@@ -184,7 +187,7 @@ public class Recommender extends HttpServlet{
 			out.println("<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>");
 			out.println("<title>Echo Servlet</title></head>");
 			Route route1 = routes.getRoutes().get(0);
-			System.out.println(routes.getRoutes().get(0));
+			logger.debug(routes.getRoutes().get(0));
 			Optional<Address> address =route1.getFrom().getAddress();
 			if (address.isPresent()){
 				java.util.Optional<String> city = address.get().getCity();
@@ -203,9 +206,9 @@ public class Recommender extends HttpServlet{
 				catch (Exception e) {
 					e.printStackTrace();
 				}
-				System.out.println(routes);
+				logger.debug(routes);
 				RouteFormatRoot response_route = filtering(routes);
-				System.out.print(routes.getRoutes().size());
+				logger.debug(routes.getRoutes().size());
 				List<Route> Trips = new ArrayList<Route>();
 				for (int i = 0; i < response_route.getRoutes().size(); i++) {
 					Route route = response_route.getRoutes().get(i);
@@ -286,12 +289,12 @@ public class Recommender extends HttpServlet{
 	//Filtering function
 	public RouteFormatRoot filtering(RouteFormatRoot routes){
 		List<Route> Trips = new ArrayList<Route>();
-		System.out.print(routes.getRoutes().size());
+		logger.debug(routes.getRoutes().size());
 		for (int i = 0; i < routes.getRoutes().size(); i++) {
 			Route trip = routes.getRoutes().get(i);
 			boolean car_owner = false;
 			boolean bike_owner = true;
-			System.out.println(trip.getFrom());
+			logger.debug(trip.getFrom());
 			trip.getFrom().getCoordinate().geometry.coordinates.get(0);
 			//Find the mode of the route searching segments of the route
 			List<String> Modes = new ArrayList<String>();
@@ -304,7 +307,7 @@ public class Recommender extends HttpServlet{
 				}
 			}
 			String mode="";
-			System.out.println(Modes);
+			logger.debug(Modes);
 			if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE")  ){
 				mode="park&ride_with_bike";
 			}
@@ -375,7 +378,7 @@ public class Recommender extends HttpServlet{
 
 		RouteFormatRoot filtered_route = new RouteFormatRoot().setRequestId(routes.getRequestId()).setRouteFormatVersion(routes.getRouteFormatVersion()).setProcessedTime(routes.getProcessedTime()).setStatus(routes.getStatus()).setCoordinateReferenceSystem(routes.getCoordinateReferenceSystem()).setRequest(routes.getRequest().get()).setRoutes(Trips);
 				//setOptimizedFor(trip.getOptimizedFor().toString())
-		System.out.println(filtered_route);
+		logger.debug(filtered_route);
 		return filtered_route;
 
 	}
@@ -387,13 +390,13 @@ public class Recommender extends HttpServlet{
 	public void addTrip(Route trip, List<Route> Trips, String mode) {
 		Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
 		additionalInfoRouteRequest.put("mode", mode);
-		System.out.println(additionalInfoRouteRequest);
+		logger.debug(additionalInfoRouteRequest);
 		Route new_trip = new Route().setFrom(trip.getFrom()).setTo(trip.getTo()).setDistanceMeters(trip.getDistanceMeters()).setDurationSeconds(trip.getDurationSeconds()).setStartTime(trip.getStartTime()).setEndTime(trip.getEndTime()).setAdditionalInfo(additionalInfoRouteRequest);
 		addTrip(new_trip, Trips);
 		Trips.add(new_trip);
 	}
 
-	private static void calculatePercentages(String user) throws IOException {
+	private void calculatePercentages(String user) throws IOException {
 		String url = "http://traffic.ijs.si/NextPinDev/getActivities";
 
 		 URL obj = new URL("http://traffic.ijs.si/NextPinDev/getActivities");
@@ -405,8 +408,8 @@ public class Recommender extends HttpServlet{
 		con.setRequestProperty("token",user);
 
 		int responseCode = con.getResponseCode();
-		System.out.println("\nSending 'GET' request to URL : " + url);
-		System.out.println("Response Code : " + responseCode);
+		logger.debug("\nSending 'GET' request to URL : " + url);
+		logger.debug("Response Code : " + responseCode);
 
 		BufferedReader in = new BufferedReader(
 				new InputStreamReader(con.getInputStream()));
@@ -418,7 +421,7 @@ public class Recommender extends HttpServlet{
 		}
 		in.close();
 		//print result
-		System.out.println(response.toString());
+		logger.debug(response.toString());
 		 //JSONObject jsonObj = new JSONObject(response);
 		 //Iterator<String> keys = jsonObj.keys();
 		 try {
@@ -426,13 +429,13 @@ public class Recommender extends HttpServlet{
 
 			 //JSONArray jsonarr= json.getJSONArray("address");
 			 //String address = jsonarr.getJSONObject(0).getString("addressLine1");
-			 System.out.println(jsonObj.getJSONArray("data"));
+			 logger.debug(jsonObj.getJSONArray("data"));
 			 JSONArray arr = jsonObj.getJSONArray("data");
 			 Integer n_car=0;
 			 Integer n_pt=0;
 			 Integer n_bike=0;
 			 Integer n_walk=0;
-			 System.out.println(arr);
+			 logger.debug(arr);
 			 for (int i = 0; i < arr.length(); i++) {
 				 String [] all_modes = {"car", "pt", "bike", "walk"};
 				 Random random = new Random();
@@ -457,7 +460,7 @@ public class Recommender extends HttpServlet{
 				 if (mode.equals("walk") ){
 					 n_walk++;
 				 }
-				 //System.out.println(arr.getJSONObject(i).get("mode"));
+				 //logger.debug(arr.getJSONObject(i).get("mode"));
 			 }
 			 //Calculate percentages
 			 double car_percent = ( (double)(n_car*100)/(double) arr.length());
@@ -465,10 +468,10 @@ public class Recommender extends HttpServlet{
 			 double bike_percent = ( (double)(n_bike*100)/(double) arr.length());
 			 double walk_percent = ( (double)(n_walk*100)/(double) arr.length());
 			 //percentages should be saved to mongo
-			 System.out.println(car_percent);
-			 System.out.println(pt_percent);
-			 System.out.println(bike_percent);
-			 System.out.println(walk_percent);
+			 logger.debug(car_percent);
+			 logger.debug(pt_percent);
+			 logger.debug(bike_percent);
+			 logger.debug(walk_percent);
 		 } catch (JSONException e) {
 			 e.printStackTrace();
 		 }
@@ -485,7 +488,7 @@ public class Recommender extends HttpServlet{
 			e.printStackTrace();
 		}
 		//Print all database names
-		//System.out.println(mongo.getDatabaseNames());
+		//logger.debug(mongo.getDatabaseNames());
 		DB db = mongo.getDB("Optimum");
 		DBCollection table = db.getCollection("OptimumUsers");
 		//Select the messages where persuasive strategy is Reward
