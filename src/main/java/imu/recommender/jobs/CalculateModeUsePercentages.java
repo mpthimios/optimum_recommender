@@ -32,7 +32,7 @@ import imu.recommender.models.User;
 public class CalculateModeUsePercentages implements Job {
 	
 	private Logger logger = Logger.getLogger(CalculateModeUsePercentages.class);
-	private final String activitiesUrl = "http://traffic.ijs.si/NextPinDev/getActivities";
+	private final String activitiesUrl = "http://traffic.ijs.si/NextPin/getActivities";
 	
     @Override
     public void execute(final JobExecutionContext ctx)

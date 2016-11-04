@@ -86,7 +86,7 @@ public class Recommender extends HttpServlet{
 
 	    if (PRINT_JSON){
 	    	try {
-				
+
 				GetProperties properties = new GetProperties();
 				logger.debug(properties.getPasswordValues());
 				RouteFormatRoot response_route = filtering(routes);

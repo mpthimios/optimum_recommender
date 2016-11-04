@@ -51,7 +51,7 @@ public class User {
 	public User(){
 		//initialize variables
 		this.name = "John";
-		this.access_token = "";
+		this.access_token = "lukaios";
 		this.bikeUsage = 0.0;
 		this.bikeUsageComparedToOthers = 0.0;
 		this.carUsage = 0.0;
