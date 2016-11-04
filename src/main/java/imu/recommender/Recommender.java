@@ -379,8 +379,7 @@ public class Recommender extends HttpServlet{
 		Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
 		additionalInfoRouteRequest.put("mode", mode);
 		logger.debug(additionalInfoRouteRequest);
-		Route new_trip = new Route().setFrom(trip.getFrom()).setTo(trip.getTo()).setDistanceMeters(trip.getDistanceMeters()).setDurationSeconds(trip.getDurationSeconds()).setStartTime(trip.getStartTime()).setEndTime(trip.getEndTime()).setAdditionalInfo(additionalInfoRouteRequest);
-		addTrip(new_trip, Trips);
+		Route new_trip = new Route().setFrom(trip.getFrom()).setTo(trip.getTo()).setDistanceMeters(trip.getDistanceMeters()).setDurationSeconds(trip.getDurationSeconds()).setStartTime(trip.getStartTime()).setEndTime(trip.getEndTime()).setAdditionalInfo(additionalInfoRouteRequest).setSegments(trip.getSegments());
 		Trips.add(new_trip);
 	}
 

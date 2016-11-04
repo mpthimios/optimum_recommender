@@ -1,0 +1,747 @@
+{
+    "routeFormatVersion" : "0.14-SNAPSHOT",
+    "requestId" : "1669",
+    "processedTime" : "2016-10-27T13:05:39.194+02:00[Europe/Vienna]",
+    "status" : "OK",
+    "coordinateReferenceSystem" : "EPSG:4326",
+    "request" : {
+        "serviceId" : "at.ac.ait.optimum",
+        "from" : {
+            "type" : "Location",
+            "coordinate" : {
+                "type" : "Feature",
+                "geometry" : {
+                    "type" : "Point",
+                    "coordinates" : [14.493627548217773, 46.04976528525784]
+                },
+                "properties" : {}
+            }
+        },
+        "to" : {
+            "type" : "Location",
+            "coordinate" : {
+                "type" : "Feature",
+                "geometry" : {
+                    "type" : "Point",
+                    "coordinates" : [14.513111114501953, 46.05893820443016]
+                },
+                "properties" : {}
+            }
+        },
+        "modesOfTransport" : [{
+                "type" : "RequestModeOfTransport",
+                "modeOfTransport" : {
+                    "generalizedType" : "FOOT",
+                    "detailedType" : "FOOT"
+                }
+            }, {
+                "type" : "RequestModeOfTransport",
+                "modeOfTransport" : {
+                    "generalizedType" : "BICYCLE",
+                    "detailedType" : "BICYCLE"
+                },
+                "locations" : [{
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.493627548217773, 46.04976528525784]
+                            },
+                            "properties" : {}
+                        }
+                    }
+                ]
+            }, {
+                "type" : "RequestModeOfTransport",
+                "modeOfTransport" : {
+                    "generalizedType" : "CAR",
+                    "detailedType" : "CAR"
+                },
+                "locations" : [{
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.493627548217773, 46.04976528525784]
+                            },
+                            "properties" : {}
+                        }
+                    }
+                ]
+            }, {
+                "type" : "RequestModeOfTransport",
+                "modeOfTransport" : {
+                    "generalizedType" : "PUBLIC_TRANSPORT"
+                }
+            }
+        ],
+        "optimizedFor" : "traveltime",
+        "departureTime" : "2016-10-27T13:05:38+02:00[Europe/Vienna]"
+    },
+    "routes" : [{
+            "from" : {
+                "type" : "Location",
+                "coordinate" : {
+                    "type" : "Feature",
+                    "geometry" : {
+                        "type" : "Point",
+                        "coordinates" : [14.4935284, 46.0498123]
+                    },
+                    "properties" : {}
+                }
+            },
+            "to" : {
+                "type" : "Location",
+                "coordinate" : {
+                    "type" : "Feature",
+                    "geometry" : {
+                        "type" : "Point",
+                        "coordinates" : [14.5130050, 46.0589369]
+                    },
+                    "properties" : {}
+                }
+            },
+            "distanceMeters" : 2652,
+            "durationSeconds" : 1356,
+            "startTime" : "2016-10-27T13:05:38+02:00[Europe/Vienna]",
+            "endTime" : "2016-10-27T13:28:14+02:00[Europe/Vienna]",
+            "boundingBox" : {
+                "type" : "Feature",
+                "geometry" : {
+                    "type" : "Polygon",
+                    "coordinates" : [[[14.4934731, 46.0466652], [14.4934731, 46.0589369], [14.5130253, 46.0589369], [14.5130253, 46.0466652], [14.4934731, 46.0466652]]]
+                },
+                "properties" : {}
+            },
+            "segments" : [{
+                    "nr" : 1,
+                    "from" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.4935284, 46.0498123]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "to" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.4987157, 46.0467284]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "distanceMeters" : 650,
+                    "durationSeconds" : 482,
+                    "modeOfTransport" : {
+                        "generalizedType" : "FOOT",
+                        "detailedType" : "FOOT"
+                    },
+                    "boardingSeconds" : 0,
+                    "alightingSeconds" : 80,
+                    "startTime" : "2016-10-27T13:05:38+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:13:40+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.4935284, 46.0498123], [14.4934731, 46.0497284], [14.4937515, 46.0492821], [14.4940290, 46.0488396], [14.4942036, 46.0488091], [14.4942122, 46.0487747], [14.4942293, 46.0486946], [14.4943132, 46.0485077], [14.4944696, 46.0482788], [14.4946461, 46.0480309], [14.4948645, 46.0477486], [14.4950666, 46.0474701], [14.4952164, 46.0474892], [14.4953384, 46.0474892], [14.4954882, 46.0474777], [14.4957428, 46.0474396], [14.4962540, 46.0472527], [14.4974298, 46.0470047], [14.4974871, 46.0469894], [14.4990730, 46.0466652], [14.4987157, 46.0467284]]
+                        },
+                        "properties" : {}
+                    }
+                }, {
+                    "nr" : 2,
+                    "from" : {
+                        "type" : "PublicTransportStop",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.4987157, 46.0467284]
+                            },
+                            "properties" : {}
+                        },
+                        "name" : "Aškerčeva"
+                    },
+                    "to" : {
+                        "type" : "PublicTransportStop",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5019478, 46.0490623]
+                            },
+                            "properties" : {}
+                        },
+                        "name" : "Drama"
+                    },
+                    "distanceMeters" : 360,
+                    "durationSeconds" : 200,
+                    "modeOfTransport" : {
+                        "generalizedType" : "PUBLIC_TRANSPORT",
+                        "detailedType" : "BUS",
+                        "service" : {
+                            "name" : "01D"
+                        }
+                    },
+                    "boardingSeconds" : 0,
+                    "alightingSeconds" : 0,
+                    "startTime" : "2016-10-27T13:13:40+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:17+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.4987157, 46.0467284], [14.5019478, 46.0490623]]
+                        },
+                        "properties" : {}
+                    }
+                }, {
+                    "nr" : 3,
+                    "from" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5019478, 46.0490623]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "to" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5019478, 46.0490623]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "distanceMeters" : 11,
+                    "durationSeconds" : 8,
+                    "modeOfTransport" : {
+                        "generalizedType" : "FOOT",
+                        "detailedType" : "FOOT"
+                    },
+                    "boardingSeconds" : 0,
+                    "alightingSeconds" : 52,
+                    "startTime" : "2016-10-27T13:17+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:17:08+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.5019478, 46.0490623], [14.5019999, 46.0490303], [14.5019478, 46.0490623]]
+                        },
+                        "properties" : {}
+                    }
+                }, {
+                    "nr" : 4,
+                    "from" : {
+                        "type" : "PublicTransportStop",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5019478, 46.0490623]
+                            },
+                            "properties" : {}
+                        },
+                        "name" : "Drama"
+                    },
+                    "to" : {
+                        "type" : "PublicTransportStop",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5070426, 46.0575367]
+                            },
+                            "properties" : {}
+                        },
+                        "name" : "Ljubljana ap"
+                    },
+                    "distanceMeters" : 1037,
+                    "durationSeconds" : 232,
+                    "modeOfTransport" : {
+                        "generalizedType" : "PUBLIC_TRANSPORT",
+                        "detailedType" : "BUS",
+                        "service" : {
+                            "name" : "51"
+                        }
+                    },
+                    "boardingSeconds" : 0,
+                    "alightingSeconds" : 0,
+                    "startTime" : "2016-10-27T13:17:08+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:21+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.5019478, 46.0490623], [14.5034508, 46.0522258], [14.5054485, 46.0564306], [14.5070426, 46.0575367]]
+                        },
+                        "properties" : {}
+                    }
+                }, {
+                    "nr" : 5,
+                    "from" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5070426, 46.0575367]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "to" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5130050, 46.0589369]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "distanceMeters" : 594,
+                    "durationSeconds" : 434,
+                    "modeOfTransport" : {
+                        "generalizedType" : "FOOT",
+                        "detailedType" : "FOOT"
+                    },
+                    "boardingSeconds" : 0,
+                    "alightingSeconds" : 0,
+                    "startTime" : "2016-10-27T13:21+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:28:14+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.5070426, 46.0575367], [14.5073633, 46.0575829], [14.5083017, 46.0575981], [14.5083742, 46.0575981], [14.5085278, 46.0576019], [14.5087070, 46.0576057], [14.5091343, 46.0576096], [14.5098352, 46.0576172], [14.5101671, 46.0576172], [14.5112391, 46.0576248], [14.5118628, 46.0576286], [14.5120459, 46.0576286], [14.5121241, 46.0576859], [14.5121593, 46.0577126], [14.5121775, 46.0577469], [14.5121622, 46.0577850], [14.5121393, 46.0578194], [14.5123405, 46.0578651], [14.5125027, 46.0578651], [14.5126123, 46.0578957], [14.5126162, 46.0580406], [14.5130253, 46.0580826], [14.5130234, 46.0582047], [14.5130234, 46.0582047], [14.5130050, 46.0589369]]
+                        },
+                        "properties" : {}
+                    }
+                }
+            ]
+        }, {
+            "from" : {
+                "type" : "Location",
+                "coordinate" : {
+                    "type" : "Feature",
+                    "geometry" : {
+                        "type" : "Point",
+                        "coordinates" : [14.4933567, 46.0501366]
+                    },
+                    "properties" : {}
+                }
+            },
+            "to" : {
+                "type" : "Location",
+                "coordinate" : {
+                    "type" : "Feature",
+                    "geometry" : {
+                        "type" : "Point",
+                        "coordinates" : [14.5130852, 46.0597690]
+                    },
+                    "properties" : {}
+                }
+            },
+            "distanceMeters" : 2575,
+            "durationSeconds" : 473,
+            "startTime" : "2016-10-27T13:15:25+02:00[Europe/Vienna]",
+            "endTime" : "2016-10-27T13:23:18+02:00[Europe/Vienna]",
+            "boundingBox" : {
+                "type" : "Feature",
+                "geometry" : {
+                    "type" : "Polygon",
+                    "coordinates" : [[[14.4924765, 46.0498009], [14.4924765, 46.0597690], [14.5130852, 46.0597690], [14.5130852, 46.0498009], [14.4924765, 46.0498009]]]
+                },
+                "properties" : {}
+            },
+            "segments" : [{
+                    "nr" : 1,
+                    "from" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.4933567, 46.0501366]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "to" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5130852, 46.0597690]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "distanceMeters" : 2575,
+                    "durationSeconds" : 473,
+                    "modeOfTransport" : {
+                        "generalizedType" : "BICYCLE",
+                        "detailedType" : "BICYCLE"
+                    },
+                    "boardingSeconds" : 0,
+                    "alightingSeconds" : 0,
+                    "startTime" : "2016-10-27T13:15:25+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:23:18+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.4933567, 46.0501366], [14.4928026, 46.0508690], [14.4924765, 46.0513000], [14.4925747, 46.0515633], [14.4927177, 46.0514603], [14.4929171, 46.0514412], [14.4931860, 46.0513611], [14.4934454, 46.0512657], [14.4937878, 46.0511284], [14.4940586, 46.0510063], [14.4943771, 46.0508652], [14.4946480, 46.0507545], [14.4947767, 46.0507088], [14.4950380, 46.0506096], [14.4953337, 46.0505028], [14.4957409, 46.0503616], [14.4962187, 46.0502129], [14.4975243, 46.0498123], [14.4977388, 46.0498009], [14.4978046, 46.0499306], [14.4981384, 46.0505791], [14.4981546, 46.0506096], [14.4987383, 46.0517197], [14.4990606, 46.0526009], [14.4993877, 46.0532646], [14.4994278, 46.0533485], [14.5000010, 46.0544128], [14.5000668, 46.0543976], [14.5001574, 46.0546188], [14.5002346, 46.0546646], [14.5004606, 46.0551071], [14.5007219, 46.0555382], [14.5013399, 46.0562744], [14.5014477, 46.0562553], [14.5015869, 46.0562935], [14.5016727, 46.0563927], [14.5015011, 46.0565796], [14.5017729, 46.0568237], [14.5019569, 46.0569839], [14.5021944, 46.0571442], [14.5025120, 46.0573235], [14.5025606, 46.0573502], [14.5029573, 46.0574951], [14.5033665, 46.0576172], [14.5036392, 46.0576973], [14.5039911, 46.0577507], [14.5043020, 46.0577736], [14.5047503, 46.0577660], [14.5051680, 46.0577278], [14.5057192, 46.0576286], [14.5059137, 46.0575943], [14.5060482, 46.0575867], [14.5060854, 46.0576859], [14.5061626, 46.0578537], [14.5063906, 46.0583420], [14.5069218, 46.0595627], [14.5071096, 46.0596619], [14.5072851, 46.0597191], [14.5080147, 46.0597382], [14.5082541, 46.0597382], [14.5110760, 46.0597534], [14.5117397, 46.0597610], [14.5118866, 46.0597610], [14.5127048, 46.0597687], [14.5128088, 46.0597649], [14.5130852, 46.0597690]]
+                        },
+                        "properties" : {}
+                    }
+                }
+            ]
+        }, {
+            "from" : {
+                "type" : "Location",
+                "coordinate" : {
+                    "type" : "Feature",
+                    "geometry" : {
+                        "type" : "Point",
+                        "coordinates" : [14.4935284, 46.0498123]
+                    },
+                    "properties" : {}
+                }
+            },
+            "to" : {
+                "type" : "Location",
+                "coordinate" : {
+                    "type" : "Feature",
+                    "geometry" : {
+                        "type" : "Point",
+                        "coordinates" : [14.5130050, 46.0589369]
+                    },
+                    "properties" : {}
+                }
+            },
+            "distanceMeters" : 3485,
+            "durationSeconds" : 1375,
+            "startTime" : "2016-10-27T13:18:58+02:00[Europe/Vienna]",
+            "endTime" : "2016-10-27T13:41:53+02:00[Europe/Vienna]",
+            "boundingBox" : {
+                "type" : "Feature",
+                "geometry" : {
+                    "type" : "Polygon",
+                    "coordinates" : [[[14.4924765, 46.0474701], [14.4924765, 46.0589369], [14.5130253, 46.0589369], [14.5130253, 46.0474701], [14.4924765, 46.0474701]]]
+                },
+                "properties" : {}
+            },
+            "segments" : [{
+                    "nr" : 1,
+                    "from" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.4935284, 46.0498123]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "to" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.4933567, 46.0501366]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "distanceMeters" : 951,
+                    "durationSeconds" : 720,
+                    "modeOfTransport" : {
+                        "generalizedType" : "FOOT",
+                        "detailedType" : "FOOT"
+                    },
+                    "boardingSeconds" : 0,
+                    "alightingSeconds" : 0,
+                    "startTime" : "2016-10-27T13:18:58+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:30:58+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.4935284, 46.0498123], [14.4934731, 46.0497284], [14.4937515, 46.0492821], [14.4940290, 46.0488396], [14.4942036, 46.0488091], [14.4942122, 46.0487747], [14.4942293, 46.0486946], [14.4943132, 46.0485077], [14.4944696, 46.0482788], [14.4946461, 46.0480309], [14.4948645, 46.0477486], [14.4950666, 46.0474701], [14.4952164, 46.0474892], [14.4951048, 46.0476532], [14.4949856, 46.0478172], [14.4947672, 46.0480919], [14.4944534, 46.0485687], [14.4954863, 46.0488472], [14.4961071, 46.0500336], [14.4961796, 46.0501442], [14.4962187, 46.0502129], [14.4957409, 46.0503616], [14.4953337, 46.0505028], [14.4950380, 46.0506096], [14.4947767, 46.0507088], [14.4945879, 46.0506325], [14.4945898, 46.0506554], [14.4946222, 46.0506706], [14.4933567, 46.0501366]]
+                        },
+                        "properties" : {}
+                    }
+                }, {
+                    "nr" : 2,
+                    "from" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.4933567, 46.0501366]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "to" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5126123, 46.0578957]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "distanceMeters" : 2391,
+                    "durationSeconds" : 489,
+                    "modeOfTransport" : {
+                        "generalizedType" : "BICYCLE",
+                        "detailedType" : "BICYCLE"
+                    },
+                    "boardingSeconds" : 60,
+                    "alightingSeconds" : 60,
+                    "startTime" : "2016-10-27T13:30:58+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:39:07+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.4933567, 46.0501366], [14.4928026, 46.0508690], [14.4924765, 46.0513000], [14.4925747, 46.0515633], [14.4927177, 46.0514603], [14.4929171, 46.0514412], [14.4931860, 46.0513611], [14.4934454, 46.0512657], [14.4937878, 46.0511284], [14.4940586, 46.0510063], [14.4943771, 46.0508652], [14.4946480, 46.0507545], [14.4947767, 46.0507088], [14.4950380, 46.0506096], [14.4953337, 46.0505028], [14.4957409, 46.0503616], [14.4962187, 46.0502129], [14.4975243, 46.0498123], [14.4977388, 46.0498009], [14.4978046, 46.0499306], [14.4981384, 46.0505791], [14.4981546, 46.0506096], [14.4987383, 46.0517197], [14.4990606, 46.0526009], [14.4993877, 46.0532646], [14.4994278, 46.0533485], [14.5000010, 46.0544128], [14.5000668, 46.0543976], [14.5001574, 46.0546188], [14.5002346, 46.0546646], [14.5004606, 46.0551071], [14.5007219, 46.0555382], [14.5013399, 46.0562744], [14.5014477, 46.0562553], [14.5015869, 46.0562935], [14.5016727, 46.0563927], [14.5015011, 46.0565796], [14.5017729, 46.0568237], [14.5019569, 46.0569839], [14.5021944, 46.0571442], [14.5025120, 46.0573235], [14.5025606, 46.0573502], [14.5029573, 46.0574951], [14.5033665, 46.0576172], [14.5036392, 46.0576973], [14.5039911, 46.0577507], [14.5043020, 46.0577736], [14.5047503, 46.0577660], [14.5051680, 46.0577278], [14.5057192, 46.0576286], [14.5059137, 46.0575943], [14.5060482, 46.0575867], [14.5062618, 46.0575829], [14.5066414, 46.0575714], [14.5073633, 46.0575829], [14.5083017, 46.0575981], [14.5083742, 46.0575981], [14.5085278, 46.0576019], [14.5087070, 46.0576057], [14.5091343, 46.0576096], [14.5098352, 46.0576172], [14.5101671, 46.0576172], [14.5112391, 46.0576248], [14.5118628, 46.0576286], [14.5120459, 46.0576286], [14.5121241, 46.0576859], [14.5121593, 46.0577126], [14.5121775, 46.0577469], [14.5121622, 46.0577850], [14.5121393, 46.0578194], [14.5123405, 46.0578651], [14.5125027, 46.0578651], [14.5126123, 46.0578957]]
+                        },
+                        "properties" : {}
+                    }
+                }, {
+                    "nr" : 3,
+                    "from" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5126123, 46.0578957]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "to" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5130050, 46.0589369]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "distanceMeters" : 143,
+                    "durationSeconds" : 166,
+                    "modeOfTransport" : {
+                        "generalizedType" : "FOOT",
+                        "detailedType" : "FOOT"
+                    },
+                    "boardingSeconds" : 0,
+                    "alightingSeconds" : 0,
+                    "startTime" : "2016-10-27T13:39:07+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:41:53+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.5126123, 46.0578957], [14.5126162, 46.0580406], [14.5130253, 46.0580826], [14.5130234, 46.0582047], [14.5130234, 46.0582047], [14.5130050, 46.0589369]]
+                        },
+                        "properties" : {}
+                    }
+                }
+            ]
+        }, {
+            "from" : {
+                "type" : "Location",
+                "coordinate" : {
+                    "type" : "Feature",
+                    "geometry" : {
+                        "type" : "Point",
+                        "coordinates" : [14.4935284, 46.0498123]
+                    },
+                    "properties" : {}
+                }
+            },
+            "to" : {
+                "type" : "Location",
+                "coordinate" : {
+                    "type" : "Feature",
+                    "geometry" : {
+                        "type" : "Point",
+                        "coordinates" : [14.5130050, 46.0589369]
+                    },
+                    "properties" : {}
+                }
+            },
+            "distanceMeters" : 3596,
+            "durationSeconds" : 1517,
+            "startTime" : "2016-10-27T13:19:59+02:00[Europe/Vienna]",
+            "endTime" : "2016-10-27T13:45:16+02:00[Europe/Vienna]",
+            "boundingBox" : {
+                "type" : "Feature",
+                "geometry" : {
+                    "type" : "Polygon",
+                    "coordinates" : [[[14.4924765, 46.0474701], [14.4924765, 46.0589369], [14.5130253, 46.0589369], [14.5130253, 46.0474701], [14.4924765, 46.0474701]]]
+                },
+                "properties" : {}
+            },
+            "segments" : [{
+                    "nr" : 1,
+                    "from" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.4935284, 46.0498123]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "to" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.4933567, 46.0501366]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "distanceMeters" : 951,
+                    "durationSeconds" : 720,
+                    "modeOfTransport" : {
+                        "generalizedType" : "FOOT",
+                        "detailedType" : "FOOT"
+                    },
+                    "boardingSeconds" : 0,
+                    "alightingSeconds" : 0,
+                    "startTime" : "2016-10-27T13:19:59+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:31:59+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.4935284, 46.0498123], [14.4934731, 46.0497284], [14.4937515, 46.0492821], [14.4940290, 46.0488396], [14.4942036, 46.0488091], [14.4942122, 46.0487747], [14.4942293, 46.0486946], [14.4943132, 46.0485077], [14.4944696, 46.0482788], [14.4946461, 46.0480309], [14.4948645, 46.0477486], [14.4950666, 46.0474701], [14.4952164, 46.0474892], [14.4951048, 46.0476532], [14.4949856, 46.0478172], [14.4947672, 46.0480919], [14.4944534, 46.0485687], [14.4954863, 46.0488472], [14.4961071, 46.0500336], [14.4961796, 46.0501442], [14.4962187, 46.0502129], [14.4957409, 46.0503616], [14.4953337, 46.0505028], [14.4950380, 46.0506096], [14.4947767, 46.0507088], [14.4945879, 46.0506325], [14.4945898, 46.0506554], [14.4946222, 46.0506706], [14.4933567, 46.0501366]]
+                        },
+                        "properties" : {}
+                    }
+                }, {
+                    "nr" : 2,
+                    "from" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.4933567, 46.0501366]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "to" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5126123, 46.0578957]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "distanceMeters" : 2502,
+                    "durationSeconds" : 391,
+                    "modeOfTransport" : {
+                        "generalizedType" : "CAR",
+                        "detailedType" : "CAR"
+                    },
+                    "boardingSeconds" : 60,
+                    "alightingSeconds" : 300,
+                    "startTime" : "2016-10-27T13:31:59+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:38:30+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.4933567, 46.0501366], [14.4928026, 46.0508690], [14.4924765, 46.0513000], [14.4925747, 46.0515633], [14.4927273, 46.0515633], [14.4929152, 46.0515175], [14.4931383, 46.0514565], [14.4934149, 46.0513535], [14.4939127, 46.0511436], [14.4943857, 46.0509377], [14.4948902, 46.0507317], [14.4954004, 46.0505524], [14.4963055, 46.0502357], [14.4976072, 46.0498428], [14.4977388, 46.0498009], [14.4978046, 46.0499306], [14.4981384, 46.0505791], [14.4981546, 46.0506096], [14.4987383, 46.0517197], [14.4977970, 46.0519028], [14.4972401, 46.0520363], [14.4981146, 46.0530396], [14.4996767, 46.0547676], [14.5005188, 46.0556564], [14.5006437, 46.0557861], [14.5009928, 46.0561104], [14.5013943, 46.0564728], [14.5015011, 46.0565796], [14.5017729, 46.0568237], [14.5019569, 46.0569839], [14.5021944, 46.0571442], [14.5025120, 46.0573235], [14.5025606, 46.0573502], [14.5029573, 46.0574951], [14.5033665, 46.0576172], [14.5036392, 46.0576973], [14.5039911, 46.0577507], [14.5043020, 46.0577736], [14.5047503, 46.0577660], [14.5051680, 46.0577278], [14.5057192, 46.0576286], [14.5059137, 46.0575943], [14.5060482, 46.0575867], [14.5062618, 46.0575829], [14.5066414, 46.0575714], [14.5073633, 46.0575829], [14.5083017, 46.0575981], [14.5083742, 46.0575981], [14.5085278, 46.0576019], [14.5087070, 46.0576057], [14.5091343, 46.0576096], [14.5098352, 46.0576172], [14.5101671, 46.0576172], [14.5112391, 46.0576248], [14.5118628, 46.0576286], [14.5120459, 46.0576286], [14.5121241, 46.0576859], [14.5121593, 46.0577126], [14.5121775, 46.0577469], [14.5121622, 46.0577850], [14.5121393, 46.0578194], [14.5123405, 46.0578651], [14.5125027, 46.0578651], [14.5126123, 46.0578957]]
+                        },
+                        "properties" : {}
+                    }
+                }, {
+                    "nr" : 3,
+                    "from" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5126123, 46.0578957]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "to" : {
+                        "type" : "Location",
+                        "coordinate" : {
+                            "type" : "Feature",
+                            "geometry" : {
+                                "type" : "Point",
+                                "coordinates" : [14.5130050, 46.0589369]
+                            },
+                            "properties" : {}
+                        }
+                    },
+                    "distanceMeters" : 143,
+                    "durationSeconds" : 406,
+                    "modeOfTransport" : {
+                        "generalizedType" : "FOOT",
+                        "detailedType" : "FOOT"
+                    },
+                    "boardingSeconds" : 0,
+                    "alightingSeconds" : 0,
+                    "startTime" : "2016-10-27T13:38:30+02:00[Europe/Vienna]",
+                    "endTime" : "2016-10-27T13:45:16+02:00[Europe/Vienna]",
+                    "geometryGeoJson" : {
+                        "type" : "Feature",
+                        "geometry" : {
+                            "type" : "LineString",
+                            "coordinates" : [[14.5126123, 46.0578957], [14.5126162, 46.0580406], [14.5130253, 46.0580826], [14.5130234, 46.0582047], [14.5130234, 46.0582047], [14.5130050, 46.0589369]]
+                        },
+                        "properties" : {}
+                    }
+                }
+            ]
+        }
+    ]
+}

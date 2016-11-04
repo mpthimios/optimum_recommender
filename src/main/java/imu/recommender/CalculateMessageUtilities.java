@@ -6,9 +6,13 @@ import at.ac.ait.ariadne.routeformat.RoutingRequest;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 //import com.sun.xml.internal.fastinfoset.util.StringArray;
+import imu.recommender.models.User;
 import org.bitpipeline.lib.owm.OwmClient;
 import org.bitpipeline.lib.owm.WeatherData;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 import sun.font.TrueTypeFont;
 
 import java.lang.reflect.Array;
@@ -17,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+//import imu.recommender.models.Message;
 
 
 public class CalculateMessageUtilities {
@@ -29,7 +34,6 @@ public class CalculateMessageUtilities {
         String city = "Vienna";
         //String city = trip.getFrom().getAddress().get().getCity().get();
         Integer duration = trip.getDurationSeconds();
-
         //Connect to mongodb
         MongoClient mongo = new MongoClient("euprojects.net",3368);
         //Print all database names
@@ -41,6 +45,14 @@ public class CalculateMessageUtilities {
         DBCollection table = db.getCollection("OptimumMessages");
         //Select the messages where persuasive strategy is Reward
         BasicDBObject searchQuery = new BasicDBObject();
+
+        //Connect to mongodb
+        /*Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+
+        Query<User> query = mongoDatastore.createQuery(.class).field("_id").equal(newUser.getId());
+        UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("owned_vehicles", userVehicles);
+
+        mongoDatastore.update(query, ops);*/
 
         //searchQuery.append("persuasive_strategy", "Reward");
         List<String> targetList = new ArrayList<String>();
@@ -69,7 +81,7 @@ public class CalculateMessageUtilities {
         if(withinWalkingDistance(route_distance) || withinBikeDistance(route_distance) ) {
             if (NiceWeather(lat, lon, city)) {
                 System.out.println("Nice Weather");
-                contextList.add("Nice Weather");
+                contextList.add("NiceWeather");
             }
         }
         /*if (emissionsIncreasing("user")){
@@ -148,8 +160,8 @@ public class CalculateMessageUtilities {
     private  static boolean NiceWeather(Float lat, Float lon, String city) throws Exception {
 
         OwmClient owm = new OwmClient ();
-        WeatherStatusResponse currentWeather = owm.currentWeatherAtCity(lat ,lon,1);
-        //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity("Wien");
+        //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity(lat ,lon,1);
+        WeatherStatusResponse currentWeather = owm.currentWeatherAtCity("Wien");
 
         if (currentWeather.hasWeatherStatus ()) {
 
