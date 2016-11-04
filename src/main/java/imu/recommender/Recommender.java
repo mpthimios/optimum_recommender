@@ -86,11 +86,7 @@ public class Recommender extends HttpServlet{
 
 	    if (PRINT_JSON){
 	    	try {
-				try {
-					calculatePercentages("luka");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				
 				GetProperties properties = new GetProperties();
 				logger.debug(properties.getPasswordValues());
 				RouteFormatRoot response_route = filtering(routes);
@@ -197,13 +193,7 @@ public class Recommender extends HttpServlet{
 				out.println("<h3>Alternatives Routes from " + address.get().getStreetName().get() + " to " + address_dest.get().getStreetName().get() + "					:</h3>");
 			}
 			try {
-				//filter route
-				try {
-					calculatePercentages("luka");
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
+				
 				logger.debug(routes);
 				RouteFormatRoot response_route = filtering(routes);
 				logger.debug(routes.getRoutes().size());
@@ -393,89 +383,6 @@ public class Recommender extends HttpServlet{
 		addTrip(new_trip, Trips);
 		Trips.add(new_trip);
 	}
-
-	private void calculatePercentages(String user) throws IOException {
-		String url = "http://traffic.ijs.si/NextPinDev/getActivities";
-
-		 URL obj = new URL("http://traffic.ijs.si/NextPinDev/getActivities");
-		 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-		 con.setRequestMethod("GET");
-
-
-		//add request header
-		con.setRequestProperty("token",user);
-
-		int responseCode = con.getResponseCode();
-		logger.debug("\nSending 'GET' request to URL : " + url);
-		logger.debug("Response Code : " + responseCode);
-
-		BufferedReader in = new BufferedReader(
-				new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		}
-		in.close();
-		//print result
-		logger.debug(response.toString());
-		 //JSONObject jsonObj = new JSONObject(response);
-		 //Iterator<String> keys = jsonObj.keys();
-		 try {
-			 JSONObject jsonObj  = new JSONObject(response.toString());
-
-			 //JSONArray jsonarr= json.getJSONArray("address");
-			 //String address = jsonarr.getJSONObject(0).getString("addressLine1");
-			 logger.debug(jsonObj.getJSONArray("data"));
-			 JSONArray arr = jsonObj.getJSONArray("data");
-			 Integer n_car=0;
-			 Integer n_pt=0;
-			 Integer n_bike=0;
-			 Integer n_walk=0;
-			 logger.debug(arr);
-			 for (int i = 0; i < arr.length(); i++) {
-				 String [] all_modes = {"car", "pt", "bike", "walk"};
-				 Random random = new Random();
-
-				 // randomly selects an index from the arr
-				 int select = random.nextInt(all_modes.length);
-				 //Put the random selected mode to string
-				 arr.getJSONObject(i).put("mode", all_modes[select]);
-
-				 JSONObject object = arr.getJSONObject(i);
-				 String mode = object.get("mode").toString();
-				 //String a = objects.get("");
-				 if (mode.equals("car") ){
-					 n_car++;
-				 }
-				 if (mode.equals("pt") ){
-					 n_pt++;
-				 }
-				 if (mode.equals("bike") ){
-					 n_bike++;
-				 }
-				 if (mode.equals("walk") ){
-					 n_walk++;
-				 }
-				 //logger.debug(arr.getJSONObject(i).get("mode"));
-			 }
-			 //Calculate percentages
-			 double car_percent = ( (double)(n_car*100)/(double) arr.length());
-			 double pt_percent = ( (double)(n_pt*100)/(double) arr.length());
-			 double bike_percent = ( (double)(n_bike*100)/(double) arr.length());
-			 double walk_percent = ( (double)(n_walk*100)/(double) arr.length());
-			 //percentages should be saved to mongo
-			 logger.debug(car_percent);
-			 logger.debug(pt_percent);
-			 logger.debug(bike_percent);
-			 logger.debug(walk_percent);
-		 } catch (JSONException e) {
-			 e.printStackTrace();
-		 }
-
-
-	 }
 
 	private void CalculateOtherUserPercentages(){
 		//Connect to mongodb

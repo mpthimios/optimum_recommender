@@ -15,6 +15,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -24,6 +26,7 @@ import com.mongodb.DBCollection;
 
 import imu.recommender.MongoConnectionHelper;
 import imu.recommender.Recommender;
+import imu.recommender.models.ModeUsage;
 import imu.recommender.models.User;
 
 public class CalculateModeUsePercentages implements Job {
@@ -64,23 +67,24 @@ public class CalculateModeUsePercentages implements Job {
 		}
     	
     	for (Object accessToken : userTokens ){
-    		logger.debug((String) accessToken);
-    		con.setRequestProperty("token",user);
-    		int responseCode = con.getResponseCode();
-			logger.debug("\nSending 'GET' request to URL : " + activitiesUrl);
-			logger.debug("Response Code : " + responseCode);
+    		try {
+    			logger.debug((String) accessToken);
+        		con.setRequestProperty("token",(String) accessToken);
+        		int responseCode = con.getResponseCode();
+    			logger.debug("\nSending 'GET' request to URL : " + activitiesUrl);
+    			logger.debug("Response Code : " + responseCode);
 
-			BufferedReader in = new BufferedReader(
- 						new InputStreamReader(con.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-			//print result
-			logger.debug(response.toString());
-			 try {
+    			BufferedReader in = new BufferedReader(
+     						new InputStreamReader(con.getInputStream()));
+    			String inputLine;
+    			StringBuffer response = new StringBuffer();
+    			while ((inputLine = in.readLine()) != null) {
+    				response.append(inputLine);
+    			}
+    			in.close();
+    			//print result
+    			logger.debug(response.toString());
+    			
 				 JSONObject jsonObj  = new JSONObject(response.toString());
 				 logger.debug(jsonObj.getJSONArray("data"));
 				 JSONArray arr = jsonObj.getJSONArray("data");
@@ -120,12 +124,29 @@ public class CalculateModeUsePercentages implements Job {
 				 double pt_percent = ( (double)(n_pt*100)/(double) arr.length());
 				 double bike_percent = ( (double)(n_bike*100)/(double) arr.length());
 				 double walk_percent = ( (double)(n_walk*100)/(double) arr.length());
+				 
+				 //test
+//				 double car_percent = 10.0;
+//				 double pt_percent = 20.0;
+//				 double bike_percent = 30.0;
+//				 double walk_percent = 40.0;
+				 
 				 //percentages should be saved to mongo
 				 logger.debug(car_percent);
 				 logger.debug(pt_percent);
 				 logger.debug(bike_percent);
 				 logger.debug(walk_percent);
-			 } catch (JSONException e) {
+				 
+				 Query<User> query = mongoDatastore.createQuery(User.class).field("access_token").equal((String) accessToken);
+				 ModeUsage modeUsage = new ModeUsage();
+				 modeUsage.setWalk_percent(walk_percent);
+				 modeUsage.setPt_percent(pt_percent);
+				 modeUsage.setCar_percent(car_percent);
+				 modeUsage.setBike_percent(bike_percent);
+				 UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage", modeUsage);
+				 mongoDatastore.update(query, ops);
+				 
+			 } catch (Exception e) {
 				 e.printStackTrace();
 			 }
 

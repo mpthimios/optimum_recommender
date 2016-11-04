@@ -1,11 +1,15 @@
 package imu.recommender.models;
 
 import java.util.List;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.*;
+
+import imu.recommender.MongoConnectionHelper;
 
 @Entity("users")
 
@@ -41,6 +45,9 @@ public class User {
 	@Embedded("facebook_data")
 	private FacebookData facebook_data;
 	
+	@Embedded("mode_usage")
+	private ModeUsage mode_usage;
+	
 	public User(){
 		//initialize variables
 		this.name = "John";
@@ -61,6 +68,24 @@ public class User {
 		this.stated_preferences = new StatedPreferences();
 		this.facebook_data = new FacebookData();
 		this.owned_vehicles = null;
+	}
+	
+	public static User findByAccessToken(String accessToken){
+		
+		Datastore mongoDatastore;
+		try {
+			mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+		User m = (User) mongoDatastore.find(User.class).field("access_token").equal(accessToken).get();
+	    if (m == null) {
+	    	return null;
+	    }
+	    return m;		
 	}
 
 	public ObjectId getId() {
@@ -197,6 +222,22 @@ public class User {
 
 	public void setFacebook_data(FacebookData facebook_data) {
 		this.facebook_data = facebook_data;
+	}
+
+	public int getCar_ownership() {
+		return car_ownership;
+	}
+
+	public void setCar_ownership(int car_ownership) {
+		this.car_ownership = car_ownership;
+	}
+
+	public ModeUsage getMode_usage() {
+		return mode_usage;
+	}
+
+	public void setMode_usage(ModeUsage mode_usage) {
+		this.mode_usage = mode_usage;
 	}
 	
 	
