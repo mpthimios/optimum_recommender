@@ -15,6 +15,7 @@ public class User {
 	
 	private String name;
 	private String mobility_type;
+	private int car_ownership;
 	private String extra_data;
 	private String access_token;
 	
@@ -49,7 +50,8 @@ public class User {
 		this.carUsage = 0.0;
 		this.carUsageComparedToOthers = 0.0;		
 		this.extra_data = "";
-		this.mobility_type = "car";				
+		this.mobility_type = "car";
+		this.car_ownership = 0;
 		this.ptUsage = 0.0;
 		this.ptUsage = 0.0;
 		this.ptUsageComparedToOthers = 0.0;

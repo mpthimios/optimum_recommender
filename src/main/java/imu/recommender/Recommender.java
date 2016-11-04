@@ -72,8 +72,6 @@ public class Recommender extends HttpServlet{
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-		//ObjectMapper mapper = new ObjectMapper();
-		//mapper.registerModule(new Jdk8Module());
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.findAndRegisterModules();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
