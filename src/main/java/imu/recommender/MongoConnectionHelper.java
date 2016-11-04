@@ -7,6 +7,7 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
+import org.mongodb.morphia.dao.BasicDAO;
 
 
 public class MongoConnectionHelper {
@@ -35,4 +36,5 @@ public class MongoConnectionHelper {
 	        return dsSingleton;
 
 	    }
+
 }

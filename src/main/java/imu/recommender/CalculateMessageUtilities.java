@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-//import imu.recommender.models.Message;
+import imu.recommender.models.Message;
 
 
 public class CalculateMessageUtilities {
@@ -34,32 +34,14 @@ public class CalculateMessageUtilities {
         String city = "Vienna";
         //String city = trip.getFrom().getAddress().get().getCity().get();
         Integer duration = trip.getDurationSeconds();
-        //Connect to mongodb
-        MongoClient mongo = new MongoClient("euprojects.net",3368);
-        //Print all database names
-        //System.out.println(mongo.getDatabaseNames());
-        DB db = mongo.getDB("Optimum");
-        GetProperties properties = new GetProperties();
-        System.out.println(properties.getPasswordValues());
-        boolean auth =db.authenticate(properties.getUsernameValues(),properties.getPasswordValues().toCharArray());
-        DBCollection table = db.getCollection("OptimumMessages");
-        //Select the messages where persuasive strategy is Reward
-        BasicDBObject searchQuery = new BasicDBObject();
 
         //Connect to mongodb
-        /*Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+        Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 
-        Query<User> query = mongoDatastore.createQuery(.class).field("_id").equal(newUser.getId());
-        UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("owned_vehicles", userVehicles);
-
-        mongoDatastore.update(query, ops);*/
-
-        //searchQuery.append("persuasive_strategy", "Reward");
         List<String> targetList = new ArrayList<String>();
         //Select the messages that the target of message is the same with the mode of route
         targetList.add("all");
         targetList.add(trip.getAdditionalInfo().get("mode").toString());
-        searchQuery.append("target",new BasicDBObject("$in", targetList));
 
         List<String> contextList = new ArrayList<String>();
         contextList.add("noContext");
@@ -109,43 +91,36 @@ public class CalculateMessageUtilities {
         if (EmissionComparetoOthers("user")){
             contextList.add("EmissionComparetoOthers");
         } */
-        searchQuery.append("context",new BasicDBObject("$in", contextList));
 
         //Find all messages after filtering
-        DBCursor cursor = table.find(searchQuery);
 
-        List<Message>  messages= new ArrayList<Message>();
-        Message message;
+        //Message m = new Message();
+        //mongoDatastore.save(m);
+        contextList.add("NiceWeather");
+        System.out.println(contextList);
+        Query<Message> query = mongoDatastore.createQuery(Message.class);
+        query.and(
+                query.criteria("persuasive_strategy").equal("suggestion"),
+                query.criteria("context").equal(new BasicDBObject("$in", contextList))
+                //query.criteria("target").equal(new BasicDBObject("$in", targetList))
+        );
+
+        List<Message> mes = query.asList();
+        System.out.println(mes);
         Double max_message_utility = 0.0;
         String selected_message_text= "";
-
-        while (cursor.hasNext()) {
-            BasicDBObject obj = (BasicDBObject) cursor.next();
-            //Calculate utility for each Message
-            message = new Message();
-            String messageId = obj.getString("id");
-            message.setMessageId(messageId);
-            String message_text= obj.getString("message_text");
-            message.setMessageText(message_text);
+        //Calculate utility for each Message
+        for (Message message : mes) {
+            System.out.println(message.getMessage_text());
             //Set random messageUtility
             Double messageUtility = Math.random();
             message.setUtility(messageUtility);
             if (messageUtility > max_message_utility) {
                 max_message_utility = messageUtility;
-                selected_message_text = message_text;
+                selected_message_text = message.getMessage_text();
             }
-            messages.add(message);
         }
 
-        System.out.println(messages);
-        System.out.println(selected_message_text);
-        System.out.println(max_message_utility);
-
-        /*Set<String> tables = db.getCollectionNames();
-
-        for(String coll : tables){
-            System.out.println(coll);
-        } */
         return selected_message_text;
 
     }

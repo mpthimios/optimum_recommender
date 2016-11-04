@@ -19,11 +19,12 @@ public class Message {
     private String message_text;
     private String target;
     private Integer number_of_successes;
+    private Double utility;
 
     public Message(){
 
         //initialize variables
-        this.persuasive_strategy = "Suggestion";
+        this.persuasive_strategy = "suggestion";
         this.context = "NiceWeather";
         this.number_of_times_sent = 0;
         this.message_text = "Today it’s sunny! Take the opportunity to use your bicycle to save CO2 emissions.";
@@ -73,6 +74,13 @@ public class Message {
 
     public void setTarget(ObjectId id) {
         this.target =target;
+    }
+
+    public Double getUtility() {
+        return utility;
+    }
+    public void setUtility(Double utility) {
+        this.utility = utility;
     }
 
 }
