@@ -1,4 +1,4 @@
-package imu.recommender;
+package imu.recommender.helpers;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

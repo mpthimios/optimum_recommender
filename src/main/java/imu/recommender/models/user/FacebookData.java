@@ -1,4 +1,4 @@
-package imu.recommender.models;
+package imu.recommender.models.user;
 
 public class FacebookData {
 	

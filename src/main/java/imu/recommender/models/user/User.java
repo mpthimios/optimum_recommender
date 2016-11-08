@@ -1,4 +1,4 @@
-package imu.recommender.models;
+package imu.recommender.models.user;
 
 import java.util.List;
 import java.net.UnknownHostException;
@@ -9,7 +9,7 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.*;
 
-import imu.recommender.MongoConnectionHelper;
+import imu.recommender.helpers.MongoConnectionHelper;
 
 @Entity("users")
 
@@ -69,6 +69,25 @@ public class User {
 		this.facebook_data = new FacebookData();
 		this.owned_vehicles = null;
 	}
+	
+	public boolean emissionsIncreasing() {
+        //
+        return true;
+
+    }
+	
+	public boolean tooManyPublicTransportRoutes() {
+        //Get percentage_of_public_transport_use_last_period from mongodb
+        Double percentage_of_public_transport_use_last_period = 0.9;
+        return percentage_of_public_transport_use_last_period>0.6;
+
+    }
+	
+	public boolean tooManyCarRoutes() {
+        //Get percentage_of_car_use_last_period from mongodb
+        Double percentage_of_car_use_last_period = 0.4;
+        return percentage_of_car_use_last_period>0.6;
+    }
 	
 	public static User findByAccessToken(String accessToken){
 		
@@ -239,6 +258,5 @@ public class User {
 	public void setMode_usage(ModeUsage mode_usage) {
 		this.mode_usage = mode_usage;
 	}
-	
 	
 }

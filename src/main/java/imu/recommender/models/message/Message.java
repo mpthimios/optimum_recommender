@@ -1,4 +1,4 @@
-package imu.recommender.models;
+package imu.recommender.models.message;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Id;

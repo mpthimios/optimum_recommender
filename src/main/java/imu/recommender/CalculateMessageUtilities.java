@@ -3,10 +3,14 @@ package imu.recommender;
 import at.ac.ait.ariadne.routeformat.Route;
 import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import at.ac.ait.ariadne.routeformat.RoutingRequest;
+import imu.recommender.helpers.MongoConnectionHelper;
+import imu.recommender.helpers.WeatherInfo;
+import imu.recommender.models.message.Message;
+import imu.recommender.models.user.User;
+
 import com.mongodb.*;
 import com.mongodb.util.JSON;
-//import com.sun.xml.internal.fastinfoset.util.StringArray;
-import imu.recommender.models.User;
+
 import org.bitpipeline.lib.owm.OwmClient;
 import org.bitpipeline.lib.owm.WeatherData;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
@@ -21,12 +25,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import imu.recommender.models.Message;
 
 
 public class CalculateMessageUtilities {
 
-    public static String calculate(RouteFormatRoot route, Route trip) throws Exception {
+    public static String calculateForUser(RouteFormatRoot route, Route trip, User user) throws Exception {
         //Get trip properties
         Integer route_distance=trip.getDistanceMeters();
         Float lat = trip.getFrom().getCoordinate().geometry.coordinates.get(0).floatValue();
@@ -61,7 +64,7 @@ public class CalculateMessageUtilities {
 
         //Check the weather if withinBikeDistance or withinWalkingDistance is True
         if(withinWalkingDistance(route_distance) || withinBikeDistance(route_distance) ) {
-            if (NiceWeather(lat, lon, city)) {
+            if (WeatherInfo.isWeatherNice(lat, lon, city)) {
                 System.out.println("Nice Weather");
                 contextList.add("NiceWeather");
             }
@@ -69,10 +72,10 @@ public class CalculateMessageUtilities {
         /*if (emissionsIncreasing("user")){
             searchQuery.append("context", "emissionsIncreasing");
         }*/
-        if (tooManyPublicTransportRoutes("user")){
+        if (user.tooManyPublicTransportRoutes()){
             contextList.add("TooManyTransportRoutes");
         }
-        if (tooManyCarRoutes("user")){
+        if (user.tooManyCarRoutes()){
             contextList.add("TooManyCarRoutes");
         }
         Route carTrip = CarTrip(route);
@@ -132,49 +135,7 @@ public class CalculateMessageUtilities {
     private static boolean withinBikeDistance(int distance) {
         return(distance<3000);
     }
-    private  static boolean NiceWeather(Float lat, Float lon, String city) throws Exception {
-
-        OwmClient owm = new OwmClient ();
-        //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity(lat ,lon,1);
-        WeatherStatusResponse currentWeather = owm.currentWeatherAtCity("Wien");
-
-        if (currentWeather.hasWeatherStatus ()) {
-
-            WeatherData weather = currentWeather.getWeatherStatus ().get (0);
-            if (weather.getPrecipitation () == Integer.MIN_VALUE) {
-                WeatherData.WeatherCondition weatherCondition = weather.getWeatherConditions ().get (0);
-                String description = weatherCondition.getDescription ();
-                if (description.contains ("rain") || description.contains ("shower"))
-                    System.out.println ("No rain measures in "+city+" but reports of " + description);
-                else
-                    System.out.println ("No rain measures in "+city+ ": " + description);
-                return true;
-            } else
-                System.out.println ("It's raining in "+city+": " + weather.getPrecipitation () + " mm/h");
-            return false;
-
-        }
-        else
-            System.out.println("No info about weather.");
-        return false;
-    }
-    private static boolean emissionsIncreasing(String user) {
-        //
-        return true;
-
-    }
-    private static boolean tooManyPublicTransportRoutes(String user) {
-        //Get percentage_of_public_transport_use_last_period from mongodb
-        Double percentage_of_public_transport_use_last_period = 0.9;
-        return percentage_of_public_transport_use_last_period>0.6;
-
-    }
-    private static boolean tooManyCarRoutes(String user) {
-        //Get percentage_of_car_use_last_period from mongodb
-        Double percentage_of_car_use_last_period = 0.4;
-        return percentage_of_car_use_last_period>0.6;
-    }
-
+    
     private static boolean CostComparetoDriving(String transport_route, String driving_route) {
         //get distance from routes and calculate cost
         Double transport_cost = 1.4;

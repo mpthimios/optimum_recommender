@@ -24,10 +24,10 @@ import org.quartz.JobExecutionException;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 
-import imu.recommender.MongoConnectionHelper;
-import imu.recommender.Recommender;
-import imu.recommender.models.ModeUsage;
-import imu.recommender.models.User;
+import imu.recommender.RequestHandler;
+import imu.recommender.helpers.MongoConnectionHelper;
+import imu.recommender.models.user.ModeUsage;
+import imu.recommender.models.user.User;
 
 public class CalculateModeUsePercentages implements Job {
 	

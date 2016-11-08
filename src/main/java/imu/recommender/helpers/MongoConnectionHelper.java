@@ -1,4 +1,4 @@
-package imu.recommender;
+package imu.recommender.helpers;
 
 import java.net.UnknownHostException;
 import java.util.ResourceBundle;

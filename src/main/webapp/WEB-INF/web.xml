@@ -7,7 +7,7 @@
   
    <servlet>
 		<servlet-name>RouteRecommender</servlet-name>
-		<servlet-class>imu.recommender.Recommender</servlet-class>
+		<servlet-class>imu.recommender.RequestHandler</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
