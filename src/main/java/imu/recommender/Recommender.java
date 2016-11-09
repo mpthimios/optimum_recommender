@@ -60,7 +60,7 @@ public class Recommender {
 			List<String> Modes = new ArrayList<String>();
 			for (int j=0; j< recommenderRoute.getRoute().getSegments().size(); j++) {
 				RouteSegment segment = recommenderRoute.getRoute().getSegments().get(j);
-				String mode = segment.getModeOfTransport().toString();
+				String mode = segment.getModeOfTransport().getGeneralizedType().toString();
 						//.getGeneralizedType().toString();
 				if (!Modes.contains(mode)) {
 					Modes.add(mode);
@@ -77,7 +77,7 @@ public class Recommender {
 			else if (Modes.contains("BICYCLE") && Modes.contains("FOOT") && Modes.contains("PUBLIC_TRANSPORT") ){
 				mode="bike&ride";
 			}
-			else if (Modes.contains("PUBLIC_TRANSPORT-BUS 01") && Modes.contains("FOOT-FOOT") ){
+			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") ){
 				mode="pt";
 			}
 			else if (Modes.contains("CAR") && Modes.contains("FOOT") ){
@@ -129,7 +129,7 @@ public class Recommender {
 		//todo
 	}
 	
-	public String getFilteredRoutesResponseStr(){
+	public RouteFormatRoot getFilteredRoutesResponseStr(){
 		ArrayList<Route> routesList = new ArrayList<Route>();
 		for (RouteModel route : filteredRoutes){
 			routesList.add(route.getRoute());
@@ -143,7 +143,8 @@ public class Recommender {
 				.setRequest(originalRouteFormatRoutes.getRequest().get())
 				.setRoutes(routesList);
 		
-		return originalRouteFormatRoutes.toString();
+		//return originalRouteFormatRoutes.toString();
+		return filtered_route;
 	}
 
 	public RouteFormatRoot getOriginalRouteFormatRoutes() {

@@ -4,6 +4,7 @@ import org.bitpipeline.lib.owm.OwmClient;
 import org.bitpipeline.lib.owm.WeatherData;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
 
+
 public class WeatherInfo {
 	
 	public static boolean isWeatherNice(Float lat, Float lon, String city) throws Exception {

@@ -44,7 +44,8 @@ public class CalculateMessageUtilities {
         List<String> targetList = new ArrayList<String>();
         //Select the messages that the target of message is the same with the mode of route
         targetList.add("all");
-        targetList.add(trip.getAdditionalInfo().get("mode").toString());
+        targetList.add("pt");
+        //targetList.add(trip.getAdditionalInfo().get("mode").toString());
 
         List<String> contextList = new ArrayList<String>();
         contextList.add("noContext");
@@ -63,12 +64,12 @@ public class CalculateMessageUtilities {
         }
 
         //Check the weather if withinBikeDistance or withinWalkingDistance is True
-        if(withinWalkingDistance(route_distance) || withinBikeDistance(route_distance) ) {
+        /*if(withinWalkingDistance(route_distance) || withinBikeDistance(route_distance) ) {
             if (WeatherInfo.isWeatherNice(lat, lon, city)) {
                 System.out.println("Nice Weather");
                 contextList.add("NiceWeather");
             }
-        }
+        }*/
         /*if (emissionsIncreasing("user")){
             searchQuery.append("context", "emissionsIncreasing");
         }*/
@@ -78,7 +79,7 @@ public class CalculateMessageUtilities {
         if (user.tooManyCarRoutes()){
             contextList.add("TooManyCarRoutes");
         }
-        Route carTrip = CarTrip(route);
+        /*Route carTrip = CarTrip(route);
         if ( carTrip!= null && trip.getAdditionalInfo().get("mode").equals("pt")) {
             Integer driving_distance = carTrip.getDistanceMeters();
             if (CostComparetoDriving("transport", "drive")) {
@@ -88,7 +89,7 @@ public class CalculateMessageUtilities {
             if (DurationComparetoDriving(duration, driving_duration)) {
                 contextList.add("Duration");
             }
-        }
+        }*/
 
         /*
         if (EmissionComparetoOthers("user")){
@@ -104,7 +105,10 @@ public class CalculateMessageUtilities {
         Query<Message> query = mongoDatastore.createQuery(Message.class);
         query.and(
                 query.criteria("persuasive_strategy").equal("suggestion"),
-                query.criteria("context").equal(new BasicDBObject("$in", contextList))
+                query.criteria("context").equal("NiceWeather"),
+                query.criteria("className").equal("imu.recommender.models.message.Message")
+                //query.criteria("")
+                //query.criteria("context").equal(new BasicDBObject("$in", contextList))
                 //query.criteria("target").equal(new BasicDBObject("$in", targetList))
         );
 
@@ -113,7 +117,7 @@ public class CalculateMessageUtilities {
         Double max_message_utility = 0.0;
         String selected_message_text= "";
         //Calculate utility for each Message
-        for (Message message : mes) {
+        for (Message message : mes ) {
             System.out.println(message.getMessage_text());
             //Set random messageUtility
             Double messageUtility = Math.random();
@@ -123,7 +127,7 @@ public class CalculateMessageUtilities {
                 selected_message_text = message.getMessage_text();
             }
         }
-
+        System.out.println(selected_message_text);
         return selected_message_text;
 
     }

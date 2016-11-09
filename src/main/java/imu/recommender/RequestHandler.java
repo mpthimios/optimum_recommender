@@ -62,6 +62,7 @@ import org.mongodb.morphia.query.UpdateOperations;
 
 import sun.font.TrueTypeFont;
 
+import static imu.recommender.CalculateMessageUtilities.calculateForUser;
 import static java.lang.System.out;
 
 public class RequestHandler extends HttpServlet{
@@ -69,6 +70,7 @@ public class RequestHandler extends HttpServlet{
 	private static boolean PRINT_JSON = true;
 	private Logger logger = Logger.getLogger(RequestHandler.class);
 	private String exampleFile = "src/main/resources/route.txt";
+	private String mes;
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -85,10 +87,32 @@ public class RequestHandler extends HttpServlet{
 	    // Allocate a output writer to write the response message into the network socket
 	    PrintWriter out = response.getWriter();
 
-
+		Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+		Query<User> query = mongoDatastore.createQuery(User.class).field("name").equal("John3");
+		User user = query.get();
 	    if (PRINT_JSON){
-	    	String routeResponseStr = recommenderRoutes.getFilteredRoutesResponseStr().toString();
-			String geoJson = mapper.writeValueAsString(routeResponseStr);
+	    	RouteFormatRoot response_route = recommenderRoutes.getFilteredRoutesResponseStr();
+			logger.debug(response_route);
+			List<Route> Trips = new ArrayList<Route>();
+			for (int i = 0; i < response_route.getRoutes().size(); i++) {
+				Route route = response_route.getRoutes().get(i);
+				if (response_route.getRoutes().get(i).getAdditionalInfo().get("mode") == "car") {
+					mes = "";
+				} else {
+					try {
+						mes = CalculateMessageUtilities.calculateForUser( response_route, route, user);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+				additionalInfoRouteRequest.put("mode", response_route.getRoutes().get(i).getAdditionalInfo().get("mode"));
+				additionalInfoRouteRequest.put("message", mes);
+				response_route.getRoutes().get(i).setAdditionalInfo(additionalInfoRouteRequest);
+			}
+			RouteFormatRoot final_route = new RouteFormatRoot().setRequestId(response_route.getRequestId()).setRouteFormatVersion(response_route.getRouteFormatVersion()).setProcessedTime(response_route.getProcessedTime()).setStatus(response_route.getStatus()).setCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem()).setRequest(response_route.getRequest().get()).setRoutes(response_route.getRoutes());
+			//String geoJson = mapper.writeValueAsString(routeResponseStr.toString());
+			String geoJson = mapper.writeValueAsString(response_route.toString());
 			out.println(geoJson);
 	    }
 	}
@@ -150,6 +174,7 @@ public class RequestHandler extends HttpServlet{
 				out.println("<h3>Alternatives Routes from " + address.get().getStreetName().get() + " to " + address_dest.get().getStreetName().get() + "					:</h3>");
 			}
 			try {
+				out.println("<h3>Alternatives Routes from " + route1.getFrom().getAddress().toString() + " to " + route1.getTo().getAddress().toString()+ "					:</h3>");
 				
 //				logger.debug(routes);
 //				RouteFormatRoot response_route = filterRoutes(routes);

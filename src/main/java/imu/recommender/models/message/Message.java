@@ -20,6 +20,7 @@ public class Message {
     private String target;
     private Integer number_of_successes;
     private Double utility;
+    private String className;
 
     public Message(){
 
@@ -30,6 +31,7 @@ public class Message {
         this.message_text = "Today it’s sunny! Take the opportunity to use your bicycle to save CO2 emissions.";
         this.target = "bike";
         this.number_of_successes = 0;
+        this.className = "imu.recommender.models.message.Message";
     }
 
     public ObjectId getId() {

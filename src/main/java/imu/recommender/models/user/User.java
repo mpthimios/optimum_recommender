@@ -68,6 +68,7 @@ public class User {
 		this.stated_preferences = new StatedPreferences();
 		this.facebook_data = new FacebookData();
 		this.owned_vehicles = null;
+
 	}
 	
 	public boolean emissionsIncreasing() {
@@ -78,14 +79,14 @@ public class User {
 	
 	public boolean tooManyPublicTransportRoutes() {
         //Get percentage_of_public_transport_use_last_period from mongodb
-        Double percentage_of_public_transport_use_last_period = 0.9;
+        Double percentage_of_public_transport_use_last_period = this.getPtUsage();
         return percentage_of_public_transport_use_last_period>0.6;
 
     }
 	
 	public boolean tooManyCarRoutes() {
         //Get percentage_of_car_use_last_period from mongodb
-        Double percentage_of_car_use_last_period = 0.4;
+        Double percentage_of_car_use_last_period = this.getCarUsage();
         return percentage_of_car_use_last_period>0.6;
     }
 	
