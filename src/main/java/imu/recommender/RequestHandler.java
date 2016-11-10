@@ -23,6 +23,7 @@ import at.ac.ait.ariadne.routeformat.geojson.GeoJSONFeatureCollection;
 import at.ac.ait.ariadne.routeformat.geojson.GeoJSONLineString;
 import at.ac.ait.ariadne.routeformat.geojson.GeoJSONPolygon;
 import at.ac.ait.ariadne.routeformat.location.Address;
+import imu.recommender.helpers.IgnoreMixIn;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.user.Demographics;
 import imu.recommender.models.user.OwnedVehicle;
@@ -31,6 +32,7 @@ import imu.recommender.models.user.User;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -78,6 +80,7 @@ public class RequestHandler extends HttpServlet{
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.findAndRegisterModules();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		
 		Recommender recommenderRoutes= new Recommender(mapper.readValue(getBody(request), RouteFormatRoot.class));
 		recommenderRoutes.filterRoutesForUser(null);
