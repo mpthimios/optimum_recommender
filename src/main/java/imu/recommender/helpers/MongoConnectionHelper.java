@@ -8,6 +8,7 @@ import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
 import org.mongodb.morphia.dao.BasicDAO;
+import org.mongodb.morphia.mapping.DefaultCreator;
 
 
 public class MongoConnectionHelper {
@@ -28,7 +29,14 @@ public class MongoConnectionHelper {
 	                	int port = 27017;
 	                	
 	                    mongoSingleton = new MongoClient(host, port);
-	                    dsSingleton = new Morphia().createDatastore(mongoSingleton, "Optimum");
+	                    Morphia morphia = new Morphia();
+//	                    morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+//	                        @Override
+//	                        protected ClassLoader getClassLoaderForClass() {
+//	                        	return Thread.currentThread().getContextClassLoader();
+//	                        }
+//	                    });
+	                    dsSingleton = morphia.createDatastore(mongoSingleton, "Optimum");	                    
 	                }
 	            }
 	        }

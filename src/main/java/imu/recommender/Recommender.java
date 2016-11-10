@@ -126,7 +126,11 @@ public class Recommender {
 	}
 	
 	public void rankRoutesForUser (User user){
-		//todo
+		
+	}
+	
+	private List<RouteModel> rankBasedonBehaviouralModel(){
+		return null;
 	}
 	
 	public RouteFormatRoot getFilteredRoutesResponseStr(){

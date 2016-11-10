@@ -55,6 +55,7 @@ import javafx.geometry.BoundingBox;
 
 import org.apache.log4j.Logger;
 import org.bitpipeline.lib.owm.WeatherForecastResponse;
+import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -76,24 +77,41 @@ public class RequestHandler extends HttpServlet{
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+		
+		//get the datastore
+		Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+		
+		//prepare the response
+		// Set the response message's MIME type
+	    response.setContentType("text/html; charset=UTF-8");
+	    // Allocate a output writer to write the response message into the network socket
+	    PrintWriter out = response.getWriter();
 
+		String userID = "";
+		User user;
+		
+		try{
+			userID = request.getHeader("X-USER-ID");
+			logger.debug(userID);
+			user = mongoDatastore.get(User.class, new ObjectId(userID));
+			//logger.debug(user.getName());
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			out.println("user not found");
+			return;
+		}
+		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.findAndRegisterModules();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		
 		Recommender recommenderRoutes= new Recommender(mapper.readValue(getBody(request), RouteFormatRoot.class));
-		recommenderRoutes.filterRoutesForUser(null);
+		recommenderRoutes.filterRoutesForUser(user);		
+		recommenderRoutes.rankRoutesForUser(user);
 
-		// Set the response message's MIME type
-	    response.setContentType("text/html; charset=UTF-8");
-	    // Allocate a output writer to write the response message into the network socket
-	    PrintWriter out = response.getWriter();
-
-		Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
-		Query<User> query = mongoDatastore.createQuery(User.class).field("name").equal("John3");
-		User user = query.get();
-	    if (PRINT_JSON){
+		if (PRINT_JSON){
 	    	RouteFormatRoot response_route = recommenderRoutes.getFilteredRoutesResponseStr();
 			logger.debug(response_route);
 			List<Route> Trips = new ArrayList<Route>();
