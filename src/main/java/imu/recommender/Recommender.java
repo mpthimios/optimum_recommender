@@ -41,6 +41,7 @@ public class Recommender {
 		for (int i = 0; i < originalRouteFormatRoutes.getRoutes().size(); i++) {
 			RouteModel recommenderRoute = new RouteModel(originalRouteFormatRoutes.getRoutes().get(i));
 			recommenderRoute.calculateEmissions();
+			recommenderRoute.addMode();
 			routes.add(recommenderRoute);						    
 		}
 		filteredRoutes = new ArrayList<RouteModel>();
@@ -126,10 +127,24 @@ public class Recommender {
 	}
 	
 	public void rankRoutesForUser (User user){
-		
+		//function aggregated 
 	}
 	
 	private List<RouteModel> rankBasedonBehaviouralModel(){
+		//todo
+		return null;
+	}
+	
+	private List<RouteModel> rankBasedonUserPreferences(){
+		//todo 
+		//get preference for this time of day (we should split the day in intervals)
+		//if there are no preferences for this time of day get preferences for any time of day
+		//if there are preferences use these preferences
+		return null;
+	}
+	
+	private List<RouteModel> rankBasedonSystemView(){
+		//todo later
 		return null;
 	}
 	

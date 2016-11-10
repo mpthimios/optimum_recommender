@@ -15,6 +15,10 @@ public class RouteModel {
 		this.route = route;
 	}
 	
+	public void addMode(){
+		//todo
+	}
+	
 	public void calculateEmissions(){
 		for (int j = 0; j < route.getSegments().size(); j++) {
 			RouteSegment segment = route.getSegments().get(j);

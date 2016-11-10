@@ -14,6 +14,8 @@ public class Personality {
 	private double Q10;
 	private double type;
 	private String typeStr;
+	//per personality type scores
+	private boolean scores_calculated = false;
 	
 	public Personality(){
 		Q1 = 1.0;
@@ -26,8 +28,8 @@ public class Personality {
 		Q8 = 1.0;
 		Q9 = 1.0;
 		Q10 = 1.0;
-		type = 2.0;
-		typeStr = "aggreableness";
+		type = 0.0;
+		typeStr = "";
 	}
 
 	public double getQ1() {
@@ -126,4 +128,11 @@ public class Personality {
 		this.typeStr = typeStr;
 	}
 	
+	public boolean isScores_calculated() {
+		return scores_calculated;
+	}
+
+	public void setScores_calculated(boolean scores_calculated) {
+		this.scores_calculated = scores_calculated;
+	}
 }

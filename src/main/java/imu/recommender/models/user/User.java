@@ -67,8 +67,7 @@ public class User {
 		this.personality = new Personality();
 		this.stated_preferences = new StatedPreferences();
 		this.facebook_data = new FacebookData();
-		this.owned_vehicles = null;
-
+		this.owned_vehicles = null;		
 	}
 	
 	public boolean emissionsIncreasing() {
@@ -106,6 +105,14 @@ public class User {
 	    	return null;
 	    }
 	    return m;		
+	}
+	
+	private String getUserPersonalityType(){
+		//todo
+		if (!this.personality.isScores_calculated()){
+			//calculate scores
+		}
+		return "sdfsdf";
 	}
 
 	public ObjectId getId() {
