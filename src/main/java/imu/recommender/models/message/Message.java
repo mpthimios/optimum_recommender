@@ -75,7 +75,7 @@ public class Message {
     public String getTarget() { return target; }
 
     public void setTarget(ObjectId id) {
-        this.target =target;
+        this.target = target;
     }
 
     public Double getUtility() {

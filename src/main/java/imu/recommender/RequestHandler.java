@@ -112,7 +112,7 @@ public class RequestHandler extends HttpServlet{
 		recommenderRoutes.rankRoutesForUser(user);
 
 		if (PRINT_JSON){
-	    	RouteFormatRoot response_route = recommenderRoutes.getFilteredRoutesResponseStr();
+	    	RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
 			logger.debug(response_route);
 			List<Route> Trips = new ArrayList<Route>();
 			for (int i = 0; i < response_route.getRoutes().size(); i++) {
@@ -133,7 +133,7 @@ public class RequestHandler extends HttpServlet{
 			}
 			RouteFormatRoot final_route = new RouteFormatRoot().setRequestId(response_route.getRequestId()).setRouteFormatVersion(response_route.getRouteFormatVersion()).setProcessedTime(response_route.getProcessedTime()).setStatus(response_route.getStatus()).setCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem()).setRequest(response_route.getRequest().get()).setRoutes(response_route.getRoutes());
 			//String geoJson = mapper.writeValueAsString(routeResponseStr.toString());
-			String geoJson = mapper.writeValueAsString(response_route.toString());
+			String geoJson = mapper.writeValueAsString(final_route);
 			out.println(geoJson);
 	    }
 	}

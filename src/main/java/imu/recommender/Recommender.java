@@ -148,7 +148,7 @@ public class Recommender {
 		return null;
 	}
 	
-	public RouteFormatRoot getFilteredRoutesResponseStr(){
+	public String getFilteredRoutesResponseStr(){
 		ArrayList<Route> routesList = new ArrayList<Route>();
 		for (RouteModel route : filteredRoutes){
 			routesList.add(route.getRoute());
@@ -163,7 +163,7 @@ public class Recommender {
 				.setRoutes(routesList);
 		
 		//return originalRouteFormatRoutes.toString();
-		return filtered_route;
+		return filtered_route.toString();
 	}
 
 	public RouteFormatRoot getOriginalRouteFormatRoutes() {
