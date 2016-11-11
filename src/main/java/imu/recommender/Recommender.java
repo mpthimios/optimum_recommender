@@ -57,48 +57,8 @@ public class Recommender {
 			boolean bike_owner = true;
 			logger.debug(recommenderRoute.getRoute().getFrom());
 			recommenderRoute.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0);
-			//Find the mode of the route searching segments of the route
-			List<String> Modes = new ArrayList<String>();
-			for (int j=0; j< recommenderRoute.getRoute().getSegments().size(); j++) {
-				RouteSegment segment = recommenderRoute.getRoute().getSegments().get(j);
-				String mode = segment.getModeOfTransport().getGeneralizedType().toString();
-						//.getGeneralizedType().toString();
-				if (!Modes.contains(mode)) {
-					Modes.add(mode);
-				}
-			}
-			String mode="";
-			logger.debug(Modes);
-			if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE")  ){
-				mode="park&ride_with_bike";
-			}
-			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") ){
-				mode="park&ride";
-			}
-			else if (Modes.contains("BICYCLE") && Modes.contains("FOOT") && Modes.contains("PUBLIC_TRANSPORT") ){
-				mode="bike&ride";
-			}
-			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") ){
-				mode="pt";
-			}
-			else if (Modes.contains("CAR") && Modes.contains("FOOT") ){
-				mode="car";
-			}
-			else if (Modes.contains("FOOT") && Modes.size()==1 ){
-				mode="walk";
-			}
-			else if (Modes.contains("BICYCLE") && Modes.size()==1 ){
-				mode="walk";
-			}
-			else if (Modes.contains("CAR") && Modes.size()==1 ){
-				mode="car";
-			}
-			else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.size()==1 ){
-				mode="pt";
-			}
-			else {
-				mode="unknown";
-			}
+			String mode = recommenderRoute.getRoute().getAdditionalInfo().get("mode").toString();
+			logger.debug(mode);
 			//Filter out routes
 			//Filter out car and park and ride modes for users that don’t own a car.
 			if(!car_owner) {
@@ -127,7 +87,7 @@ public class Recommender {
 	}
 	
 	public void rankRoutesForUser (User user){
-		//function aggregated 
+		//function aggregated
 	}
 	
 	private List<RouteModel> rankBasedonBehaviouralModel(){
@@ -139,6 +99,7 @@ public class Recommender {
 		//todo 
 		//get preference for this time of day (we should split the day in intervals)
 		//if there are no preferences for this time of day get preferences for any time of day
+
 		//if there are preferences use these preferences
 		return null;
 	}
