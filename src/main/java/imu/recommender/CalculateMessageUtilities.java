@@ -64,7 +64,7 @@ public class CalculateMessageUtilities {
         }
 
         //Check the weather if withinBikeDistance or withinWalkingDistance is True
-        /*if(withinWalkingDistance(route_distance) || withinBikeDistance(route_distance) ) {
+       /* if(withinWalkingDistance(route_distance) || withinBikeDistance(route_distance) ) {
             if (WeatherInfo.isWeatherNice(lat, lon, city)) {
                 System.out.println("Nice Weather");
                 contextList.add("NiceWeather");
@@ -79,7 +79,7 @@ public class CalculateMessageUtilities {
         if (user.tooManyCarRoutes()){
             contextList.add("TooManyCarRoutes");
         }
-        /*Route carTrip = CarTrip(route);
+        Route carTrip = CarTrip(route);
         if ( carTrip!= null && trip.getAdditionalInfo().get("mode").equals("pt")) {
             Integer driving_distance = carTrip.getDistanceMeters();
             if (CostComparetoDriving("transport", "drive")) {
@@ -89,7 +89,7 @@ public class CalculateMessageUtilities {
             if (DurationComparetoDriving(duration, driving_duration)) {
                 contextList.add("Duration");
             }
-        }*/
+        }
 
         /*
         if (EmissionComparetoOthers("user")){

@@ -36,6 +36,7 @@ public class RouteModel {
 			}
 		}
 		String mode="";
+
 		logger.debug(Modes);
 		if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE")  ){
 			mode = RecommenderModes.recommenderModesStr[RecommenderModes.PARK_AND_RIDE_WITH_BIKE];
@@ -71,7 +72,7 @@ public class RouteModel {
 		Map<String, Object> additionalInfo = route.getAdditionalInfo();
 		additionalInfo.put("mode", mode);
 		route.setAdditionalInfo(additionalInfo);
-		
+
 	}
 	
 	public void calculateEmissions(){

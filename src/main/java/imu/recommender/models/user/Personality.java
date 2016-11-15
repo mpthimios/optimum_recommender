@@ -14,10 +14,15 @@ public class Personality {
 	private double Q10;
 	private double type;
 	private String typeStr;
+	private double Extraversion;
+	private double Openness;
+	private double Neuroticism;
+	private double Agreeableness;
+	private double Consientiousness;
 	//per personality type scores
 	private boolean scores_calculated = false;
-	
-	public Personality(){
+
+	public Personality() {
 		Q1 = 1.0;
 		Q2 = 1.0;
 		Q3 = 1.0;
@@ -30,6 +35,12 @@ public class Personality {
 		Q10 = 1.0;
 		type = 0.0;
 		typeStr = "";
+		Extraversion = 0.0;
+		Openness = 0.0;
+		Neuroticism = 0.0;
+		Agreeableness = 0.0;
+		Consientiousness = 0.0;
+
 	}
 
 	public double getQ1() {
@@ -127,7 +138,7 @@ public class Personality {
 	public void setTypeStr(String typeStr) {
 		this.typeStr = typeStr;
 	}
-	
+
 	public boolean isScores_calculated() {
 		return scores_calculated;
 	}
@@ -135,4 +146,37 @@ public class Personality {
 	public void setScores_calculated(boolean scores_calculated) {
 		this.scores_calculated = scores_calculated;
 	}
+
+	public double getExtraversion() {
+		return Extraversion;
+	}
+
+	public void setExtraversion(double extraversion) {
+		Extraversion = extraversion;
+	}
+	public double getOpenness(){
+		return Openness;
+	}
+	public void setOpenness(double openness){
+		Openness = openness;
+	}
+	public double getNeuroticism(){
+		return Neuroticism;
+	}
+	public void setNeuroticism(double neuroticism){
+		Neuroticism = neuroticism;
+	}
+	public double getAgreeableness(){
+		return Agreeableness;
+	}
+	public void setAgreeableness(double agreeableness){
+		Agreeableness = agreeableness;
+	}
+	public double getConsientiousness(){
+		return Consientiousness;
+	}
+	public void setConsientiousness(double consientiousness){
+		Consientiousness = consientiousness;
+	}
+
 }

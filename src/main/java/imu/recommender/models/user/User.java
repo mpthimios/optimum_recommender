@@ -1,5 +1,6 @@
 package imu.recommender.models.user;
 
+import java.util.Arrays;
 import java.util.List;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -30,7 +31,8 @@ public class User {
 	private double carUsageComparedToOthers;
 	private double ptUsageComparedToOthers;
 	private double bikeUsageComparedToOthers;	
-	
+	private double emissionsLastWeek;
+
 	private ArrayList<OwnedVehicle> owned_vehicles;
 	
 	@Embedded("demographics")
@@ -67,7 +69,8 @@ public class User {
 		this.personality = new Personality();
 		this.stated_preferences = new StatedPreferences();
 		this.facebook_data = new FacebookData();
-		this.owned_vehicles = null;		
+		this.owned_vehicles = null;
+		this.emissionsLastWeek = 0.0;
 	}
 	
 	public boolean emissionsIncreasing() {
@@ -107,12 +110,33 @@ public class User {
 	    return m;		
 	}
 	
-	private String getUserPersonalityType(){
-		//todo
+	public String getUserPersonalityType(){
+
 		if (!this.personality.isScores_calculated()){
 			//calculate scores
+			double extraversion_score = ( this.personality.getQ1() + this.personality.getQ6() )/2;
+			double agreeableness_score = ( this.personality.getQ2() + this.personality.getQ7() )/2;
+			double conscientiousness_score = ( this.personality.getQ3() + this.personality.getQ8() )/2;
+			double neuroticism_score = ( this.personality.getQ4() + this.personality.getQ9() )/2;
+			double openness_score = (this.personality.getQ5() + this.personality.getQ10() )/2;
+			this.personality.setExtraversion(extraversion_score);
+			this.personality.setAgreeableness(agreeableness_score);
+			this.personality.setConsientiousness(conscientiousness_score);
+			this.personality.setNeuroticism(neuroticism_score);
+			this.personality.setOpenness(openness_score);
+			this.personality.setScores_calculated(true);
+			//Find max score
+			List<String> personalities =  Arrays.asList("Extraversion", "Agreeableness", "Conssientiousness", "Neuroticism", "Openness");
+			List<Double> scores = Arrays.asList( this.personality.getExtraversion(), this.personality.getAgreeableness(), this.personality.getConsientiousness(), this.personality.getNeuroticism(), this.personality.getOpenness() );
+			double max = 0.0;
+			for(int i=0; i<personalities.size(); i++){
+				if (scores.get(i) > max) {
+					max= scores.get(i);
+					this.personality.setTypeStr(personalities.get(i));
+				}
+			}
 		}
-		return "sdfsdf";
+		return this.personality.getTypeStr();
 	}
 
 	public ObjectId getId() {
@@ -201,6 +225,14 @@ public class User {
 
 	public void setBikeUsage(double bikeUsage) {
 		this.bikeUsage = bikeUsage;
+	}
+
+	public double getEmissionsLastWeek() {
+		return emissionsLastWeek;
+	}
+
+	public void setEmissionsLastWeek(double emissionsLastWeek) {
+		this.emissionsLastWeek = emissionsLastWeek;
 	}
 
 	public double getCarUsageComparedToOthers() {
