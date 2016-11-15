@@ -88,7 +88,7 @@ public class RequestHandler extends HttpServlet{
 	    PrintWriter out = response.getWriter();
 
 		String userID = "";
-		User user;
+		User user = null;
 		
 		try{
 			userID = request.getHeader("X-USER-ID");
@@ -98,8 +98,8 @@ public class RequestHandler extends HttpServlet{
 		}
 		catch (Exception e){
 			e.printStackTrace();
-			out.println("user not found");
-			return;
+//			out.println("user not found");
+//			return;
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
