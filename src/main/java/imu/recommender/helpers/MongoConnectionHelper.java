@@ -3,32 +3,52 @@ package imu.recommender.helpers;
 import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+
+import imu.recommender.RequestHandler;
+
 import org.mongodb.morphia.dao.BasicDAO;
 import org.mongodb.morphia.mapping.DefaultCreator;
 
 
-public class MongoConnectionHelper {
+public class MongoConnectionHelper implements ServletContextListener {
 	 private static MongoClient mongoSingleton = null;
 	 private static Datastore dsSingleton = null;
+	 private Logger logger = Logger.getLogger(RequestHandler.class);
+	 
+	 private static String host = "83.212.113.64";
+	 private static int port = 27017;
+	 private static String user = "";
+	 private static String pass = "";
 
-	    public static synchronized Datastore getMongoDatastore() throws UnknownHostException {
+	    public static synchronized Datastore getMongoDatastore() 
+	    		throws UnknownHostException {
 
 	        if (mongoSingleton == null) {
 
 	            synchronized (MongoConnectionHelper.class) {
 	                if (mongoSingleton == null) {
-
-	                    //ResourceBundle bundle = ResourceBundle.getBundle("mongodb");
-	                    //String host = bundle.getString("host");
-	                	String host = "83.212.113.64";	                	
-	                    //int port = Integer.parseInt(bundle.getString("port"));
-	                	int port = 27017;
 	                	
-	                    mongoSingleton = new MongoClient(host, port);
+	                	if (user.matches("")){
+	                		mongoSingleton = new MongoClient(host, port);	                		
+	                	}else{
+	                		String connectionStr = "mongodb://" + user + ":" + pass + "@" + host + ":" + port + "/Optimum";
+	                		mongoSingleton = new MongoClient(	                				
+	                  			new MongoClientURI(connectionStr)
+	                  		);
+	                	}
+	                		
+	                	
+	                    
 	                    Morphia morphia = new Morphia();
 //	                    morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
 //	                        @Override
@@ -44,5 +64,34 @@ public class MongoConnectionHelper {
 	        return dsSingleton;
 
 	    }
+
+		@Override
+		public void contextDestroyed(ServletContextEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void contextInitialized(ServletContextEvent servletContextEvent) {
+			//test
+			try{
+	    		ServletContext sc = servletContextEvent.getServletContext();
+	    		String mongoURL = sc.getInitParameter("mongoURL");
+	    		logger.debug("mongoURL: " + mongoURL);
+	    		this.host = mongoURL;
+	    		String mongoPort = sc.getInitParameter("mongoPort");
+	    		logger.debug("mongoPort: " + mongoPort);
+	    		this.port = Integer.parseInt(mongoPort);
+	    		String mongoUser = sc.getInitParameter("mongoUser");
+	    		logger.debug("mongoUser: " + mongoUser);
+	    		this.user = mongoUser;
+	    		String mongoPass = sc.getInitParameter("mongoPass");
+	    		logger.debug("mongoPass: " + mongoPass);
+	    		this.pass = mongoPass;
+			}
+			catch (Exception e){
+				e.printStackTrace();
+			}
+		}
 
 }

@@ -160,6 +160,7 @@
                 <configuration>
                     <url>http://127.0.0.1:8080/manager/html</url>
                     <server>local</server>
+                    <contextFile>${project.basedir}\src\main\resources\context.xml</contextFile>
                 </configuration>
             </plugin>
             <plugin>

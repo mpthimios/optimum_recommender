@@ -90,27 +90,32 @@ public class RequestHandler extends HttpServlet{
 		String userID = "";
 		User user = null;
 		
-		try{
-			userID = request.getHeader("X-USER-ID");
-			logger.debug(userID);
-			user = mongoDatastore.get(User.class, new ObjectId(userID));
-			//logger.debug(user.getName());
-		}
-		catch (Exception e){
-			e.printStackTrace();
-//			out.println("user not found");
-//			return;
-		}
-		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.findAndRegisterModules();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		
 		Recommender recommenderRoutes= new Recommender(mapper.readValue(getBody(request), RouteFormatRoot.class));
-		recommenderRoutes.filterRoutesForUser(user);		
-		recommenderRoutes.rankRoutesForUser(user);
-
+		try{
+			userID = request.getHeader("X-USER-ID");
+			logger.debug(userID);
+			user = mongoDatastore.get(User.class, new ObjectId(userID));
+			logger.debug("user object: ");
+			logger.debug(user);
+			//for testing
+			logger.debug(user.getDemographics().getGender());			
+			recommenderRoutes.filterRoutesForUser(user);		
+			recommenderRoutes.rankRoutesForUser(user);
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			out.println("user not found");
+			//rank by the default list
+			
+			//add a default message
+			
+			//return;
+		}
+		
 		if (PRINT_JSON){
 	    	RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
 			logger.debug(response_route);

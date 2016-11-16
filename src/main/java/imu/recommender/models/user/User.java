@@ -12,7 +12,7 @@ import org.mongodb.morphia.annotations.*;
 
 import imu.recommender.helpers.MongoConnectionHelper;
 
-@Entity("users")
+@Entity("OptimumUsers")
 
 public class User {
 	@Id

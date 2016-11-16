@@ -16,7 +16,11 @@
 	</servlet-mapping>
 	
 	<listener>
-        <listener-class>org.quartz.ee.servlet.QuartzInitializerListener</listener-class>
+        <listener-class>org.quartz.ee.servlet.QuartzInitializerListener</listener-class>        
+    </listener>
+    
+    <listener>        
+        <listener-class>imu.recommender.helpers.MongoConnectionHelper</listener-class>
     </listener>
   
 </web-app>
