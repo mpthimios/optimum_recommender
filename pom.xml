@@ -161,6 +161,12 @@
                     <url>http://127.0.0.1:8080/manager/html</url>
                     <server>local</server>
                     <contextFile>${project.basedir}\src\main\resources\context.xml</contextFile>
+                    <systemProperties>
+                        <property>
+                            <name>catalina.base</name>
+                            <value>${project.basedir}</value>
+                        </property>
+                    </systemProperties>
                 </configuration>
             </plugin>
             <plugin>

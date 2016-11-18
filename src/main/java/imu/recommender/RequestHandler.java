@@ -108,7 +108,7 @@ public class RequestHandler extends HttpServlet{
 		}
 		catch (Exception e){
 			e.printStackTrace();
-			out.println("user not found");
+			logger.debug("user not found");
 			//rank by the default list
 			
 			//add a default message
