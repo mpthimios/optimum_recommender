@@ -1,11 +1,10 @@
 package imu.recommender;
 
+import imu.recommender.helpers.UserPreferMode;
+import java.lang.reflect.Array;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -160,14 +159,79 @@ public class Recommender {
 		
 		return 0.0;
 	}
-	
-	private List<RouteModel> rankBasedonUserPreferences(){
-		//todo 
-		//get preference for this time of day (we should split the day in intervals)
-		//if there are no preferences for this time of day get preferences for any time of day
 
-		//if there are preferences use these preferences
-		return null;
+	public List<RouteModel> rankBasedonUserPreferences(List<RouteModel> routes, User user){
+		//todo
+		//get preference for this time of day (we should split the day in intervals)
+
+		//if there are no preferences for this time of day get preferences for any time of day
+		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
+
+		UserPreferMode[] modes = new UserPreferMode[4];
+
+		try {
+
+			UserPreferMode car = new UserPreferMode("car", (int) user.getMode_usage().getCar_percent());
+			UserPreferMode bike = new UserPreferMode("bike", (int) user.getMode_usage().getBike_percent());
+			UserPreferMode walk = new UserPreferMode("walk", (int) user.getMode_usage().getWalk_percent());
+			UserPreferMode pt = new UserPreferMode("pt", (int) user.getMode_usage().getPt_percent());
+
+			modes[0]=car;
+			modes[1]=bike;
+			modes[2]=walk;
+			modes[3]=pt;
+		}
+		catch (Exception e){
+			//if there are no preferences for any time of day get the default
+
+			UserPreferMode car = new UserPreferMode("car", 4);
+			UserPreferMode bike = new UserPreferMode("bike", 3);
+			UserPreferMode walk = new UserPreferMode("walk", 2);
+			UserPreferMode pt = new UserPreferMode("pt", 1);
+
+			modes[0]=car;
+			modes[1]=bike;
+			modes[2]=walk;
+			modes[3]=pt;
+
+		}
+
+
+		Arrays.sort(modes);
+
+		int i=0;
+		for(UserPreferMode temp: modes){
+			System.out.println("mode " + ++i + " : " + temp.getMode() +
+					", Percentage : " + temp.getPercentage());
+		}
+
+		List<RouteModel> FirstListRoutes = new ArrayList<RouteModel>();
+		List<RouteModel> SecondListRoutes = new ArrayList<RouteModel>();
+		List<RouteModel> ThirdListRoutes = new ArrayList<RouteModel>();
+		List<RouteModel> ForthListRoutes = new ArrayList<RouteModel>();
+
+		for (RouteModel route : routes){
+			String m = route.getRoute().getAdditionalInfo().get("mode").toString();
+			if (m.equals(modes[0].getMode() ) ){
+				FirstListRoutes.add(route);
+			}
+			if (m.equals(modes[1].getMode() ) ){
+				SecondListRoutes.add(route);
+			}
+			if (m.equals(modes[2].getMode() ) ){
+				ThirdListRoutes.add(route);
+			}
+			if (m.equals(modes[3].getMode() ) ){
+				ForthListRoutes.add(route);
+			}
+
+		}
+		rankedRoutes.addAll(FirstListRoutes);
+		rankedRoutes.addAll(SecondListRoutes);
+		rankedRoutes.addAll(ThirdListRoutes);
+		rankedRoutes.addAll(ForthListRoutes);
+		// if there are preferences use these preferences
+		return rankedRoutes;
 	}
 	
 	private List<RouteModel> rankBasedonSystemView(){
