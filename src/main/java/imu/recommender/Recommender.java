@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.RecommenderModes;
 import imu.recommender.models.route.RouteModel;
 import at.ac.ait.ariadne.routeformat.Route;
@@ -71,13 +72,13 @@ public class Recommender {
 			}
 			//Filter out bike modes for users that don’t own a bike and for routes containing biking more than 3 Km
 			else if (mode == RecommenderModes.BICYCLE){
-				if((bike_owner) && (recommenderRoute.getRoute().getDistanceMeters()<3000)){
+				if((bike_owner) && (recommenderRoute.getRoute().getDistanceMeters()<GetProperties.getMaxBikeDistance())){
 					filteredRoutes.add(recommenderRoute);
 				}
 			}
 			//Filter out walk modes for routes containing walking more than 1 Km
 			else if(mode == RecommenderModes.WALK){
-				if(recommenderRoute.getRoute().getDistanceMeters()<1000){
+				if(recommenderRoute.getRoute().getDistanceMeters()<GetProperties.getMaxWalkingDistance()){
 					filteredRoutes.add(recommenderRoute);
 				}				
 			}
@@ -118,6 +119,48 @@ public class Recommender {
 		return null;
 	}
 	
+	private double U1(){
+		double ASC1 = 0.0;
+		double TravelCostgeneric = -0.0779;
+		double TravelTime1 = -0.0606;
+		
+		return 0.0;
+	}
+	
+	private double U2(){
+		double ASC2 = 0.821;
+		double TravelCostgeneric = -0.0779;
+		double TravelTime2 = -0.0568;
+		
+		return 0.0;
+	}
+	
+	private double U3(){
+		double ASC3 = -1.31;
+		double TravelCostgeneric = -0.0779;
+		double TravelTime3 = -0.0568; //???
+		
+		return 0.0;
+	}
+	
+	private double U4(){
+		double ASC3 = 1.92;
+		double TravelCostgeneric = -0.0779;
+		double TravelTime4 = -0.0714;
+		
+		return 0.0;
+	}
+	
+	private double AspEnv(){
+		double g0 = 4.08;
+		double g1 = 0.0361;
+		double g2 = -0.797;
+		double g3 = 1.41;
+		double g4 = -2.10;
+		
+		return 0.0;
+	}
+	
 	private List<RouteModel> rankBasedonUserPreferences(){
 		//todo 
 		//get preference for this time of day (we should split the day in intervals)
@@ -132,7 +175,7 @@ public class Recommender {
 		return null;
 	}
 	
-	public String getFilteredRoutesResponseStr(){
+	public RouteFormatRoot getFilteredRoutesResponse(){
 		ArrayList<Route> routesList = new ArrayList<Route>();
 		for (RouteModel route : filteredRoutes){
 			routesList.add(route.getRoute());
@@ -147,7 +190,7 @@ public class Recommender {
 				.setRoutes(routesList);
 		
 		//return originalRouteFormatRoutes.toString();
-		return filtered_route.toString();
+		return filtered_route;
 	}
 
 	public RouteFormatRoot getOriginalRouteFormatRoutes() {

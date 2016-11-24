@@ -94,30 +94,29 @@ public class RequestHandler extends HttpServlet{
 		mapper.findAndRegisterModules();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		Recommender recommenderRoutes= new Recommender(mapper.readValue(getBody(request), RouteFormatRoot.class));
+		String requestBody = getBody(request);
+		logger.debug(requestBody);
+		Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class));
 		try{
 			userID = request.getHeader("X-USER-ID");
+			logger.debug("X-USER-ID");
 			logger.debug(userID);
-			user = mongoDatastore.get(User.class, new ObjectId(userID));
+			//user = mongoDatastore.get(User.class, new ObjectId(userID));
+			user = User.findById(userID);
 			logger.debug("user object: ");
 			logger.debug(user);
 			//for testing
 			logger.debug(user.getDemographics().getGender());			
 			recommenderRoutes.filterRoutesForUser(user);		
 			recommenderRoutes.rankRoutesForUser(user);
+			
+			String jsonResult = mapper.writeValueAsString(recommenderRoutes.getFilteredRoutesResponse());
+			out.println(jsonResult);			
 		}
 		catch (Exception e){
 			e.printStackTrace();
 			logger.debug("user not found");
-			//rank by the default list
-			
-			//add a default message
-			
-			//return;
-		}
-		
-		if (PRINT_JSON){
-	    	RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
+			RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
 			logger.debug(response_route);
 			List<Route> Trips = new ArrayList<Route>();
 			for (int i = 0; i < response_route.getRoutes().size(); i++) {
@@ -126,9 +125,9 @@ public class RequestHandler extends HttpServlet{
 					mes = "";
 				} else {
 					try {
-						mes = CalculateMessageUtilities.calculateForUser( response_route, route, user);
-					} catch (Exception e) {
-						e.printStackTrace();
+						mes = CalculateMessageUtilities.calculateForUser(response_route, route, user);
+					} catch (Exception ex) {
+						ex.printStackTrace();
 					}
 				}
 				Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
@@ -136,11 +135,18 @@ public class RequestHandler extends HttpServlet{
 				additionalInfoRouteRequest.put("message", mes);
 				response_route.getRoutes().get(i).setAdditionalInfo(additionalInfoRouteRequest);
 			}
-			RouteFormatRoot final_route = new RouteFormatRoot().setRequestId(response_route.getRequestId()).setRouteFormatVersion(response_route.getRouteFormatVersion()).setProcessedTime(response_route.getProcessedTime()).setStatus(response_route.getStatus()).setCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem()).setRequest(response_route.getRequest().get()).setRoutes(response_route.getRoutes());
+			RouteFormatRoot final_route = new RouteFormatRoot()
+					.setRequestId(response_route.getRequestId())
+					.setRouteFormatVersion(response_route.getRouteFormatVersion())
+					.setProcessedTime(response_route.getProcessedTime())
+					.setStatus(response_route.getStatus())
+					.setCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem())
+					.setRequest(response_route.getRequest().get())
+					.setRoutes(response_route.getRoutes());
 			//String geoJson = mapper.writeValueAsString(routeResponseStr.toString());
 			String geoJson = mapper.writeValueAsString(final_route);
 			out.println(geoJson);
-	    }
+		}		
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)

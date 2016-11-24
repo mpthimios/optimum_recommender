@@ -16,7 +16,9 @@ import imu.recommender.helpers.MongoConnectionHelper;
 
 public class User {
 	@Id
-	private ObjectId id;
+	private ObjectId _id;
+	
+	private String id;
 	
 	private String name;
 	private String mobility_type;
@@ -110,6 +112,24 @@ public class User {
 	    return m;		
 	}
 	
+	public static User findById(String id){
+		
+		Datastore mongoDatastore;
+		try {
+			mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+		User m = (User) mongoDatastore.find(User.class).field("id").equal(id).get();
+	    if (m == null) {
+	    	return null;
+	    }
+	    return m;		
+	}
+	
 	public String getUserPersonalityType(){
 
 		if (!this.personality.isScores_calculated()){
@@ -139,11 +159,19 @@ public class User {
 		return this.personality.getTypeStr();
 	}
 
-	public ObjectId getId() {
+	public ObjectId get_Id() {
+		return _id;
+	}
+
+	public void set_Id(ObjectId id) {
+		this._id = _id;
+	}
+	
+	public String getId() {
 		return id;
 	}
 
-	public void setId(ObjectId id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

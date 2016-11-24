@@ -22,5 +22,9 @@
     <listener>        
         <listener-class>imu.recommender.helpers.MongoConnectionHelper</listener-class>
     </listener>
+    
+    <listener>        
+        <listener-class>imu.recommender.helpers.GetProperties</listener-class>
+    </listener>
   
 </web-app>
