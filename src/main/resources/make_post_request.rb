@@ -24,7 +24,7 @@ file.close
 #puts @body
 
 request = Net::HTTP::Post.new(@path, initheader = {'Content-Type' =>'text/plain;charset=utf-8'})
-request.initialize_http_header({"X-USER-ID" => "581cada65ed01dda30885af6"})
+request.initialize_http_header({"X-USER-ID" => "582b2344e4b0b1b16cb8cadc"})
 request.body = @body
 response = Net::HTTP.new(@host, @port).start {|http| http.request(request) }
 puts "Response #{response.code} #{response.message}: #{response.body}"

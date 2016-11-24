@@ -14,6 +14,7 @@ import org.mongodb.morphia.query.UpdateOperations;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import java.time.Instant;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -23,6 +24,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -30,7 +33,7 @@ import java.util.Random;
  * Created by evangelie on 11/11/2016.
  */
 public class CalculateEmissions implements Job {
-    private Logger logger = Logger.getLogger(CalculateModeUsePercentages.class);
+    private Logger logger = Logger.getLogger(CalculateEmissions.class);
     private final String activitiesUrl = "http://traffic.ijs.si/NextPin/getActivities";
 
     @Override
@@ -55,15 +58,15 @@ public class CalculateEmissions implements Job {
             URL obj = new URL(activitiesUrl);
             con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
-            //we should get current time and 7 days before
-            String urlParameters = "from=1436991007182&to=1437163807182";
+            //Get activities of the last week of the user.
+            final ZonedDateTime input = ZonedDateTime.now();
+            final ZonedDateTime startOfLastWeek = input.minusWeeks(1);
 
-            // Send post request
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
+            long last_week = startOfLastWeek.toEpochSecond()*1000;
+            long now = input.toEpochSecond()*1000;
+            String urlParameters = "from="+last_week+"&to="+now;
+            con.setRequestProperty("urlParameters", urlParameters);
+
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -131,7 +134,9 @@ public class CalculateEmissions implements Job {
 
 
                 Query<User> query = mongoDatastore.createQuery(User.class).field("access_token").equal((String) accessToken);
-                query.get().setEmissionsLastWeek(total_emissions);
+                logger.debug(total_emissions);
+                //Update the emissionsLastWeek field
+                mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("emissionsLastWeek", total_emissions));
 
             } catch (Exception e) {
                 e.printStackTrace();

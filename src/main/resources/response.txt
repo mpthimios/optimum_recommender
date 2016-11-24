@@ -334,7 +334,7 @@ Response 200 OK: {
       "properties" : { }
     },
     "additionalInfo" : {
-      "message" : "Today it’s sunny! Take the opportunity to use your bicycle to save CO2 emissions.",
+      "message" : "Nice weather for walk.",
       "mode" : "pt"
     }
   }, {
@@ -416,8 +416,8 @@ Response 200 OK: {
       "properties" : { }
     },
     "additionalInfo" : {
-      "message" : "Today it’s sunny! Take the opportunity to use your bicycle to save CO2 emissions.",
-      "mode" : "walk"
+      "message" : "Nice weather for walk.",
+      "mode" : "bicycle"
     }
   }, {
     "from" : {
@@ -582,7 +582,7 @@ Response 200 OK: {
       "properties" : { }
     },
     "additionalInfo" : {
-      "message" : "Today it’s sunny! Take the opportunity to use your bicycle to save CO2 emissions.",
+      "message" : "Nice weather for walk.",
       "mode" : "unknown"
     }
   }, {
