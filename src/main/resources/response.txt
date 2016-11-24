@@ -334,7 +334,8 @@ Response 200 OK: {
       "properties" : { }
     },
     "additionalInfo" : {
-      "message" : "Nice weather for walk.",
+      "UserPreferencesRank" : 3,
+      "emissions" : 0.0,
       "mode" : "pt"
     }
   }, {
@@ -416,7 +417,8 @@ Response 200 OK: {
       "properties" : { }
     },
     "additionalInfo" : {
-      "message" : "Nice weather for walk.",
+      "UserPreferencesRank" : 2,
+      "emissions" : 0.0,
       "mode" : "bicycle"
     }
   }, {
@@ -582,7 +584,7 @@ Response 200 OK: {
       "properties" : { }
     },
     "additionalInfo" : {
-      "message" : "Nice weather for walk.",
+      "emissions" : 0.0,
       "mode" : "unknown"
     }
   }, {
@@ -748,7 +750,8 @@ Response 200 OK: {
       "properties" : { }
     },
     "additionalInfo" : {
-      "message" : "",
+      "UserPreferencesRank" : 1,
+      "emissions" : 275.22,
       "mode" : "car"
     }
   } ]
