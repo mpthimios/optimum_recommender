@@ -2,10 +2,15 @@ package imu.recommender;
 
 import imu.recommender.helpers.UserPreferMode;
 import java.lang.reflect.Array;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -34,6 +39,8 @@ public class Recommender {
 	
 	public Recommender(RouteFormatRoot originalRouteFormatRoutes) throws JsonParseException, JsonMappingException, IOException{
 		this.originalRouteFormatRoutes = originalRouteFormatRoutes;
+		getLocationValue(this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(0).toString(),
+				this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(1).toString());
 		initialize();
 	}
 	
@@ -118,36 +125,52 @@ public class Recommender {
 		return null;
 	}
 	
-	private double U1(){
+	private double U1(double cost, double time, User user){
 		double ASC1 = 0.0;
 		double TravelCostgeneric = -0.0779;
 		double TravelTime1 = -0.0606;
+		double gAspEnv1 = 3.18;
 		
-		return 0.0;
+		double U1 = ASC1 + TravelCostgeneric*cost + TravelTime1*time +
+				gAspEnv1*AspEnv(user)*time;
+		
+		return U1;
 	}
 	
-	private double U2(){
+	private double U2(double cost, double time, User user){
 		double ASC2 = 0.821;
 		double TravelCostgeneric = -0.0779;
 		double TravelTime2 = -0.0568;
+		double gAspEnv2 = 5.34;
 		
-		return 0.0;
+		double U2 = ASC2 + TravelCostgeneric*cost + TravelTime2*time +
+				gAspEnv2*AspEnv(user)*time;
+		
+		return U2;
 	}
 	
-	private double U3(){
+	private double U3(double cost, double time, User user){
 		double ASC3 = -1.31;
 		double TravelCostgeneric = -0.0779;
 		double TravelTime3 = -0.0568; //???
+		double gAspEnv3 = 1.29;
 		
-		return 0.0;
+		double U3 = ASC3 + TravelCostgeneric*cost + TravelTime3*time +
+				gAspEnv3*AspEnv(user)*time;
+		
+		return U3;
 	}
 	
-	private double U4(){
-		double ASC3 = 1.92;
+	private double U4(double cost, double time, User user){
+		double ASC4 = 1.92;
 		double TravelCostgeneric = -0.0779;
 		double TravelTime4 = -0.0714;
+		double gAspEnv4 = 2.13;
 		
-		return 0.0;
+		double U4 = ASC4 + TravelCostgeneric*cost + TravelTime4*time +
+				gAspEnv4*AspEnv(user)*time;
+		
+		return U4;
 	}
 	
 	private double AspEnv(User user){
@@ -159,12 +182,62 @@ public class Recommender {
 		
 		double result = g0 + 
 				g1*(double)user.getDemographics().getAge() +
-				g2*1 +//(double)user.getDemographics().getEducation()
-				g3*1 +
-				g4*1; //user.getDemographics().getGender()
-		
-		
+				g2*1 +educationValue(user.getDemographics().getEducation()) +
+				g3*genderValue(user.getDemographics().getGender()) +
+				g4*getLocationValue(this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(0).toString(),
+						this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(1).toString());
 		return 0.0;
+	}
+	
+	double educationValue(String education){
+		if (education.matches("High School")){
+			return 1.0;
+		}
+		else if (education.matches("University")){
+			return 2.0;
+		}
+		else if (education.matches("PHD")){
+			return 3.0;
+		}
+		else if (education.matches("Masters")){
+			return 4.0;
+		}
+		else return 0.0;
+	}
+	
+	double genderValue(String gender){
+		if (gender.matches("male")){
+			return 0.0;
+		}
+		else return 1.0;
+	}
+	
+	double getLocationValue(String lng, String lat){
+		
+		String urlString = "http://api.geonames.org/countryCode?lat="+lat+"&lng="+lng+"&username=demo";
+		try{
+			URL url = new URL(urlString);
+			URLConnection conn = url.openConnection();
+			InputStream is = conn.getInputStream();
+			String location = IOUtils.toString(is, "UTF-8").trim().replaceAll("\n ", "");			
+			if (location.matches("SI")){
+				logger.debug("request from Slovenia");
+				return 1.0;
+			}
+			else if (location.matches("AT")){
+				logger.debug("request from Austria");
+				return 2.0;
+			}
+			else if (location.matches("GB")){
+				logger.debug("request from UK");
+				return 3.0;
+			}
+			else return 0.0;
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			return 0.0;
+		}		
 	}
 
 	public List<RouteModel> rankBasedonUserPreferences(List<RouteModel> routes, User user){

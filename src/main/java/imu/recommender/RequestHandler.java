@@ -99,17 +99,15 @@ public class RequestHandler extends HttpServlet{
 		String requestBody = getBody(request);
 		logger.debug(requestBody);
 		Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class));
+		
 		try{
 			userID = request.getHeader("X-USER-ID");
 			logger.debug("X-USER-ID");
 			logger.debug(userID);
 			user = User.findById(userID);
-			logger.debug("user object: ");
-			logger.debug(user);
-			//for testing
-			logger.debug(user.getDemographics().getGender());			
+			
 			recommenderRoutes.filterRoutesForUser(user);		
-			recommenderRoutes.rankRoutesForUser(user);
+			//recommenderRoutes.rankRoutesForUser(user);
 			List <RouteModel> ranked = recommenderRoutes.rankBasedonUserPreferences(recommenderRoutes.getRoutes(),user);
 			recommenderRoutes.setRoutes(ranked);
 			String jsonResult = mapper.writeValueAsString(recommenderRoutes.getFilteredRoutesResponse());
