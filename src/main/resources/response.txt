@@ -3536,7 +3536,7 @@ Response 200 OK: {
     },
     "additionalInfo" : {
       "UserPreferencesRank" : 5,
-      "message" : "Nice weather for biking.",
+      "message" : "When the weather was good you biked 20 minutes per day on average.",
       "mode" : "bicycle"
     }
   }, {
@@ -9781,7 +9781,7 @@ Response 200 OK: {
     },
     "additionalInfo" : {
       "UserPreferencesRank" : 7,
-      "message" : "Nice weather to bike&ride.",
+      "message" : "When the weather was good you combined bike with public transportation 20 minutes per day on average",
       "mode" : "bike&ride"
     }
   }, {
@@ -11671,7 +11671,7 @@ Response 200 OK: {
     },
     "additionalInfo" : {
       "UserPreferencesRank" : 6,
-      "message" : "Today it s sunny! Take the opportunity to use your bicycle to save CO2 emissions.",
+      "message" : "When the weather was good you biked 20 minutes per day on average.",
       "mode" : "bicycle"
     }
   } ]

@@ -14,6 +14,7 @@ import com.mongodb.util.JSON;
 
 import org.bitpipeline.lib.owm.OwmClient;
 import org.bitpipeline.lib.owm.WeatherData;
+import org.bitpipeline.lib.owm.WeatherForecastResponse;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
@@ -38,6 +39,11 @@ public class CalculateMessageUtilities {
         String city = "Vienna";
         //String city = trip.getFrom().getAddress().get().getCity().get();
         Integer duration = trip.getRoute().getDurationSeconds();
+
+        //Get personality of user
+        String personality = user.getUserPersonalityType(user.getId());
+        //Get the most convincing persuasive strategy
+        String strategy = user.getBestPersuasiveStrategy(personality);
 
         //Connect to mongodb
         Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
@@ -103,11 +109,12 @@ public class CalculateMessageUtilities {
         //mongoDatastore.save(m);
         contextList.add("NiceWeather");
         System.out.println(contextList);
+        System.out.println(strategy);
         Query<Message> query = mongoDatastore.createQuery(Message.class);
         query.and(
                 //query.criteria("persuasive_strategy").equal("suggestion"),
                 //query.criteria("context").equal("NiceWeather"),
-                query.criteria("persuasive_strategy").equal("suggestion "),
+                query.criteria("persuasive_strategy").equal(strategy),
                 //query.criteria("className").equal("imu.recommender.models.message.Message")
                 //query.criteria("")
                 query.criteria("context").equal(new BasicDBObject("$in", contextList)),

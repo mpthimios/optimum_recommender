@@ -107,7 +107,7 @@ public class RequestHandler extends HttpServlet{
 			logger.debug("user object: ");
 			logger.debug(user);
 			//for testing
-			logger.debug(user.getDemographics().getGender());			
+			logger.debug(user.getDemographics().getGender());
 			recommenderRoutes.filterRoutesForUser(user);
 			//Rank routes based on User Preference
 			recommenderRoutes.rankRoutesForUser(user);
