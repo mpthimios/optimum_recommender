@@ -151,12 +151,19 @@ public class Recommender {
 		return 0.0;
 	}
 	
-	private double AspEnv(){
+	private double AspEnv(User user){
 		double g0 = 4.08;
 		double g1 = 0.0361;
 		double g2 = -0.797;
 		double g3 = 1.41;
 		double g4 = -2.10;
+		
+		double result = g0 + 
+				g1*(double)user.getDemographics().getAge() +
+				g2*1 +//(double)user.getDemographics().getEducation()
+				g3*1 +
+				g4*1; //user.getDemographics().getGender()
+		
 		
 		return 0.0;
 	}
