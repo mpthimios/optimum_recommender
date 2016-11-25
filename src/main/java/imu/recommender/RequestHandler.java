@@ -25,6 +25,7 @@ import at.ac.ait.ariadne.routeformat.geojson.GeoJSONPolygon;
 import at.ac.ait.ariadne.routeformat.location.Address;
 import imu.recommender.helpers.IgnoreMixIn;
 import imu.recommender.helpers.MongoConnectionHelper;
+import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.Demographics;
 import imu.recommender.models.user.OwnedVehicle;
 import imu.recommender.models.user.Personality;
@@ -102,7 +103,6 @@ public class RequestHandler extends HttpServlet{
 			userID = request.getHeader("X-USER-ID");
 			logger.debug("X-USER-ID");
 			logger.debug(userID);
-			//user = mongoDatastore.get(User.class, new ObjectId(userID));
 			user = User.findById(userID);
 			logger.debug("user object: ");
 			logger.debug(user);
@@ -110,7 +110,8 @@ public class RequestHandler extends HttpServlet{
 			logger.debug(user.getDemographics().getGender());			
 			recommenderRoutes.filterRoutesForUser(user);		
 			recommenderRoutes.rankRoutesForUser(user);
-			
+			List <RouteModel> ranked = recommenderRoutes.rankBasedonUserPreferences(recommenderRoutes.getRoutes(),user);
+			recommenderRoutes.setRoutes(ranked);
 			String jsonResult = mapper.writeValueAsString(recommenderRoutes.getFilteredRoutesResponse());
 			out.println(jsonResult);			
 		}

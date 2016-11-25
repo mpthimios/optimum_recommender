@@ -16,6 +16,19 @@
                 <name>TestJob</name>
                 <job-name>TestJob</job-name>
                 <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+
+            </cron>
+        </trigger>
+        <job>
+            <name>TestJob2</name>
+            <job-class>imu.recommender.jobs.CalculateEmissions</job-class>
+        </job>
+        <trigger>
+            <cron>
+                <name>TestJob2</name>
+                <job-name>TestJob2</job-name>
+                <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+                <!-- <cron-expression>0/5 * * * * ?</cron-expression> -->
             </cron>
         </trigger>
     </schedule>

@@ -1,12 +1,14 @@
 package imu.recommender.models.message;
 
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
 /**
  * Created by evangelie on 4/11/2016.
  */
 
+@Entity("OptimumMessages")
 
 public class Message {
 
@@ -20,7 +22,6 @@ public class Message {
     private String target;
     private Integer number_of_successes;
     private Double utility;
-    private String className;
 
     public Message(){
 
@@ -31,7 +32,7 @@ public class Message {
         this.message_text = "Today it’s sunny! Take the opportunity to use your bicycle to save CO2 emissions.";
         this.target = "bike";
         this.number_of_successes = 0;
-        this.className = "imu.recommender.models.message.Message";
+        //this.className = "imu.recommender.models.message.Message";
     }
 
     public ObjectId getId() {

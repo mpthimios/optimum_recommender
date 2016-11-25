@@ -104,9 +104,9 @@ public class CalculateMessageUtilities {
         System.out.println(contextList);
         Query<Message> query = mongoDatastore.createQuery(Message.class);
         query.and(
-                query.criteria("persuasive_strategy").equal("suggestion"),
-                query.criteria("context").equal("NiceWeather"),
-                query.criteria("className").equal("imu.recommender.models.message.Message")
+                query.criteria("persuasive_strategy").equal("Suggestion"),
+                query.criteria("context").equal("NiceWeather")
+                //query.criteria("className").equal("imu.recommender.models.message.Message")
                 //query.criteria("")
                 //query.criteria("context").equal(new BasicDBObject("$in", contextList))
                 //query.criteria("target").equal(new BasicDBObject("$in", targetList))

@@ -1,11 +1,10 @@
 package imu.recommender;
 
+import imu.recommender.helpers.UserPreferMode;
+import java.lang.reflect.Array;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -167,14 +166,116 @@ public class Recommender {
 		
 		return 0.0;
 	}
-	
-	private List<RouteModel> rankBasedonUserPreferences(){
-		//todo 
-		//get preference for this time of day (we should split the day in intervals)
-		//if there are no preferences for this time of day get preferences for any time of day
 
-		//if there are preferences use these preferences
-		return null;
+	public List<RouteModel> rankBasedonUserPreferences(List<RouteModel> routes, User user){
+		//todo
+		//get preference for this time of day (we should split the day in intervals)
+
+		//if there are no preferences for this time of day get preferences for any time of day
+		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
+
+		UserPreferMode[] modes = new UserPreferMode[7];
+
+		try {
+
+			UserPreferMode car = new UserPreferMode("car", (int) user.getMode_usage().getCar_percent());
+			UserPreferMode bike = new UserPreferMode("bicycle", (int) user.getMode_usage().getBike_percent());
+			UserPreferMode walk = new UserPreferMode("walk", (int) user.getMode_usage().getWalk_percent());
+			UserPreferMode pt = new UserPreferMode("pt", (int) user.getMode_usage().getPt_percent());
+			UserPreferMode bike_ride = new UserPreferMode("bike&ride", (int) 10);
+			UserPreferMode park_ride_bike = new UserPreferMode("park&ride_with_bike", (int) 12);
+			UserPreferMode park_ride = new UserPreferMode("park&ride", (int) 6);
+
+
+			modes[0]=car;
+			modes[1]=bike;
+			modes[2]=walk;
+			modes[3]=pt;
+			modes[4]=bike_ride;
+			modes[5]=park_ride_bike;
+			modes[6]=park_ride;
+
+		}
+		catch (Exception e){
+			//if there are no preferences for any time of day get the default
+
+			UserPreferMode car = new UserPreferMode("car", 4);
+			UserPreferMode bike = new UserPreferMode("bicycle", 3);
+			UserPreferMode walk = new UserPreferMode("walk", 2);
+			UserPreferMode pt = new UserPreferMode("pt", 1);
+			UserPreferMode bike_ride = new UserPreferMode("bike&ride", (int) 5);
+			UserPreferMode park_ride_bike = new UserPreferMode("park&ride_with_bike", (int) 6);
+			UserPreferMode park_ride = new UserPreferMode("park&ride", (int) 7);
+
+			modes[0]=car;
+			modes[1]=bike;
+			modes[2]=walk;
+			modes[3]=pt;
+			modes[4]=bike_ride;
+			modes[5]=park_ride_bike;
+			modes[6]=park_ride;
+
+		}
+
+
+		Arrays.sort(modes);
+
+		int i=0;
+		for(UserPreferMode temp: modes){
+			System.out.println("mode " + ++i + " : " + temp.getMode() +
+					", Percentage : " + temp.getPercentage());
+		}
+
+		List<RouteModel> FirstListRoutes = new ArrayList<RouteModel>();
+		List<RouteModel> SecondListRoutes = new ArrayList<RouteModel>();
+		List<RouteModel> ThirdListRoutes = new ArrayList<RouteModel>();
+		List<RouteModel> ForthListRoutes = new ArrayList<RouteModel>();
+		List<RouteModel> FifthListRoutes = new ArrayList<RouteModel>();
+		List<RouteModel> SixthListRoutes = new ArrayList<RouteModel>();
+		List<RouteModel> SeventhListRoutes = new ArrayList<RouteModel>();
+
+		for (RouteModel route : routes){
+			String m = route.getRoute().getAdditionalInfo().get("mode").toString();
+			if (m.equals(modes[0].getMode() ) ){
+				FirstListRoutes.add(route);
+			}
+			if (m.equals(modes[1].getMode() ) ){
+				SecondListRoutes.add(route);
+			}
+			if (m.equals(modes[2].getMode() ) ){
+				ThirdListRoutes.add(route);
+			}
+			if (m.equals(modes[3].getMode() ) ){
+				ForthListRoutes.add(route);
+			}
+			if (m.equals(modes[4].getMode() ) ){
+				FifthListRoutes.add(route);
+			}
+			if (m.equals(modes[5].getMode() ) ){
+				SixthListRoutes.add(route);
+			}
+			if (m.equals(modes[6].getMode() ) ){
+				SeventhListRoutes.add(route);
+			}
+
+		}
+		rankedRoutes.addAll(FirstListRoutes);
+		rankedRoutes.addAll(SecondListRoutes);
+		rankedRoutes.addAll(ThirdListRoutes);
+		rankedRoutes.addAll(ForthListRoutes);
+		rankedRoutes.addAll(FifthListRoutes);
+		rankedRoutes.addAll(SixthListRoutes);
+		rankedRoutes.addAll(SeventhListRoutes);
+		i=1;
+		for (RouteModel route : rankedRoutes){
+			Map<String, Object> additionalInfoRouteRequest = route.getRoute().getAdditionalInfo();
+			//Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+			additionalInfoRouteRequest.put("UserPreferencesRank", i);
+			route.getRoute().setAdditionalInfo(additionalInfoRouteRequest);
+			i++;
+		}
+		// if there are preferences use these preferences
+		return rankedRoutes;
 	}
 	
 	private List<RouteModel> rankBasedonSystemView(){
