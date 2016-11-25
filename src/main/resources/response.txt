@@ -334,8 +334,7 @@ Response 200 OK: {
       "properties" : { }
     },
     "additionalInfo" : {
-      "UserPreferencesRank" : 3,
-      "emissions" : 0.0,
+      "message" : "Today it s sunny! Take the opportunity to use public transport to save CO2 emissions.",
       "mode" : "pt"
     }
   }, {
@@ -417,8 +416,7 @@ Response 200 OK: {
       "properties" : { }
     },
     "additionalInfo" : {
-      "UserPreferencesRank" : 2,
-      "emissions" : 0.0,
+      "message" : "Nice weather for biking.",
       "mode" : "bicycle"
     }
   }, {
@@ -750,8 +748,7 @@ Response 200 OK: {
       "properties" : { }
     },
     "additionalInfo" : {
-      "UserPreferencesRank" : 1,
-      "emissions" : 275.22,
+      "message" : "",
       "mode" : "car"
     }
   } ]

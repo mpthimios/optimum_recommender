@@ -107,10 +107,29 @@ public class RequestHandler extends HttpServlet{
 			logger.debug(user);
 			//for testing
 			logger.debug(user.getDemographics().getGender());			
-			recommenderRoutes.filterRoutesForUser(user);		
+			recommenderRoutes.filterRoutesForUser(user);
+			//Rank routes based on User Preference
 			recommenderRoutes.rankRoutesForUser(user);
 			List <RouteModel> ranked = recommenderRoutes.rankBasedonUserPreferences(recommenderRoutes.getRoutes(),user);
 			recommenderRoutes.setRoutes(ranked);
+			//Select target route and add message
+			for (int i = 0; i < recommenderRoutes.getRoutes().size(); i++) {
+				RouteModel route = recommenderRoutes.getRoutes().get(i);
+				if (recommenderRoutes.getRoutes().get(i).getRoute().getAdditionalInfo().get("mode") == "car") {
+					mes = "";
+				} else {
+					try {
+						mes = CalculateMessageUtilities.calculateForUser(recommenderRoutes, route, user);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+				Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+				additionalInfoRouteRequest.put("mode", recommenderRoutes.getRoutes().get(i).getRoute().getAdditionalInfo().get("mode"));
+				additionalInfoRouteRequest.put("message", mes);
+				recommenderRoutes.getRoutes().get(i).getRoute().setAdditionalInfo(additionalInfoRouteRequest);
+			}
+
 			String jsonResult = mapper.writeValueAsString(recommenderRoutes.getFilteredRoutesResponse());
 			out.println(jsonResult);			
 		}
@@ -126,7 +145,7 @@ public class RequestHandler extends HttpServlet{
 					mes = "";
 				} else {
 					try {
-						mes = CalculateMessageUtilities.calculateForUser(response_route, route, user);
+						//mes = CalculateMessageUtilities.calculateForUser(response_route, route, user);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}

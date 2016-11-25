@@ -6,6 +6,7 @@ import at.ac.ait.ariadne.routeformat.RoutingRequest;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.helpers.WeatherInfo;
 import imu.recommender.models.message.Message;
+import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.User;
 
 import com.mongodb.*;
@@ -29,26 +30,26 @@ import java.util.Set;
 
 public class CalculateMessageUtilities {
 
-    public static String calculateForUser(RouteFormatRoot route, Route trip, User user) throws Exception {
+    public static String calculateForUser(Recommender route, RouteModel trip, User user) throws Exception {
         //Get trip properties
-        Integer route_distance=trip.getDistanceMeters();
-        Float lat = trip.getFrom().getCoordinate().geometry.coordinates.get(0).floatValue();
-        Float lon = trip.getFrom().getCoordinate().geometry.coordinates.get(1).floatValue();
+        Integer route_distance=trip.getRoute().getDistanceMeters();
+        Float lat = trip.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0).floatValue();
+        Float lon = trip.getRoute().getFrom().getCoordinate().geometry.coordinates.get(1).floatValue();
         String city = "Vienna";
         //String city = trip.getFrom().getAddress().get().getCity().get();
-        Integer duration = trip.getDurationSeconds();
+        Integer duration = trip.getRoute().getDurationSeconds();
 
         //Connect to mongodb
         Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 
         List<String> targetList = new ArrayList<String>();
         //Select the messages that the target of message is the same with the mode of route
-        targetList.add("all");
-        targetList.add("pt");
-        //targetList.add(trip.getAdditionalInfo().get("mode").toString());
+        String target = trip.getRoute().getAdditionalInfo().get("mode").toString();
+        //targetList.add("all");
+        //targetList.add("pt");
+        //targetList.add(trip.getRoute().getAdditionalInfo().get("mode").toString());
 
         List<String> contextList = new ArrayList<String>();
-        contextList.add("noContext");
 
         //Check if the distance of route is walking
         if(withinWalkingDistance(route_distance)){
@@ -79,13 +80,13 @@ public class CalculateMessageUtilities {
         if (user.tooManyCarRoutes()){
             contextList.add("TooManyCarRoutes");
         }
-        Route carTrip = CarTrip(route);
-        if ( carTrip!= null && trip.getAdditionalInfo().get("mode").equals("pt")) {
-            Integer driving_distance = carTrip.getDistanceMeters();
+        RouteModel carTrip = CarTrip(route);
+        if ( carTrip!= null && trip.getRoute().getAdditionalInfo().get("mode").equals("pt")) {
+            Integer driving_distance = carTrip.getRoute().getDistanceMeters();
             if (CostComparetoDriving("transport", "drive")) {
                 contextList.add("Cost");
             }
-            Integer driving_duration = carTrip.getDurationSeconds();
+            Integer driving_duration = carTrip.getRoute().getDurationSeconds();
             if (DurationComparetoDriving(duration, driving_duration)) {
                 contextList.add("Duration");
             }
@@ -104,12 +105,13 @@ public class CalculateMessageUtilities {
         System.out.println(contextList);
         Query<Message> query = mongoDatastore.createQuery(Message.class);
         query.and(
-                query.criteria("persuasive_strategy").equal("Suggestion"),
-                query.criteria("context").equal("NiceWeather")
+                //query.criteria("persuasive_strategy").equal("suggestion"),
+                //query.criteria("context").equal("NiceWeather"),
+                query.criteria("persuasive_strategy").equal("suggestion "),
                 //query.criteria("className").equal("imu.recommender.models.message.Message")
                 //query.criteria("")
-                //query.criteria("context").equal(new BasicDBObject("$in", contextList))
-                //query.criteria("target").equal(new BasicDBObject("$in", targetList))
+                query.criteria("context").equal(new BasicDBObject("$in", contextList)),
+                query.criteria("target").equal(target)
         );
 
         List<Message> mes = query.asList();
@@ -160,10 +162,10 @@ public class CalculateMessageUtilities {
 
     }
 
-    private static Route CarTrip(RouteFormatRoot route){
-        Route cartrip = null;
+    private static RouteModel CarTrip(Recommender route){
+        RouteModel cartrip = null;
         for (int i = 0; i < route.getRoutes().size(); i++) {
-            if (route.getRoutes().get(i).getAdditionalInfo().get("mode").equals("car")) {
+            if (route.getRoutes().get(i).getRoute().getAdditionalInfo().get("mode").equals("car")) {
                 cartrip = route.getRoutes().get(i);
             }
 
