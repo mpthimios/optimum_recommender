@@ -50,6 +50,9 @@ public class RouteModel {
 		else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") ){
 			mode = RecommenderModes.recommenderModesStr[RecommenderModes.PUBLIC_TRANSPORT];
 		}
+		else if (Modes.contains("BICYCLE") && Modes.contains("FOOT") ){
+			mode = RecommenderModes.recommenderModesStr[RecommenderModes.BICYCLE];
+		}
 		else if (Modes.contains("CAR") && Modes.contains("FOOT") ){
 			mode = RecommenderModes.recommenderModesStr[RecommenderModes.CAR];
 		}

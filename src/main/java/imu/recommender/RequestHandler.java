@@ -127,6 +127,7 @@ public class RequestHandler extends HttpServlet{
 				}
 				Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
 				additionalInfoRouteRequest.put("mode", recommenderRoutes.getRoutes().get(i).getRoute().getAdditionalInfo().get("mode"));
+				additionalInfoRouteRequest.put("UserPreferencesRank", recommenderRoutes.getRoutes().get(i).getRoute().getAdditionalInfo().get("UserPreferencesRank"));
 				additionalInfoRouteRequest.put("message", mes);
 				recommenderRoutes.getRoutes().get(i).getRoute().setAdditionalInfo(additionalInfoRouteRequest);
 			}
