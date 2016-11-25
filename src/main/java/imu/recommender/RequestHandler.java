@@ -84,7 +84,8 @@ public class RequestHandler extends HttpServlet{
 		
 		//prepare the response
 		// Set the response message's MIME type
-	    response.setContentType("text/html; charset=UTF-8");
+	    response.setContentType("application/json; charset=UTF-8");
+	    response.setCharacterEncoding("utf-8");
 	    // Allocate a output writer to write the response message into the network socket
 	    PrintWriter out = response.getWriter();
 
