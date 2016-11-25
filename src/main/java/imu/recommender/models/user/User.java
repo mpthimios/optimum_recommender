@@ -11,6 +11,8 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.*;
 
 import imu.recommender.helpers.MongoConnectionHelper;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 
 @Entity("OptimumUsers")
 
@@ -130,15 +132,18 @@ public class User {
 	    return m;		
 	}
 	
-	public String getUserPersonalityType(){
+	public String getUserPersonalityType(String id) throws UnknownHostException {
+
+		Datastore mongoDatastore;
+		mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 
 		if (!this.personality.isScores_calculated()){
 			//calculate scores
-			double extraversion_score = ( this.personality.getQ1() + this.personality.getQ6() )/2;
-			double agreeableness_score = ( this.personality.getQ2() + this.personality.getQ7() )/2;
-			double conscientiousness_score = ( this.personality.getQ3() + this.personality.getQ8() )/2;
-			double neuroticism_score = ( this.personality.getQ4() + this.personality.getQ9() )/2;
-			double openness_score = (this.personality.getQ5() + this.personality.getQ10() )/2;
+			double extraversion_score = ( reverse(this.personality.getQ1()) + this.personality.getQ6() )/2;
+			double agreeableness_score = ( this.personality.getQ2() + reverse(this.personality.getQ7() ) )/2;
+			double conscientiousness_score = ( reverse(this.personality.getQ3() ) + this.personality.getQ8() )/2;
+			double neuroticism_score = ( reverse(this.personality.getQ4()) + this.personality.getQ9() )/2;
+			double openness_score = (reverse(this.personality.getQ5()) + this.personality.getQ10() )/2;
 			this.personality.setExtraversion(extraversion_score);
 			this.personality.setAgreeableness(agreeableness_score);
 			this.personality.setConsientiousness(conscientiousness_score);
@@ -146,16 +151,43 @@ public class User {
 			this.personality.setOpenness(openness_score);
 			this.personality.setScores_calculated(true);
 			//Find max score
-			List<String> personalities =  Arrays.asList("Extraversion", "Agreeableness", "Conssientiousness", "Neuroticism", "Openness");
+			List<String> personalities =  Arrays.asList("Extraversion", "Agreeableness", "Conscientiousness", "Neuroticism", "Openness");
 			List<Double> scores = Arrays.asList( this.personality.getExtraversion(), this.personality.getAgreeableness(), this.personality.getConsientiousness(), this.personality.getNeuroticism(), this.personality.getOpenness() );
 			double max = 0.0;
 			for(int i=0; i<personalities.size(); i++){
 				if (scores.get(i) > max) {
 					max= scores.get(i);
 					this.personality.setTypeStr(personalities.get(i));
+					this.personality.setType(max);
 				}
 			}
+
+			Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal(id);
+			//Update the personality of user.
+			Personality personality = new Personality();
+			personality.setTypeStr(this.personality.getTypeStr());
+			personality.setType(this.personality.getType());
+			personality.setQ1(this.personality.getQ1());
+			personality.setQ2(this.personality.getQ2());
+			personality.setQ3(this.personality.getQ3());
+			personality.setQ4(this.personality.getQ4());
+			personality.setQ5(this.personality.getQ5());
+			personality.setQ6(this.personality.getQ6());
+			personality.setQ7(this.personality.getQ7());
+			personality.setQ8(this.personality.getQ8());
+			personality.setQ9(this.personality.getQ9());
+			personality.setQ10(this.personality.getQ10());
+			personality.setConsientiousness(this.personality.getConsientiousness());
+			personality.setAgreeableness(this.personality.getAgreeableness());
+			personality.setOpenness(this.personality.getOpenness());
+			personality.setNeuroticism(this.personality.getNeuroticism());
+			personality.setExtraversion(this.personality.getExtraversion());
+			personality.setScores_calculated(true);
+
+			UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("personality",personality);
+			mongoDatastore.update(query, ops);
 		}
+
 		return this.personality.getTypeStr();
 	}
 
@@ -325,6 +357,48 @@ public class User {
 
 	public void setMode_usage(ModeUsage mode_usage) {
 		this.mode_usage = mode_usage;
+	}
+
+	public String getBestPersuasiveStrategy(String personality){
+		String strategy = "";
+		if (personality.equals("Extraversion") ){
+			strategy="comparison";
+		}
+		else if (personality.equals("Agreeableness") ){
+			strategy="self-monitoring";
+		}
+		else if (personality.equals("Openness") ){
+			strategy="self-monitoring";
+		}
+		else if (personality.equals("Conscientiousness") ){
+			strategy="suggestion ";
+		}
+		else if (personality.equals("Neuroticism") ){
+			strategy="suggestion ";
+		}
+
+		return strategy;
+
+	}
+
+	private Double reverse(Double score){
+		Double reversed = 0.0;
+		if (score == 1.0){
+			reversed = 5.0;
+		}
+		else if (score == 2.0){
+			reversed = 4.0;
+		}
+		else if (score == 4.0){
+			reversed = 2.0;
+		}
+		if (score == 5.0){
+			reversed = 1.0;
+		}
+		else{
+			reversed = 3.0;
+		}
+		return reversed;
 	}
 	
 }
