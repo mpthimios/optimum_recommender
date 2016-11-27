@@ -15,10 +15,12 @@ import imu.recommender.helpers.RecommenderModes;
 public class RouteModel {
 
 	private Logger logger = Logger.getLogger(RouteModel.class);
-	private Route route;
+	private Route route = new Route();
 	private double emissions = 0.0;
 	private double behaviouralModelUtility = 0.0;
 	private int mode;
+	private double userPreferencesRank = 0.0;
+	private String message = "";
 	
 	public RouteModel (Route route){
 		this.route = route;
@@ -37,7 +39,7 @@ public class RouteModel {
 		}
 		String mode="";
 
-		logger.debug(Modes);
+		logger.debug("adding mode");
 		if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE")  ){
 			mode = RecommenderModes.recommenderModesStr[RecommenderModes.PARK_AND_RIDE_WITH_BIKE];
 		}
@@ -72,9 +74,9 @@ public class RouteModel {
 			mode = RecommenderModes.recommenderModesStr[RecommenderModes.UNKNOWN];
 		}
 		
-		Map<String, Object> additionalInfo = route.getAdditionalInfo();
-		additionalInfo.put("mode", mode);
-		route.setAdditionalInfo(additionalInfo);
+		Map<String, Object> additionalInfoRouteRequest = route.getAdditionalInfo();
+		additionalInfoRouteRequest.put("mode", mode);
+		route.setAdditionalInfo(additionalInfoRouteRequest);
 
 	}
 	
@@ -88,7 +90,7 @@ public class RouteModel {
 		}
 		Map<String, Object> additionalInfo = route.getAdditionalInfo();
 		additionalInfo.put("emissions", emissions);
-		route.setAdditionalInfo(additionalInfo);
+		this.route.setAdditionalInfo(additionalInfo);
 		
 	}
 	
@@ -150,6 +152,28 @@ public class RouteModel {
 
 	public void setMode(int mode) {
 		this.mode = mode;
+	}
+
+	public double getUserPreferencesRank() {
+		return userPreferencesRank;
+	}
+
+	public void setUserPreferencesRank(double userPreferencesRank) {
+		this.userPreferencesRank = userPreferencesRank;
+		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();		 
+		additionalInfo.put("UserPreferencesRank", userPreferencesRank);
+		this.route.setAdditionalInfo(additionalInfo);
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();		 
+		additionalInfo.put("message", message);
+		this.route.setAdditionalInfo(additionalInfo);
 	}
 	
 	

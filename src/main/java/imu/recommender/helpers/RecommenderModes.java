@@ -10,6 +10,10 @@ public class RecommenderModes {
 	public static final int CAR = 6;
 	public static final int UNKNOWN = 7;
 	
+	public static int[] recommenderModesOrder = {
+			WALK, BICYCLE, BIKE_AND_RIDE, PUBLIC_TRANSPORT, PARK_AND_RIDE_WITH_BIKE, PARK_AND_RIDE, CAR, UNKNOWN
+		};
+	
 	public static String[] recommenderModesStr = {
 		"walk",
 		"bicycle",

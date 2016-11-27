@@ -32,6 +32,7 @@ public class Recommender {
 	RouteFormatRoot originalRouteFormatRoutes = null;
 	List<RouteModel> routes = null;
 	List<RouteModel> filteredRoutes = null;
+	final ObjectMapper mapper = new ObjectMapper();
 	
 	public Recommender(){
 		//nothing to do for now 
@@ -39,8 +40,9 @@ public class Recommender {
 	
 	public Recommender(RouteFormatRoot originalRouteFormatRoutes) throws JsonParseException, JsonMappingException, IOException{
 		this.originalRouteFormatRoutes = originalRouteFormatRoutes;
-		getLocationValue(this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(0).toString(),
-				this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(1).toString());
+		//BehaviouralModel.U1(20.0, 20.0, );
+		//getLocationValue(this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(0).toString(),
+		//this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(1).toString());
 		initialize();
 	}
 	
@@ -50,17 +52,45 @@ public class Recommender {
 			RouteModel recommenderRoute = new RouteModel(originalRouteFormatRoutes.getRoutes().get(i));
 			recommenderRoute.calculateEmissions();
 			recommenderRoute.setMode();
-			routes.add(recommenderRoute);						    
+			routes.add(recommenderRoute);	
+			logger.debug("route mode: " + recommenderRoute.getRoute().getAdditionalInfo().get("mode"));
 		}
 		filteredRoutes = new ArrayList<RouteModel>();
 	}
 	
-	//filterRoutes function
+
+	//filterDuplicates 
+	public void filterDuplicates(){
+		logger.debug("filtering duplicates - before size: " + routes.size());
+		HashMap<String, RouteModel> uniquesHash = new HashMap<String, RouteModel>(); 
+		try{
+			for (RouteModel route : routes){
+				String key = String.valueOf(route.getRoute().getDistanceMeters()) + mapper.writeValueAsString(route.getRoute().getSegments());
+				if (!uniquesHash.containsKey(key)){
+					uniquesHash.put(key, route);
+					logger.debug("non duplicate route found");
+				}
+				else{
+					logger.debug("DUPLICATE route found");
+				}
+			}
+			routes.clear();
+			for (Map.Entry<String, RouteModel> entry : uniquesHash.entrySet()){
+				routes.add(entry.getValue());				
+			}
+			logger.debug("filtering duplicates - after size: " + routes.size());
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	//filterRoutes for User function
 	public void filterRoutesForUser (User user){
 		logger.debug(routes.size());
 		
 		for (int i = 0; i < routes.size(); i++) {
-			RouteModel recommenderRoute = routes.get(i);
+			RouteModel recommenderRoute = routes.get(i);			
 			boolean car_owner = false;
 			boolean bike_owner = true;
 			logger.debug(recommenderRoute.getRoute().getFrom());
@@ -96,6 +126,10 @@ public class Recommender {
 	
 	public void rankRoutesForUser (User user){
 		//function aggregated
+		List<RouteModel> rankedRoutes = rankBasedonUserPreferences(user);
+		routes.clear();
+		routes = rankedRoutes;
+		selectTargetRouteandAddMessageForUser(user);		
 	}
 	
 	private List<RouteModel> rankBasedonBehaviouralModel(List<RouteModel> routes, User user){
@@ -125,229 +159,47 @@ public class Recommender {
 		return null;
 	}
 	
-	private double U1(double cost, double time, User user){
-		double ASC1 = 0.0;
-		double TravelCostgeneric = -0.0779;
-		double TravelTime1 = -0.0606;
-		double gAspEnv1 = 3.18;
-		
-		double U1 = ASC1 + TravelCostgeneric*cost + TravelTime1*time +
-				gAspEnv1*AspEnv(user)*time;
-		
-		return U1;
-	}
-	
-	private double U2(double cost, double time, User user){
-		double ASC2 = 0.821;
-		double TravelCostgeneric = -0.0779;
-		double TravelTime2 = -0.0568;
-		double gAspEnv2 = 5.34;
-		
-		double U2 = ASC2 + TravelCostgeneric*cost + TravelTime2*time +
-				gAspEnv2*AspEnv(user)*time;
-		
-		return U2;
-	}
-	
-	private double U3(double cost, double time, User user){
-		double ASC3 = -1.31;
-		double TravelCostgeneric = -0.0779;
-		double TravelTime3 = -0.0568; //???
-		double gAspEnv3 = 1.29;
-		
-		double U3 = ASC3 + TravelCostgeneric*cost + TravelTime3*time +
-				gAspEnv3*AspEnv(user)*time;
-		
-		return U3;
-	}
-	
-	private double U4(double cost, double time, User user){
-		double ASC4 = 1.92;
-		double TravelCostgeneric = -0.0779;
-		double TravelTime4 = -0.0714;
-		double gAspEnv4 = 2.13;
-		
-		double U4 = ASC4 + TravelCostgeneric*cost + TravelTime4*time +
-				gAspEnv4*AspEnv(user)*time;
-		
-		return U4;
-	}
-	
-	private double AspEnv(User user){
-		double g0 = 4.08;
-		double g1 = 0.0361;
-		double g2 = -0.797;
-		double g3 = 1.41;
-		double g4 = -2.10;
-		
-		double result = g0 + 
-				g1*(double)user.getDemographics().getAge() +
-				g2*1 +educationValue(user.getDemographics().getEducation()) +
-				g3*genderValue(user.getDemographics().getGender()) +
-				g4*getLocationValue(this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(0).toString(),
-						this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(1).toString());
-		return 0.0;
-	}
-	
-	double educationValue(String education){
-		if (education.matches("High School")){
-			return 1.0;
-		}
-		else if (education.matches("University")){
-			return 2.0;
-		}
-		else if (education.matches("PHD")){
-			return 3.0;
-		}
-		else if (education.matches("Masters")){
-			return 4.0;
-		}
-		else return 0.0;
-	}
-	
-	double genderValue(String gender){
-		if (gender.matches("male")){
-			return 0.0;
-		}
-		else return 1.0;
-	}
-	
-	double getLocationValue(String lng, String lat){
-		
-		String urlString = "http://api.geonames.org/countryCode?lat="+lat+"&lng="+lng+"&username=demo";
-		try{
-			URL url = new URL(urlString);
-			URLConnection conn = url.openConnection();
-			InputStream is = conn.getInputStream();
-			String location = IOUtils.toString(is, "UTF-8").trim().replaceAll("\n ", "");			
-			if (location.matches("SI")){
-				logger.debug("request from Slovenia");
-				return 1.0;
-			}
-			else if (location.matches("AT")){
-				logger.debug("request from Austria");
-				return 2.0;
-			}
-			else if (location.matches("GB")){
-				logger.debug("request from UK");
-				return 3.0;
-			}
-			else return 0.0;
-		}
-		catch (Exception e){
-			e.printStackTrace();
-			return 0.0;
-		}		
-	}
-
-	public List<RouteModel> rankBasedonUserPreferences(List<RouteModel> routes, User user){
+	private List<RouteModel> rankBasedonUserPreferences(User user){
 		//todo
 		//get preference for this time of day (we should split the day in intervals)
 
 		//if there are no preferences for this time of day get preferences for any time of day
 		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
 
-		UserPreferMode[] modes = new UserPreferMode[7];
-
+		TreeMap<Double, Integer> userPreferedModes = new TreeMap<Double, Integer>();
 		try {
-
-			UserPreferMode car = new UserPreferMode("car", (int) user.getMode_usage().getCar_percent());
-			UserPreferMode bike = new UserPreferMode("bicycle", (int) user.getMode_usage().getBike_percent());
-			UserPreferMode walk = new UserPreferMode("walk", (int) user.getMode_usage().getWalk_percent());
-			UserPreferMode pt = new UserPreferMode("pt", (int) user.getMode_usage().getPt_percent());
-			UserPreferMode bike_ride = new UserPreferMode("bike&ride", (int) 10);
-			UserPreferMode park_ride_bike = new UserPreferMode("park&ride_with_bike", (int) 12);
-			UserPreferMode park_ride = new UserPreferMode("park&ride", (int) 6);
-
-
-			modes[0]=car;
-			modes[1]=bike;
-			modes[2]=walk;
-			modes[3]=pt;
-			modes[4]=bike_ride;
-			modes[5]=park_ride_bike;
-			modes[6]=park_ride;
-
+			userPreferedModes.put(user.getMode_usage().getCar_percent(), RecommenderModes.CAR);
+			userPreferedModes.put(user.getMode_usage().getBike_percent(), RecommenderModes.BICYCLE);
+			userPreferedModes.put(user.getMode_usage().getWalk_percent(), RecommenderModes.WALK);
+			userPreferedModes.put(user.getMode_usage().getPt_percent(), RecommenderModes.PUBLIC_TRANSPORT);
+			userPreferedModes.put(10.0, RecommenderModes.BIKE_AND_RIDE);
+			userPreferedModes.put(12.0, RecommenderModes.PARK_AND_RIDE_WITH_BIKE);
+			userPreferedModes.put(6.0, RecommenderModes.PARK_AND_RIDE);
 		}
 		catch (Exception e){
 			//if there are no preferences for any time of day get the default
-
-			UserPreferMode car = new UserPreferMode("car", 4);
-			UserPreferMode bike = new UserPreferMode("bicycle", 3);
-			UserPreferMode walk = new UserPreferMode("walk", 2);
-			UserPreferMode pt = new UserPreferMode("pt", 1);
-			UserPreferMode bike_ride = new UserPreferMode("bike&ride", (int) 5);
-			UserPreferMode park_ride_bike = new UserPreferMode("park&ride_with_bike", (int) 6);
-			UserPreferMode park_ride = new UserPreferMode("park&ride", (int) 7);
-
-			modes[0]=car;
-			modes[1]=bike;
-			modes[2]=walk;
-			modes[3]=pt;
-			modes[4]=bike_ride;
-			modes[5]=park_ride_bike;
-			modes[6]=park_ride;
-
+			int i = 0;
+			for (Integer order : RecommenderModes.recommenderModesOrder){
+				userPreferedModes.put((double) order, i);
+				i++;
+			}
+			e.printStackTrace();
 		}
-
-
-		Arrays.sort(modes);
-
-		int i=0;
-		for(UserPreferMode temp: modes){
-			System.out.println("mode " + ++i + " : " + temp.getMode() +
-					", Percentage : " + temp.getPercentage());
+		
+		Map<Integer, ArrayList<RouteModel>> rankedRoutesMap = new LinkedHashMap<Integer, ArrayList<RouteModel>>(); 
+		for (Map.Entry<Double, Integer> entry : userPreferedModes.entrySet()){
+			logger.debug("preference: " + entry.getKey() + " mode: " + entry.getValue());
+			rankedRoutesMap.put(entry.getValue(), new ArrayList<RouteModel>());
 		}
-
-		List<RouteModel> FirstListRoutes = new ArrayList<RouteModel>();
-		List<RouteModel> SecondListRoutes = new ArrayList<RouteModel>();
-		List<RouteModel> ThirdListRoutes = new ArrayList<RouteModel>();
-		List<RouteModel> ForthListRoutes = new ArrayList<RouteModel>();
-		List<RouteModel> FifthListRoutes = new ArrayList<RouteModel>();
-		List<RouteModel> SixthListRoutes = new ArrayList<RouteModel>();
-		List<RouteModel> SeventhListRoutes = new ArrayList<RouteModel>();
-
+		
 		for (RouteModel route : routes){
-			String m = route.getRoute().getAdditionalInfo().get("mode").toString();
-			if (m.equals(modes[0].getMode() ) ){
-				FirstListRoutes.add(route);
-			}
-			if (m.equals(modes[1].getMode() ) ){
-				SecondListRoutes.add(route);
-			}
-			if (m.equals(modes[2].getMode() ) ){
-				ThirdListRoutes.add(route);
-			}
-			if (m.equals(modes[3].getMode() ) ){
-				ForthListRoutes.add(route);
-			}
-			if (m.equals(modes[4].getMode() ) ){
-				FifthListRoutes.add(route);
-			}
-			if (m.equals(modes[5].getMode() ) ){
-				SixthListRoutes.add(route);
-			}
-			if (m.equals(modes[6].getMode() ) ){
-				SeventhListRoutes.add(route);
-			}
+			rankedRoutesMap.get(route.getMode()).add(route);			
+		}				
+		
+		for (Map.Entry<Integer, ArrayList<RouteModel>> entry : rankedRoutesMap.entrySet()){
+			rankedRoutes.addAll(entry.getValue());
+		}
 
-		}
-		rankedRoutes.addAll(FirstListRoutes);
-		rankedRoutes.addAll(SecondListRoutes);
-		rankedRoutes.addAll(ThirdListRoutes);
-		rankedRoutes.addAll(ForthListRoutes);
-		rankedRoutes.addAll(FifthListRoutes);
-		rankedRoutes.addAll(SixthListRoutes);
-		rankedRoutes.addAll(SeventhListRoutes);
-		i=1;
-		for (RouteModel route : rankedRoutes){
-			Map<String, Object> additionalInfoRouteRequest = route.getRoute().getAdditionalInfo();
-			//Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
-			additionalInfoRouteRequest.put("UserPreferencesRank", i);
-			route.getRoute().setAdditionalInfo(additionalInfoRouteRequest);
-			i++;
-		}
-		// if there are preferences use these preferences
 		return rankedRoutes;
 	}
 	
@@ -356,9 +208,47 @@ public class Recommender {
 		return null;
 	}
 	
+	private void selectTargetRouteandAddMessageForUser(User user){
+		//Select target route and add message
+		String mes="";
+		double userPreferencesRank = 1.0;
+		for (RouteModel route : routes) {							
+			if (route.getMode() == RecommenderModes.CAR) {
+				mes = "";
+			} else {
+				try {
+					mes = CalculateMessageUtilities.calculateForUser(this, route, user);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+			route.setUserPreferencesRank(userPreferencesRank);
+			userPreferencesRank++;
+			route.setMessage(mes);			
+		}
+	}
+	
 	public RouteFormatRoot getFilteredRoutesResponse(){
 		ArrayList<Route> routesList = new ArrayList<Route>();
 		for (RouteModel route : filteredRoutes){
+			routesList.add(route.getRoute());
+		}
+		RouteFormatRoot filtered_route = new RouteFormatRoot()
+				.setRequestId(originalRouteFormatRoutes.getRequestId())
+				.setRouteFormatVersion(originalRouteFormatRoutes.getRouteFormatVersion())
+				.setProcessedTime(originalRouteFormatRoutes.getProcessedTime())
+				.setStatus(originalRouteFormatRoutes.getStatus())
+				.setCoordinateReferenceSystem(originalRouteFormatRoutes.getCoordinateReferenceSystem())
+				.setRequest(originalRouteFormatRoutes.getRequest().get())
+				.setRoutes(routesList);
+		
+		//return originalRouteFormatRoutes.toString();
+		return filtered_route;
+	}
+	
+	public RouteFormatRoot getRankedRoutesResponse(){
+		ArrayList<Route> routesList = new ArrayList<Route>();
+		for (RouteModel route : routes){
 			routesList.add(route.getRoute());
 		}
 		RouteFormatRoot filtered_route = new RouteFormatRoot()
