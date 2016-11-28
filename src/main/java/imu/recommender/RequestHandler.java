@@ -73,8 +73,7 @@ public class RequestHandler extends HttpServlet{
 
 	private static boolean PRINT_JSON = true;
 	private Logger logger = Logger.getLogger(RequestHandler.class);
-	private String exampleFile = "src/main/resources/route.txt";
-	private String mes;
+	private String exampleFile = "src/main/resources/route.txt";	
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -99,40 +98,17 @@ public class RequestHandler extends HttpServlet{
 		String requestBody = getBody(request);
 		logger.debug(requestBody);
 		Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class));
+		
 		try{
 			userID = request.getHeader("X-USER-ID");
 			logger.debug("X-USER-ID");
 			logger.debug(userID);
 			user = User.findById(userID);
-			logger.debug("user object: ");
-			logger.debug(user);
-			//for testing
-			logger.debug(user.getDemographics().getGender());
-			recommenderRoutes.filterRoutesForUser(user);
-			//Rank routes based on User Preference
-			recommenderRoutes.rankRoutesForUser(user);
-			List <RouteModel> ranked = recommenderRoutes.rankBasedonUserPreferences(recommenderRoutes.getRoutes(),user);
-			recommenderRoutes.setRoutes(ranked);
-			//Select target route and add message
-			for (int i = 0; i < recommenderRoutes.getRoutes().size(); i++) {
-				RouteModel route = recommenderRoutes.getRoutes().get(i);
-				if (recommenderRoutes.getRoutes().get(i).getRoute().getAdditionalInfo().get("mode") == "car") {
-					mes = "";
-				} else {
-					try {
-						mes = CalculateMessageUtilities.calculateForUser(recommenderRoutes, route, user);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-				Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
-				additionalInfoRouteRequest.put("mode", recommenderRoutes.getRoutes().get(i).getRoute().getAdditionalInfo().get("mode"));
-				additionalInfoRouteRequest.put("UserPreferencesRank", recommenderRoutes.getRoutes().get(i).getRoute().getAdditionalInfo().get("UserPreferencesRank"));
-				additionalInfoRouteRequest.put("message", mes);
-				recommenderRoutes.getRoutes().get(i).getRoute().setAdditionalInfo(additionalInfoRouteRequest);
-			}
 
-			String jsonResult = mapper.writeValueAsString(recommenderRoutes.getFilteredRoutesResponse());
+			recommenderRoutes.filterDuplicates();
+			recommenderRoutes.filterRoutesForUser(user);		
+			recommenderRoutes.rankRoutesForUser(user);						
+			String jsonResult = mapper.writeValueAsString(recommenderRoutes.getRankedRoutesResponse());
 			out.println(jsonResult);			
 		}
 		catch (Exception e){
@@ -140,8 +116,9 @@ public class RequestHandler extends HttpServlet{
 			logger.debug("user not found");
 			RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
 			logger.debug(response_route);
-			List<Route> Trips = new ArrayList<Route>();
+			List<Route> Trips = new ArrayList<Route>();			
 			for (int i = 0; i < response_route.getRoutes().size(); i++) {
+				String mes ="";
 				Route route = response_route.getRoutes().get(i);
 				if (response_route.getRoutes().get(i).getAdditionalInfo().get("mode") == "car") {
 					mes = "";
