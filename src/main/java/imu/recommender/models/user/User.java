@@ -215,10 +215,12 @@ public class User {
 			//target.add("bikeSharing");
 		}
 		if (user_mode.equals("bicycle")){
+		    target.add("bicycle");
 			target.add("walk");
 			//target.add("bikeSharing");
 		}
 		if (user_mode.equals("walk")){
+            target.add("bicycle");
 			target.add("walk");
 		}
 		if (user_mode.equals("car")){

@@ -210,17 +210,32 @@ public class Recommender {
 	
 	private void selectTargetRouteandAddMessageForUser(User user){
 		//Select target route and add message
+		List<String> targetList = user.getTargetList();
+		logger.debug(targetList);
+		String target = "";
 		String mes="";
+		for (int i = 0; i < targetList.size(); i++) {
+			for (RouteModel route : routes) {
+				logger.debug(targetList.get(i));
+				logger.debug(route.getRoute().getAdditionalInfo().get("mode"));
+				if (route.getRoute().getAdditionalInfo().get("mode") == targetList.get(i)) {
+					target = targetList.get(i);
+					break;
+				}
+			}
+		}
+		logger.debug(target);
 		double userPreferencesRank = 1.0;
-		for (RouteModel route : routes) {							
-			if (route.getMode() == RecommenderModes.CAR) {
-				mes = "";
-			} else {
+		for (RouteModel route : routes) {
+			if (route.getRoute().getAdditionalInfo().get("mode") == target){
 				try {
 					mes = CalculateMessageUtilities.calculateForUser(this, route, user);
-				} catch (Exception ex) {
-					ex.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
+			}
+			else {
+				mes = "";
 			}
 			route.setUserPreferencesRank(userPreferencesRank);
 			userPreferencesRank++;
