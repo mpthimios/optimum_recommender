@@ -194,42 +194,50 @@ public class User {
 
 	public List<String> getTargetList() {
 		List<String> target = new ArrayList<String>();
-		Double max = this.getMode_usage().getPt_percent();
-		String user_mode="pt";
-		if (this.getMode_usage().getCar_percent() > max ){
-			max = this.getMode_usage().getCar_percent();
-			user_mode="car";
+		try {			
+			Double max = this.getMode_usage().getPt_percent();
+			String user_mode="pt";
+			if (this.getMode_usage().getCar_percent() > max ){
+				max = this.getMode_usage().getCar_percent();
+				user_mode="car";
+			}
+			if (this.getMode_usage().getWalk_percent() > max ){
+				max = this.getMode_usage().getWalk_percent();
+				user_mode = "walk";
+			}
+			if (this.getMode_usage().getBike_percent() > max ){
+				max = this.getMode_usage().getBike_percent();
+				user_mode = "bicycle";
+			}
+			if (user_mode.equals("pt")){
+				target.add("bike&ride");
+				target.add("bicycle");
+				target.add("walk");
+				//target.add("bikeSharing");
+			}
+			if (user_mode.equals("bicycle")){
+			    target.add("bicycle");
+				target.add("walk");
+				//target.add("bikeSharing");
+			}
+			if (user_mode.equals("walk")){
+	            target.add("bicycle");
+				target.add("walk");
+			}
+			if (user_mode.equals("car")){
+				//target.add("carSharing");
+				target.add("park&ride");
+				target.add("pt");
+				target.add("bike&ride");
+				//target.add("bikeSharing");
+				target.add("bike");
+				target.add("walk");
+			}
 		}
-		if (this.getMode_usage().getWalk_percent() > max ){
-			max = this.getMode_usage().getWalk_percent();
-			user_mode = "walk";
-		}
-		if (this.getMode_usage().getBike_percent() > max ){
-			max = this.getMode_usage().getBike_percent();
-			user_mode = "bicycle";
-		}
-		if (user_mode.equals("pt")){
-			target.add("bike&ride");
-			target.add("bicycle");
-			target.add("walk");
-			//target.add("bikeSharing");
-		}
-		if (user_mode.equals("bicycle")){
-		    target.add("bicycle");
-			target.add("walk");
-			//target.add("bikeSharing");
-		}
-		if (user_mode.equals("walk")){
-            target.add("bicycle");
-			target.add("walk");
-		}
-		if (user_mode.equals("car")){
-			//target.add("carSharing");
-			target.add("park&ride");
+		catch (Exception e){
 			target.add("pt");
 			target.add("bike&ride");
-			//target.add("bikeSharing");
-			target.add("bike");
+			target.add("bicycle");
 			target.add("walk");
 		}
 

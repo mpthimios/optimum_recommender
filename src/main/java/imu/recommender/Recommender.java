@@ -126,7 +126,8 @@ public class Recommender {
 	
 	public void rankRoutesForUser (User user){
 		//function aggregated
-		List<RouteModel> rankedRoutes = rankBasedonUserPreferences(user);
+		//List<RouteModel> rankedRoutes = rankBasedonUserPreferences(user);
+		List<RouteModel> rankedRoutes = this.rankBasedonCO2();
 		routes.clear();
 		routes = rankedRoutes;
 		selectTargetRouteandAddMessageForUser(user);		
@@ -160,9 +161,6 @@ public class Recommender {
 	}
 	
 	private List<RouteModel> rankBasedonUserPreferences(User user){
-		//todo
-		//get preference for this time of day (we should split the day in intervals)
-
 		//if there are no preferences for this time of day get preferences for any time of day
 		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
 
@@ -201,11 +199,29 @@ public class Recommender {
 		}
 
 		return rankedRoutes;
+		
 	}
 	
 	private List<RouteModel> rankBasedonSystemView(User user){
 		//todo later
 		return null;
+	}
+	
+	private List<RouteModel> rankBasedonCO2(){
+		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
+
+		TreeMap<Double, RouteModel> co2RankedRoutes = new TreeMap<Double, RouteModel>();
+		
+		for (RouteModel route : routes){
+			co2RankedRoutes.put(route.getEmissions(), route);			
+		}				
+		
+		for (Map.Entry<Double, RouteModel> entry : co2RankedRoutes.entrySet()){
+			rankedRoutes.add(entry.getValue());
+		}
+
+		return rankedRoutes;
+		
 	}
 	
 	private void selectTargetRouteandAddMessageForUser(User user){
