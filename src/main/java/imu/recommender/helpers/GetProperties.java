@@ -15,14 +15,15 @@ import org.apache.log4j.Logger;
  * Created by evangelie on 21/10/2016.
  */
 public class GetProperties implements ServletContextListener {
-   
-	String username = "";
+
+    String username = "";
     String password = "";
     InputStream inputStream;
     private Logger logger = Logger.getLogger(GetProperties.class);
     
     private static int maxWalkingDistance = 1000;
     private static int maxBikeDistance = 3000;
+    private static String weatherId = "";
 
     public String getUsernameValues() throws IOException {
 
@@ -94,6 +95,10 @@ public class GetProperties implements ServletContextListener {
     		String bikeDistance = sc.getInitParameter("maxBikeDistance");
     		logger.debug("maxBikeDistance: " + bikeDistance);
     		GetProperties.maxBikeDistance = Integer.parseInt(bikeDistance);
+
+            String weatherId = sc.getInitParameter("weatherId");
+            logger.debug("weatherId: " + weatherId);
+            GetProperties.weatherId = String.valueOf (weatherId);
 		}
 		catch (Exception e){
 			e.printStackTrace();
@@ -116,5 +121,14 @@ public class GetProperties implements ServletContextListener {
 	public static void setMaxBikeDistance(int maxBikeDistance) {
 		GetProperties.maxBikeDistance = maxBikeDistance;
 	}
+
+    public static String getweatherId() {
+        return weatherId;
+    }
+
+    public static void setweatherId(String weatherId) {
+        GetProperties.weatherId = weatherId;
+    }
+
 }
 

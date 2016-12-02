@@ -203,7 +203,7 @@ public class Recommender {
 		return rankedRoutes;
 	}
 	
-	private List<RouteModel> rankBasedonSystemView(){
+	private List<RouteModel> rankBasedonSystemView(User user){
 		//todo later
 		return null;
 	}
@@ -294,6 +294,5 @@ public class Recommender {
 	public void setRoutes(List<RouteModel> routes) {
 		this.routes = routes;
 	}
-	
 
 }

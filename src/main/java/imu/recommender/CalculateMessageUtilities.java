@@ -69,6 +69,10 @@ public class CalculateMessageUtilities {
             contextList.add("BikeDistance");
 
         }
+        if (WeatherInfo.isWeatherNice(lat, lon, city)) {
+            System.out.println("Nice Weather");
+            contextList.add("NiceWeather");
+        }
 
         //Check the weather if withinBikeDistance or withinWalkingDistance is True
        /* if(withinWalkingDistance(route_distance) || withinBikeDistance(route_distance) ) {
@@ -107,7 +111,7 @@ public class CalculateMessageUtilities {
 
         //Message m = new Message();
         //mongoDatastore.save(m);
-        contextList.add("NiceWeather");
+        //contextList.add("NiceWeather");
         System.out.println(contextList);
         System.out.println(strategy);
         Query<Message> query = mongoDatastore.createQuery(Message.class);
@@ -141,15 +145,15 @@ public class CalculateMessageUtilities {
 
     }
 
-    private static boolean withinWalkingDistance(int distance) {
+    public static boolean withinWalkingDistance(int distance) {
         return (distance<1000);
 
     }
-    private static boolean withinBikeDistance(int distance) {
+    public static boolean withinBikeDistance(int distance) {
         return(distance<3000);
     }
     
-    private static boolean CostComparetoDriving(String transport_route, String driving_route) {
+    public static boolean CostComparetoDriving(String transport_route, String driving_route) {
         //get distance from routes and calculate cost
         Double transport_cost = 1.4;
         Double driving_cost = 5.0;
@@ -157,19 +161,19 @@ public class CalculateMessageUtilities {
 
     }
 
-    private static boolean DurationComparetoDriving(Integer transport_duration, Integer driving_duration) {
+    public static boolean DurationComparetoDriving(Integer transport_duration, Integer driving_duration) {
 
         return transport_duration - driving_duration <=5;
 
     }
 
-    private static boolean EmissionComparetoOthers(String user) {
+    public static boolean EmissionComparetoOthers(String user) {
 
         return true;
 
     }
 
-    private static RouteModel CarTrip(Recommender route){
+    public static RouteModel CarTrip(Recommender route){
         RouteModel cartrip = null;
         for (int i = 0; i < route.getRoutes().size(); i++) {
             if (route.getRoutes().get(i).getRoute().getAdditionalInfo().get("mode").equals("car")) {
