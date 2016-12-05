@@ -20,6 +20,7 @@ public class RouteModel {
 	private double behaviouralModelUtility = 0.0;
 	private int mode;
 	private double userPreferencesRank = 0.0;
+	private double SystemRank = 0.0;
 	private String message = "";
 	
 	public RouteModel (Route route){
@@ -173,6 +174,17 @@ public class RouteModel {
 		this.message = message;
 		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();		 
 		additionalInfo.put("message", message);
+		this.route.setAdditionalInfo(additionalInfo);
+	}
+
+	public double getSystemRank() {
+		return SystemRank;
+	}
+
+	public void setSystemRank(double SystemRankRank) {
+		this.SystemRank = SystemRankRank;
+		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
+		additionalInfo.put("SystemRank", SystemRankRank);
 		this.route.setAdditionalInfo(additionalInfo);
 	}
 	

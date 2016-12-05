@@ -126,10 +126,31 @@ public class Recommender {
 	
 	public void rankRoutesForUser (User user){
 		//function aggregated
-		//List<RouteModel> rankedRoutes = rankBasedonUserPreferences(user);
-		List<RouteModel> rankedRoutes = this.rankBasedonCO2();
+		List<RouteModel> rankedRoutes = this.rankBasedonUserPreferences(user);
+		//List<RouteModel> rankedRoutes = this.rankBasedonCO2();
 		routes.clear();
 		routes = rankedRoutes;
+		List<RouteModel> rankedSystemRoutes = this.rankBasedonSystemView(user, rankedRoutes);
+		//Implement Borda count
+		/*List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
+
+		TreeMap<Double, RouteModel> FinalRankedRoutes = new TreeMap<Double, RouteModel>();
+
+		for (RouteModel route : routes){
+			double SystemRank = route.getSystemRank();
+			double UserRank = route.getUserPreferencesRank();
+			double finalRank = (SystemRank + UserRank)/2;
+			System.out.println(finalRank);
+			FinalRankedRoutes.put(finalRank, route);
+
+		}
+
+		for (Map.Entry<Double, RouteModel> entry : FinalRankedRoutes.entrySet()){
+			rankedRoutes2.add(entry.getValue());
+		}
+
+		routes.clear();
+		routes = rankedRoutes2; */
 		selectTargetRouteandAddMessageForUser(user);		
 	}
 	
@@ -184,29 +205,154 @@ public class Recommender {
 			e.printStackTrace();
 		}
 		
-		Map<Integer, ArrayList<RouteModel>> rankedRoutesMap = new LinkedHashMap<Integer, ArrayList<RouteModel>>(); 
+		Map<Integer, RouteModel> rankedRoutesMap = new LinkedHashMap<Integer, RouteModel>();
 		for (Map.Entry<Double, Integer> entry : userPreferedModes.entrySet()){
 			logger.debug("preference: " + entry.getKey() + " mode: " + entry.getValue());
-			rankedRoutesMap.put(entry.getValue(), new ArrayList<RouteModel>());
+			rankedRoutesMap.put(entry.getValue(), routes.get(0));
 		}
 		
 		for (RouteModel route : routes){
-			rankedRoutesMap.get(route.getMode()).add(route);			
-		}				
+			Integer number = route.getMode();
+			rankedRoutesMap.replace(number,route);
+			//rank.add(number,route);
+		}
 		
-		for (Map.Entry<Integer, ArrayList<RouteModel>> entry : rankedRoutesMap.entrySet()){
-			rankedRoutes.addAll(entry.getValue());
+		for (Map.Entry<Integer, RouteModel> entry : rankedRoutesMap.entrySet()){
+			rankedRoutes.add(entry.getValue());
 		}
 
+		double userPreferencesRank= 1.0;
+		for (RouteModel route : rankedRoutes){
+			route.setUserPreferencesRank(userPreferencesRank);
+			userPreferencesRank++;
+
+		}
 		return rankedRoutes;
 		
 	}
-	
-	private List<RouteModel> rankBasedonSystemView(User user){
-		//todo later
-		return null;
+
+	private List<RouteModel> rankBasedonSystemView(User user, List<RouteModel> rout){
+
+		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
+		TreeMap<Integer, Double> rankedRoutesMap = new TreeMap<Integer, Double>();
+		double max_emissions=0.0;
+		//Find max emissions
+		for (RouteModel route : routes){
+			if (route.getEmissions() > max_emissions){
+				max_emissions=route.getEmissions();
+			}
+		}
+
+		for (RouteModel route : routes){
+			//Get distance of route
+			Integer route_distance=route.getRoute().getDistanceMeters();
+			//Get the mode of route
+			String mode = route.getRoute().getAdditionalInfo().get("mode").toString();
+			//Return 1 if context exists else return 0
+			double BikeDistance = boolToDouble(CalculateMessageUtilities.withinBikeDistance(route_distance));
+			double WalkDistance = boolToDouble(CalculateMessageUtilities.withinWalkingDistance(route_distance));
+			double ManyPT = boolToDouble(user.tooManyPublicTransportRoutes());
+			double ManyCar = boolToDouble(user.tooManyCarRoutes());
+			double Emissions = boolToDouble(user.emissionsIncreasing());
+			//double NiceWeather = boolToDouble(WeatherInfo.isWeatherNice(lat, lon, city))
+			double NiceWeather = 1.0;
+			double Duration = 0.0;
+
+			//Calculate utility of route based on the mode
+			double context_utility = 0.0;
+			double emissions_utility = 0.0;
+			double utility = 0.0;
+			if(mode.equals("walk")){
+				if (ManyCar == 1.0){
+					context_utility = ( 0.4218*WalkDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
+				}
+				else if (ManyPT == 1.0){
+					context_utility = ( 0.4074*WalkDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
+				}
+				else {
+					context_utility = ( 0.4*WalkDistance + 0.3*Duration + 0.1*Emissions +0.2*NiceWeather)/4.0;
+				}
+				emissions_utility = 0.0;
+				utility = (context_utility + (1-emissions_utility) )/2;
+				rankedRoutesMap.put(RecommenderModes.WALK, utility);
+			}
+			else if(mode.equals("bicycle") || mode.equals("bikeSharing")){
+				if (ManyCar == 1.0){
+					context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
+				}
+				else if (ManyPT == 1.0){
+					context_utility = ( 0.4074*BikeDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
+				}
+				else {
+					context_utility = ( 0.4*BikeDistance + 0.3*Duration + 0.1*Emissions +0.2*NiceWeather)/4.0;
+				}
+				emissions_utility = 0.0;
+				utility = (context_utility + (1-emissions_utility) )/2;
+				rankedRoutesMap.put(RecommenderModes.BICYCLE, utility);
+			}
+			else if(mode.equals("bike&ride")){
+				if (ManyCar == 1.0) {
+					context_utility = (0.0901 * ManyCar + 0.5152 * Duration + 0.179 * Emissions + 0.2157 * NiceWeather) / 4.0;
+				}
+				else if (ManyPT == 1.0) {
+					context_utility = (0.049 * ManyCar + 0.5193 * Duration + 0.1958 * Emissions + 0.2359 * NiceWeather) / 4.0;
+				}
+				else{
+					context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0777*Emissions +0.1321*NiceWeather)/4.0;
+				}
+				emissions_utility = route.getEmissions()/max_emissions;
+				utility = (context_utility + (1-emissions_utility) )/2;
+				rankedRoutesMap.put( RecommenderModes.BIKE_AND_RIDE, utility);
+			}
+			else if(mode.equals("pt")){
+				context_utility = ( 0.5125*Duration + 0.0949*ManyCar + 0.315*Emissions +0.0775*NiceWeather)/4.0;
+				emissions_utility = route.getEmissions()/max_emissions;
+				utility = (context_utility + (1-emissions_utility) )/2;
+				rankedRoutesMap.put( RecommenderModes.PUBLIC_TRANSPORT, utility);
+			}
+			else if(mode.equals("park&ride")){
+				context_utility = ( 0.5152*Duration + 0.0901*ManyCar + 0.179*Emissions +0.2157*NiceWeather)/4.0;
+				emissions_utility = route.getEmissions()/max_emissions;
+				utility = (context_utility + (1-emissions_utility) )/2;
+				rankedRoutesMap.put( RecommenderModes.PARK_AND_RIDE, utility);
+			}
+			else if(mode.equals("car")){
+				context_utility = 0.0001;
+				emissions_utility = route.getEmissions()/max_emissions;
+				utility = (context_utility + (1-emissions_utility) )/2;
+				rankedRoutesMap.put( RecommenderModes.CAR,utility);
+			}
+			//prepei na ta pros8esw ola pairnei mono an exoun allh timh
+			//rankedRoutesMap.put(route,utility);
+		}
+		Map<Integer, RouteModel> rankedRoutesMap2 = new LinkedHashMap<Integer, RouteModel>();
+
+		for (Map.Entry<Integer, Double> entry : rankedRoutesMap.entrySet()){
+			logger.debug("utility: " + entry.getKey() + " mode: " + entry.getValue());
+			rankedRoutesMap2.put(entry.getKey(), routes.get(0));
+		}
+
+		for (RouteModel route : routes){
+			Integer number = route.getMode();
+			rankedRoutesMap2.replace(number,route);
+			//rankedRoutesMap2.put(number,route);
+		}
+
+
+		for (Map.Entry<Integer, RouteModel> entry : rankedRoutesMap2.entrySet()){
+			rankedRoutes.add(entry.getValue());
+		}
+
+		double SystemRank= 1.0;
+		for (RouteModel route : rankedRoutes ){
+			route.setSystemRank(SystemRank);
+			SystemRank++;
+		}
+
+		return rankedRoutes;
 	}
-	
+
+
 	private List<RouteModel> rankBasedonCO2(){
 		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
 
@@ -241,7 +387,6 @@ public class Recommender {
 			}
 		}
 		logger.debug(target);
-		double userPreferencesRank = 1.0;
 		for (RouteModel route : routes) {
 			if (route.getRoute().getAdditionalInfo().get("mode") == target){
 				try {
@@ -253,9 +398,7 @@ public class Recommender {
 			else {
 				mes = "";
 			}
-			route.setUserPreferencesRank(userPreferencesRank);
-			userPreferencesRank++;
-			route.setMessage(mes);			
+			route.setMessage(mes);
 		}
 	}
 	
@@ -309,6 +452,13 @@ public class Recommender {
 
 	public void setRoutes(List<RouteModel> routes) {
 		this.routes = routes;
+	}
+
+	//This function converts boolean to Integer
+	private double boolToDouble( boolean b ) {
+		if (b)
+			return 1.0;
+		return 0.0;
 	}
 
 }

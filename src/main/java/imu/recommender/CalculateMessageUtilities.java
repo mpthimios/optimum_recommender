@@ -3,6 +3,7 @@ package imu.recommender;
 import at.ac.ait.ariadne.routeformat.Route;
 import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import at.ac.ait.ariadne.routeformat.RoutingRequest;
+import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.helpers.WeatherInfo;
 import imu.recommender.models.message.Message;
@@ -146,11 +147,11 @@ public class CalculateMessageUtilities {
     }
 
     public static boolean withinWalkingDistance(int distance) {
-        return (distance<1000);
+        return (distance<GetProperties.getMaxWalkingDistance());
 
     }
     public static boolean withinBikeDistance(int distance) {
-        return(distance<3000);
+        return(distance< GetProperties.getMaxBikeDistance());
     }
     
     public static boolean CostComparetoDriving(String transport_route, String driving_route) {
