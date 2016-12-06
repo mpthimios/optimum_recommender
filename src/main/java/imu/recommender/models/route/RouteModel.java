@@ -20,7 +20,7 @@ public class RouteModel {
 	private double behaviouralModelUtility = 0.0;
 	private int mode;
 	private double userPreferencesRank = 0.0;
-	private String message = "";
+	private String message = "";	
 	
 	public RouteModel (Route route){
 		this.route = route;
@@ -41,42 +41,54 @@ public class RouteModel {
 
 		logger.debug("adding mode");
 		if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE")  ){
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.PARK_AND_RIDE_WITH_BIKE];
+			this.setMode(RecommenderModes.PARK_AND_RIDE_WITH_BIKE);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];			
 		}
 		else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") ){
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.PARK_AND_RIDE];
+			this.setMode(RecommenderModes.PARK_AND_RIDE);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];	
 		}
 		else if (Modes.contains("BICYCLE") && Modes.contains("FOOT") && Modes.contains("PUBLIC_TRANSPORT") ){
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.BIKE_AND_RIDE];
+			this.setMode(RecommenderModes.BIKE_AND_RIDE);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
 		else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") ){
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.PUBLIC_TRANSPORT];
+			this.setMode(RecommenderModes.PUBLIC_TRANSPORT);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
 		else if (Modes.contains("BICYCLE") && Modes.contains("FOOT") ){
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.BICYCLE];
+			this.setMode(RecommenderModes.BICYCLE);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
 		else if (Modes.contains("CAR") && Modes.contains("FOOT") ){
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.CAR];
+			this.setMode(RecommenderModes.CAR);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
 		else if (Modes.contains("FOOT") && Modes.size()==1 ){
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.WALK];
+			this.setMode(RecommenderModes.WALK);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
 		else if (Modes.contains("BICYCLE") && Modes.size()==1 ){
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.BICYCLE];
+			this.setMode(RecommenderModes.BICYCLE);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
 		else if (Modes.contains("CAR") && Modes.size()==1 ){
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.CAR];
+			this.setMode(RecommenderModes.CAR);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
 		else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.size()==1 ){
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.PUBLIC_TRANSPORT];
+			this.setMode(RecommenderModes.PUBLIC_TRANSPORT);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
 		else {
-			mode = RecommenderModes.recommenderModesStr[RecommenderModes.UNKNOWN];
+			this.setMode(RecommenderModes.UNKNOWN);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
 		
 		Map<String, Object> additionalInfoRouteRequest = route.getAdditionalInfo();
 		additionalInfoRouteRequest.put("mode", mode);
 		route.setAdditionalInfo(additionalInfoRouteRequest);
+		
 
 	}
 	
@@ -96,6 +108,9 @@ public class RouteModel {
 	
 	private double CalculateSegmentEmissions(Integer distance, String travel_mode, String detailed_mode) {
 		double emissions=0.0;
+		
+		logger.debug("calculating emissions for: ");
+		logger.debug("distance: " + distance + " travel_mode: " + travel_mode + " detailed_mode: " + detailed_mode);
 		if (travel_mode.equals("FOOT") ){
 			emissions = 0;
 		}
@@ -104,13 +119,13 @@ public class RouteModel {
 		}
 		if (travel_mode.equals("PUBLIC_TRANSPORT") ) {
 
-			if (detailed_mode.equals("SUBWAY")) {
+			if (detailed_mode.equals("Optional[SUBWAY]")) {
 				emissions = ( (double)(distance*20)/1000 );
 			}
-			if (detailed_mode.equals("HEAVY_RAIL")) {
+			if (detailed_mode.equals("Optional[HEAVY_RAIL]")) {
 				emissions = ( (double)(distance*50)/1000 );
 			}
-			if (detailed_mode.equals("BUS")) {
+			if (detailed_mode.equals("Optional[BUS]")) {
 				emissions = ( (distance*25.5)/1000 );
 			}
 		}

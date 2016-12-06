@@ -7,11 +7,49 @@ import java.net.URLConnection;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import imu.recommender.helpers.RecommenderModes;
+import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.User;
 
 public class BehaviouralModel {
 	
 	private static Logger logger = Logger.getLogger(BehaviouralModel.class);
+	
+	public static double calculateBhaviouralModelUtility (RouteModel route, User user){
+		double utility = 0.0;
+		String[] location = {
+				route.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0).toString(),
+				route.getRoute().getFrom().getCoordinate().geometry.coordinates.get(1).toString()	
+		};
+		double time = (double)route.getRoute().getDurationSeconds();
+		switch (route.getMode()){
+			case RecommenderModes.WALK:
+				utility = U2(0, time, user, location);
+				break;
+			case RecommenderModes.BICYCLE:
+				utility = U1(0, time, user, location);
+				break;
+			case RecommenderModes.BIKE_AND_RIDE:
+				utility = U1(0, time, user, location);
+				break;
+			case RecommenderModes.PUBLIC_TRANSPORT:
+				utility = U3(0, time, user, location);
+				break;
+			case RecommenderModes.PARK_AND_RIDE_WITH_BIKE:
+				utility = U4(0, time, user, location);
+				break;
+			case RecommenderModes.PARK_AND_RIDE:
+				utility = U4(0, time, user, location);
+				break;
+			case RecommenderModes.CAR:
+				utility = U4(0, time, user, location);
+				break;
+			default:
+					break;
+		}
+		logger.debug("behavioural model utility: " + utility);
+		return utility;
+	}
 	
 	public static double U1(double cost, double time, User user, String[] location){
 		double ASC1 = 0.0;
@@ -77,16 +115,16 @@ public class BehaviouralModel {
 	}
 	
 	private static double educationValue(String education){
-		if (education.matches("High School")){
+		if (education.matches("Primary education or less")){
 			return 1.0;
 		}
-		else if (education.matches("University")){
+		else if (education.matches("Secondary education")){
 			return 2.0;
 		}
-		else if (education.matches("PHD")){
+		else if (education.matches("Undergraduate degree")){
 			return 3.0;
 		}
-		else if (education.matches("Masters")){
+		else if (education.matches("Graduate or post-graduate degree")){
 			return 4.0;
 		}
 		else return 0.0;
