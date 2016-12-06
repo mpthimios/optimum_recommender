@@ -1,37 +1,97 @@
 package imu.recommender.helpers;
 
+import jdk.nashorn.internal.objects.annotations.Property;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.apache.http.client.methods.HttpGet;
 import org.bitpipeline.lib.owm.OwmClient;
+import org.bitpipeline.lib.owm.StatusWeatherData;
 import org.bitpipeline.lib.owm.WeatherData;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Locale;
 
-public class WeatherInfo {
-	
-	public static boolean isWeatherNice(Float lat, Float lon, String city) throws Exception {
+public class WeatherInfo implements ServletContextListener {
 
-        OwmClient owm = new OwmClient ();
-        //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity(lat ,lon,1);
-        WeatherStatusResponse currentWeather = owm.currentWeatherAtCity("Wien");
+    private static String weatherId;
 
-        if (currentWeather.hasWeatherStatus ()) {
+    public static boolean isWeatherNice(Float lat, Float lon, String city) throws Exception {
 
-            WeatherData weather = currentWeather.getWeatherStatus ().get (0);
-            if (weather.getPrecipitation () == Integer.MIN_VALUE) {
-                WeatherData.WeatherCondition weatherCondition = weather.getWeatherConditions ().get (0);
-                String description = weatherCondition.getDescription ();
-                if (description.contains ("rain") || description.contains ("shower"))
-                    System.out.println ("No rain measures in "+city+" but reports of " + description);
-                else
-                    System.out.println ("No rain measures in "+city+ ": " + description);
+        OwmClient owm = new OwmClient();
+
+        //owm.setAPPID("e0f5c1a1d86a8bd69e497197804d411c");
+        //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity("Tokyo", "JP");
+        WeatherStatusResponse currentWeather;
+
+        String url = "http://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+lon+"&appid="+GetProperties.getweatherId();
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        // optional default is GET
+        con.setRequestMethod("GET");
+
+        //add request header
+        //con.setRequestProperty("User-Agent", USER_AGENT);
+
+        int responseCode = con.getResponseCode();
+        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("Response Code : " + responseCode);
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        System.out.println(response.toString());
+        JSONObject js = new JSONObject(response.toString());
+        System.out.println(js.get("weather").toString().contains("Rain") || js.get("weather").toString().contains("Rain"));
+        //System.out.println(js.getJSONArray("weather").get(1));
+
+        try {
+            if(js.get("weather").toString().contains("Rain") || js.get("weather").toString().contains("Rain") ) {
+                return false;
+            }
+            else{
                 return true;
-            } else
-                System.out.println ("It's raining in "+city+": " + weather.getPrecipitation () + " mm/h");
-            return false;
+            }
+
+        }catch (Exception e){
+            return true;
+        }
+
+    }
+    @Override
+    public void contextDestroyed(ServletContextEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
+        //test
+        try{
+            ServletContext sc = servletContextEvent.getServletContext();
+            String weatherId = sc.getInitParameter("weatherId");
+            this.weatherId = weatherId;
 
         }
-        else
-            System.out.println("No info about weather.");
-        return false;
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 	
 }
