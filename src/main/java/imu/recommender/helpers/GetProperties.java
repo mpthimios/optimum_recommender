@@ -24,6 +24,7 @@ public class GetProperties implements ServletContextListener {
     private static int maxWalkingDistance = 1000;
     private static int maxBikeDistance = 3000;
     private static String weatherId = "";
+    private static int Duration = 5;
 
     public String getUsernameValues() throws IOException {
 
@@ -128,6 +129,14 @@ public class GetProperties implements ServletContextListener {
 
     public static void setweatherId(String weatherId) {
         GetProperties.weatherId = weatherId;
+    }
+
+    public static int getDuration() {
+        return Duration;
+    }
+
+    public static void setDuration(int Duration) {
+        GetProperties.Duration = Duration;
     }
 
 }

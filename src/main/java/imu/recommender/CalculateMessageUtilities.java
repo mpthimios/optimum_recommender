@@ -164,7 +164,7 @@ public class CalculateMessageUtilities {
 
     public static boolean DurationComparetoDriving(Integer transport_duration, Integer driving_duration) {
 
-        return transport_duration - driving_duration <=5;
+        return transport_duration - driving_duration <=GetProperties.getDuration();
 
     }
 

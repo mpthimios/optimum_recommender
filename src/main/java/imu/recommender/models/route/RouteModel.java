@@ -16,12 +16,14 @@ public class RouteModel {
 
 	private Logger logger = Logger.getLogger(RouteModel.class);
 	private Route route = new Route();
+	private int routeId;
 	private double emissions = 0.0;
 	private double behaviouralModelUtility = 0.0;
 	private int mode;
 	private double userPreferencesRank = 0.0;
 	private double SystemRank = 0.0;
 	private String message = "";
+
 	
 	public RouteModel (Route route){
 		this.route = route;
@@ -181,10 +183,22 @@ public class RouteModel {
 		return SystemRank;
 	}
 
-	public void setSystemRank(double SystemRankRank) {
-		this.SystemRank = SystemRankRank;
+	public void setSystemRank(double SystemRank) {
+		this.SystemRank = SystemRank;
 		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
-		additionalInfo.put("SystemRank", SystemRankRank);
+		additionalInfo.put("SystemRank", SystemRank);
+		this.route.setAdditionalInfo(additionalInfo);
+	}
+
+	public int getRouteId() {
+		return routeId;
+	}
+
+	public void setRouteId(int routeId) {
+
+		this.routeId = routeId;
+		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
+		additionalInfo.put("routeId", routeId);
 		this.route.setAdditionalInfo(additionalInfo);
 	}
 	

@@ -1,6 +1,7 @@
 package imu.recommender;
 
-import imu.recommender.helpers.UserPreferMode;
+import imu.recommender.helpers.*;
+
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,8 +19,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import imu.recommender.helpers.GetProperties;
-import imu.recommender.helpers.RecommenderModes;
 import imu.recommender.models.route.RouteModel;
 import at.ac.ait.ariadne.routeformat.Route;
 import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
@@ -52,8 +51,10 @@ public class Recommender {
 			RouteModel recommenderRoute = new RouteModel(originalRouteFormatRoutes.getRoutes().get(i));
 			recommenderRoute.calculateEmissions();
 			recommenderRoute.setMode();
-			routes.add(recommenderRoute);	
+			recommenderRoute.setRouteId(i+1);
+			routes.add(recommenderRoute);
 			logger.debug("route mode: " + recommenderRoute.getRoute().getAdditionalInfo().get("mode"));
+			logger.debug("route id: " + recommenderRoute.getRoute().getAdditionalInfo().get("routeId"));
 		}
 		filteredRoutes = new ArrayList<RouteModel>();
 	}
@@ -126,12 +127,46 @@ public class Recommender {
 	
 	public void rankRoutesForUser (User user){
 		//function aggregated
-		List<RouteModel> rankedRoutes = this.rankBasedonUserPreferences(user);
+		List<RouteModel> rankedRoutes = rankBasedonUserPreferences(user);
 		//List<RouteModel> rankedRoutes = this.rankBasedonCO2();
 		routes.clear();
 		routes = rankedRoutes;
-		List<RouteModel> rankedSystemRoutes = this.rankBasedonSystemView(user, rankedRoutes);
+		List<RouteModel> rankedSystemRoutes = rankBasedonSystemView(user);
+		double SystemRank= 1.0;
+		int i=0;
+		routes.clear();
+		routes = rankedSystemRoutes;
+		List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
+		for (RouteModel route : rankedSystemRoutes ){
+			RouteModel m = new RouteModel(route.getRoute());
+			//Route n = new Route();
+			Route n = new Route().setFrom(route.getRoute().getFrom()).setBoundingBox(route.getRoute().getBoundingBox().get()).setTo(route.getRoute().getTo()).setDistanceMeters(route.getRoute().getDistanceMeters()).setDurationSeconds(route.getRoute().getDurationSeconds()).setEndTime(route.getRoute().getEndTime()).setSegments(route.getRoute().getSegments()).setStartTime(route.getRoute().getStartTime()).setOptimizedFor(route.getRoute().getOptimizedFor().toString()).setId(route.getRoute().getId().toString());
+			Map<String, Object> additionalInfo = m.getRoute().getAdditionalInfo();
+			additionalInfo.put("SystemRank", SystemRank);
+			n.setAdditionalInfo(additionalInfo);
+			m.setRoute(n);
+			SystemRank++;
+			rankedRoutes2.add(m);
+		}
+		System.out.println("-----");
+		//System.out.println(rankedRoutes2.get(3).getRoute().getAdditionalInfo());
+		System.out.println(rankedRoutes2.get(2).getRoute().getAdditionalInfo());
 		//Implement Borda count
+		ArrayList<Ballot> b = getBallots(rankedRoutes2);
+		VotingSystem system = new Borda(b.toArray(new Ballot[b.size()]));
+		System.out.println(system.results());
+		String[] sortedRoutesId = system.getSortedCandidateList();
+		List<RouteModel> FinalrankedRoutes = new ArrayList<RouteModel>();
+		for (String e:sortedRoutesId){
+			for (int k=0;k<rankedRoutes2.size();k++) {
+				if ( rankedRoutes2.get(k).getRoute().getAdditionalInfo().get("routeId").toString().equals(e)){
+					FinalrankedRoutes.add(rankedRoutes2.get(k));
+					break;
+				}
+			}
+		}
+		System.out.println(FinalrankedRoutes);
+		System.out.println("----");
 		/*List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
 
 		TreeMap<Double, RouteModel> FinalRankedRoutes = new TreeMap<Double, RouteModel>();
@@ -147,11 +182,11 @@ public class Recommender {
 
 		for (Map.Entry<Double, RouteModel> entry : FinalRankedRoutes.entrySet()){
 			rankedRoutes2.add(entry.getValue());
-		}
+		}*/
 
 		routes.clear();
-		routes = rankedRoutes2; */
-		selectTargetRouteandAddMessageForUser(user);		
+		routes = FinalrankedRoutes;
+		selectTargetRouteandAddMessageForUser(user);
 	}
 	
 	private List<RouteModel> rankBasedonBehaviouralModel(List<RouteModel> routes, User user){
@@ -222,19 +257,28 @@ public class Recommender {
 		}
 
 		double userPreferencesRank= 1.0;
-		for (RouteModel route : rankedRoutes){
-			route.setUserPreferencesRank(userPreferencesRank);
-			userPreferencesRank++;
 
+		List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
+		for (RouteModel route : rankedRoutes ){
+			RouteModel m = new RouteModel(route.getRoute());
+			Route n = new Route().setFrom(route.getRoute().getFrom()).setBoundingBox(route.getRoute().getBoundingBox().get()).setTo(route.getRoute().getTo()).setDistanceMeters(route.getRoute().getDistanceMeters()).setDurationSeconds(route.getRoute().getDurationSeconds()).setEndTime(route.getRoute().getEndTime()).setSegments(route.getRoute().getSegments()).setStartTime(route.getRoute().getStartTime()).setOptimizedFor(route.getRoute().getOptimizedFor().toString()).setId(route.getRoute().getId().toString());
+			Map<String, Object> additionalInfo = m.getRoute().getAdditionalInfo();
+			additionalInfo.put("userPreferencesRank", userPreferencesRank);
+			n.setAdditionalInfo(additionalInfo);
+			m.setRoute(n);
+			userPreferencesRank++;
+			rankedRoutes2.add(m);
 		}
-		return rankedRoutes;
+		return rankedRoutes2;
 		
 	}
 
-	private List<RouteModel> rankBasedonSystemView(User user, List<RouteModel> rout){
+	private List<RouteModel> rankBasedonSystemView(User user){
 
 		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
-		TreeMap<Integer, Double> rankedRoutesMap = new TreeMap<Integer, Double>();
+		Map<Integer, Double> rankedRoutesMap = new HashMap<Integer, Double>();
+		//MyComparator comp=new MyComparator(rankedRoutesMap);
+		//TreeMap<Integer, Double> rankedRoutesMap1 = new TreeMap<Integer, Double>();
 		double max_emissions=0.0;
 		//Find max emissions
 		for (RouteModel route : routes){
@@ -242,12 +286,15 @@ public class Recommender {
 				max_emissions=route.getEmissions();
 			}
 		}
-
+		int r_id=1;
 		for (RouteModel route : routes){
 			//Get distance of route
 			Integer route_distance=route.getRoute().getDistanceMeters();
 			//Get the mode of route
 			String mode = route.getRoute().getAdditionalInfo().get("mode").toString();
+			route.setRouteId(r_id);
+			r_id++;
+			Integer routeId = route.getRouteId();
 			//Return 1 if context exists else return 0
 			double BikeDistance = boolToDouble(CalculateMessageUtilities.withinBikeDistance(route_distance));
 			double WalkDistance = boolToDouble(CalculateMessageUtilities.withinWalkingDistance(route_distance));
@@ -274,7 +321,8 @@ public class Recommender {
 				}
 				emissions_utility = 0.0;
 				utility = (context_utility + (1-emissions_utility) )/2;
-				rankedRoutesMap.put(RecommenderModes.WALK, utility);
+				//rankedRoutesMap.put(RecommenderModes.WALK, utility);
+				rankedRoutesMap.put(routeId,utility);
 			}
 			else if(mode.equals("bicycle") || mode.equals("bikeSharing")){
 				if (ManyCar == 1.0){
@@ -288,7 +336,8 @@ public class Recommender {
 				}
 				emissions_utility = 0.0;
 				utility = (context_utility + (1-emissions_utility) )/2;
-				rankedRoutesMap.put(RecommenderModes.BICYCLE, utility);
+				//rankedRoutesMap.put(RecommenderModes.BICYCLE, utility);
+				rankedRoutesMap.put(routeId,utility);
 			}
 			else if(mode.equals("bike&ride")){
 				if (ManyCar == 1.0) {
@@ -302,51 +351,47 @@ public class Recommender {
 				}
 				emissions_utility = route.getEmissions()/max_emissions;
 				utility = (context_utility + (1-emissions_utility) )/2;
-				rankedRoutesMap.put( RecommenderModes.BIKE_AND_RIDE, utility);
+				//rankedRoutesMap.put( RecommenderModes.BIKE_AND_RIDE, utility);
+				rankedRoutesMap.put(routeId,utility);
 			}
 			else if(mode.equals("pt")){
 				context_utility = ( 0.5125*Duration + 0.0949*ManyCar + 0.315*Emissions +0.0775*NiceWeather)/4.0;
 				emissions_utility = route.getEmissions()/max_emissions;
 				utility = (context_utility + (1-emissions_utility) )/2;
-				rankedRoutesMap.put( RecommenderModes.PUBLIC_TRANSPORT, utility);
+				//rankedRoutesMap.put( RecommenderModes.PUBLIC_TRANSPORT, utility);
+				rankedRoutesMap.put(routeId,utility);
 			}
 			else if(mode.equals("park&ride")){
 				context_utility = ( 0.5152*Duration + 0.0901*ManyCar + 0.179*Emissions +0.2157*NiceWeather)/4.0;
 				emissions_utility = route.getEmissions()/max_emissions;
 				utility = (context_utility + (1-emissions_utility) )/2;
-				rankedRoutesMap.put( RecommenderModes.PARK_AND_RIDE, utility);
+				//rankedRoutesMap.put( RecommenderModes.PARK_AND_RIDE, utility);
+				rankedRoutesMap.put(routeId,utility);
 			}
 			else if(mode.equals("car")){
 				context_utility = 0.0001;
 				emissions_utility = route.getEmissions()/max_emissions;
 				utility = (context_utility + (1-emissions_utility) )/2;
-				rankedRoutesMap.put( RecommenderModes.CAR,utility);
+				//rankedRoutesMap.put( RecommenderModes.CAR,utility);
+				rankedRoutesMap.put(routeId,utility);
 			}
 			//prepei na ta pros8esw ola pairnei mono an exoun allh timh
 			//rankedRoutesMap.put(route,utility);
 		}
+
+		System.out.println(rankedRoutesMap);
+		System.out.println(entriesSortedByValues(rankedRoutesMap));
+
+
 		Map<Integer, RouteModel> rankedRoutesMap2 = new LinkedHashMap<Integer, RouteModel>();
 
 		for (Map.Entry<Integer, Double> entry : rankedRoutesMap.entrySet()){
-			logger.debug("utility: " + entry.getKey() + " mode: " + entry.getValue());
-			rankedRoutesMap2.put(entry.getKey(), routes.get(0));
+			logger.debug("mode: " + entry.getKey() + " utility: " + entry.getValue());
+			rankedRoutesMap2.put(entry.getKey(), routes.get(entry.getKey()-1));
 		}
-
-		for (RouteModel route : routes){
-			Integer number = route.getMode();
-			rankedRoutesMap2.replace(number,route);
-			//rankedRoutesMap2.put(number,route);
-		}
-
 
 		for (Map.Entry<Integer, RouteModel> entry : rankedRoutesMap2.entrySet()){
 			rankedRoutes.add(entry.getValue());
-		}
-
-		double SystemRank= 1.0;
-		for (RouteModel route : rankedRoutes ){
-			route.setSystemRank(SystemRank);
-			SystemRank++;
 		}
 
 		return rankedRoutes;
@@ -387,10 +432,11 @@ public class Recommender {
 			}
 		}
 		logger.debug(target);
+		List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
 		for (RouteModel route : routes) {
 			if (route.getRoute().getAdditionalInfo().get("mode") == target){
 				try {
-					mes = CalculateMessageUtilities.calculateForUser(this, route, user);
+					mes = CalculateMessageUtilities.calculateForUser( this, route, user);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -399,7 +445,11 @@ public class Recommender {
 				mes = "";
 			}
 			route.setMessage(mes);
+			rankedRoutes2.add(route);
 		}
+		routes.clear();
+		routes=rankedRoutes2;
+
 	}
 	
 	public RouteFormatRoot getFilteredRoutesResponse(){
@@ -460,5 +510,44 @@ public class Recommender {
 			return 1.0;
 		return 0.0;
 	}
+
+	private ArrayList<Ballot> getBallots(List<RouteModel> routes){
+		//Add routes as candidates
+		ArrayList<Ballot> ballots = new ArrayList<Ballot>();
+		int max= routes.size();
+
+		for (RouteModel route : routes){
+			double userpref = Double.parseDouble(route.getRoute().getAdditionalInfo().get("userPreferencesRank").toString());
+			double system =  Double.parseDouble(route.getRoute().getAdditionalInfo().get("SystemRank").toString());
+			for (int i = 0; i < (max-userpref)+1; i++) {
+				ballots.add(new Ballot(route.getRoute().getAdditionalInfo().get("routeId").toString()));
+			}
+			for (int i = 0; i < (max-system)+1; i++) {
+				ballots.add(new Ballot(route.getRoute().getAdditionalInfo().get("routeId").toString()));
+			}
+
+		}
+
+		return ballots;
+
+	}
+
+	static <K,V extends Comparable<? super V>>
+	List<Map.Entry<K, V>> entriesSortedByValues(Map<K,V> map) {
+
+		List<Map.Entry<K,V>> sortedEntries = new ArrayList<Map.Entry<K,V>>(map.entrySet());
+
+		Collections.sort(sortedEntries,
+				new Comparator<Map.Entry<K,V>>() {
+					@Override
+					public int compare(Map.Entry<K,V> e1, Map.Entry<K,V> e2) {
+						return e2.getValue().compareTo(e1.getValue());
+					}
+				}
+		);
+
+		return sortedEntries;
+	}
+
 
 }
