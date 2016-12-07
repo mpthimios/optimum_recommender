@@ -29,6 +29,7 @@ import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.Demographics;
 import imu.recommender.models.user.OwnedVehicle;
 import imu.recommender.models.user.Personality;
+import imu.recommender.models.user.RoutePreference;
 import imu.recommender.models.user.User;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -97,14 +98,28 @@ public class RequestHandler extends HttpServlet{
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		String requestBody = getBody(request);
 		logger.debug(requestBody);
-		Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class));
 		
 		try{
 			userID = request.getHeader("X-USER-ID");
 			logger.debug("X-USER-ID");
 			logger.debug(userID);
 			user = User.findById(userID);
-
+			
+			if (user.getRoutePreferences().size() == 1){
+				RoutePreference routePreference = new RoutePreference();
+				routePreference.setLabel("car_preference");
+				routePreference.setBikeSharingPref(0.1);
+				routePreference.setPtPref(0.6);
+				routePreference.setCarPref(1.0);
+				routePreference.setWalkPref(10000.0);
+				user.getRoutePreferences().add(routePreference);
+			}
+			
+			Query query = mongoDatastore.createQuery(User.class).field("id").equal(userID);
+			UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("route_preferences", user.getRoutePreferences());
+			mongoDatastore.update(query, ops);
+			
+			Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
 			recommenderRoutes.filterDuplicates();
 			recommenderRoutes.filterRoutesForUser(user);		
 			recommenderRoutes.rankRoutesForUser(user);
@@ -114,6 +129,7 @@ public class RequestHandler extends HttpServlet{
 		catch (Exception e){
 			e.printStackTrace();
 			logger.debug("user not found");
+			Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
 			RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
 			logger.debug(response_route);
 			List<Route> Trips = new ArrayList<Route>();			

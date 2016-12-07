@@ -32,16 +32,15 @@ public class Recommender {
 	List<RouteModel> routes = null;
 	List<RouteModel> filteredRoutes = null;
 	final ObjectMapper mapper = new ObjectMapper();
-	
+	User user = null;
+
 	public Recommender(){
 		//nothing to do for now 
 	}
 	
-	public Recommender(RouteFormatRoot originalRouteFormatRoutes) throws JsonParseException, JsonMappingException, IOException{
+	public Recommender(RouteFormatRoot originalRouteFormatRoutes, User user) throws JsonParseException, JsonMappingException, IOException{
 		this.originalRouteFormatRoutes = originalRouteFormatRoutes;
-		//BehaviouralModel.U1(20.0, 20.0, );
-		//getLocationValue(this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(0).toString(),
-		//this.originalRouteFormatRoutes.getRequest().get().getFrom().getCoordinate().geometry.coordinates.get(1).toString());
+		this.user = user;
 		initialize();
 	}
 	
@@ -51,6 +50,15 @@ public class Recommender {
 			RouteModel recommenderRoute = new RouteModel(originalRouteFormatRoutes.getRoutes().get(i));
 			recommenderRoute.calculateEmissions();
 			recommenderRoute.setMode();
+			if (user != null){
+				recommenderRoute.setBehaviouralModelUtility(BehaviouralModel.calculateBhaviouralModelUtility(recommenderRoute, user));
+			}
+			else{
+				recommenderRoute.setBehaviouralModelUtility(0.0);
+			}
+			routes.add(recommenderRoute);
+			logger.debug("route mode: " + recommenderRoute.getRoute().getAdditionalInfo().get("mode") +
+					" emissions: " + recommenderRoute.getEmissions());
 			recommenderRoute.setRouteId(i+1);
 			routes.add(recommenderRoute);
 			logger.debug("route mode: " + recommenderRoute.getRoute().getAdditionalInfo().get("mode"));
@@ -88,7 +96,6 @@ public class Recommender {
 	
 	//filterRoutes for User function
 	public void filterRoutesForUser (User user){
-		logger.debug(routes.size());
 		
 		for (int i = 0; i < routes.size(); i++) {
 			RouteModel recommenderRoute = routes.get(i);			
@@ -100,14 +107,16 @@ public class Recommender {
 			int mode = recommenderRoute.getMode();
 			//Filter out routes
 			//Filter out car and park and ride modes for users that don’t own a car.
-			if(!car_owner) {
-				if ((mode == RecommenderModes.CAR) || (mode == RecommenderModes.PARK_AND_RIDE)) {
+			logger.debug("MODE: " + mode);
+			if ((mode == RecommenderModes.CAR) || (mode == RecommenderModes.PARK_AND_RIDE)) {
+				if(!car_owner) {
 					continue;
-				} else {
+				}
+				else {
 					filteredRoutes.add(recommenderRoute);
 				}
 			}
-			//Filter out bike modes for users that don’t own a bike and for routes containing biking more than 3 Km
+//					//Filter out bike modes for users that don’t own a bike and for routes containing biking more than 3 Km
 			else if (mode == RecommenderModes.BICYCLE){
 				if((bike_owner) && (recommenderRoute.getRoute().getDistanceMeters()<GetProperties.getMaxBikeDistance())){
 					filteredRoutes.add(recommenderRoute);
@@ -115,6 +124,8 @@ public class Recommender {
 			}
 			//Filter out walk modes for routes containing walking more than 1 Km
 			else if(mode == RecommenderModes.WALK){
+				logger.debug("recommenderRoute.getRoute().getDistanceMeters(): " + recommenderRoute.getRoute().getDistanceMeters());
+				logger.debug("GetProperties.getMaxWalkingDistance(): " + GetProperties.getMaxWalkingDistance());
 				if(recommenderRoute.getRoute().getDistanceMeters()<GetProperties.getMaxWalkingDistance()){
 					filteredRoutes.add(recommenderRoute);
 				}				
@@ -189,31 +200,31 @@ public class Recommender {
 		selectTargetRouteandAddMessageForUser(user);
 	}
 	
-	private List<RouteModel> rankBasedonBehaviouralModel(List<RouteModel> routes, User user){
-		//todo	
+	private List<RouteModel> rankBasedonBehaviouralModel(List<RouteModel> routes){
+
 		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
+		TreeMap<Double, ArrayList<RouteModel>> tmp = new TreeMap<Double, ArrayList<RouteModel>>();
+
 		for (RouteModel route : routes){
-			switch (route.getMode()){
-				case RecommenderModes.WALK:
-					break;
-				case RecommenderModes.BICYCLE:
-					break;
-				case RecommenderModes.BIKE_AND_RIDE:
-					break;
-				case RecommenderModes.PUBLIC_TRANSPORT:
-					break;
-				case RecommenderModes.PARK_AND_RIDE_WITH_BIKE:
-					break;
-				case RecommenderModes.PARK_AND_RIDE:
-					break;
-				case RecommenderModes.CAR:
-					break;
-				default:
-						break;
+			if (tmp.containsKey(route.getBehaviouralModelUtility())){
+				tmp.get(route.getBehaviouralModelUtility()).add(route);
+			}
+			else{
+				ArrayList<RouteModel> newArrayList = new ArrayList<RouteModel>();
+				newArrayList.add(route);
+				tmp.put(route.getBehaviouralModelUtility(), newArrayList);
 			}
 		}
 		
-		return null;
+		for (Map.Entry<Double, ArrayList<RouteModel>> entry : tmp.entrySet()){
+			logger.debug("CO2: " + entry.getKey());
+			for (RouteModel route : entry.getValue()){
+				rankedRoutes.add(route);
+				logger.debug("route Mode: " + route.getRoute().getAdditionalInfo().get("mode"));
+			}
+		}
+
+		return rankedRoutes;
 	}
 	
 	private List<RouteModel> rankBasedonUserPreferences(User user){
@@ -401,16 +412,26 @@ public class Recommender {
 	private List<RouteModel> rankBasedonCO2(){
 		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
 
-		TreeMap<Double, RouteModel> co2RankedRoutes = new TreeMap<Double, RouteModel>();
+		TreeMap<Double, ArrayList<RouteModel>> co2RankedRoutes = new TreeMap<Double, ArrayList<RouteModel>>();
 		
 		for (RouteModel route : routes){
-			co2RankedRoutes.put(route.getEmissions(), route);			
-		}				
-		
-		for (Map.Entry<Double, RouteModel> entry : co2RankedRoutes.entrySet()){
-			rankedRoutes.add(entry.getValue());
+			if (co2RankedRoutes.containsKey(route.getEmissions())){
+				co2RankedRoutes.get(route.getEmissions()).add(route);
+			}
+			else{
+				co2RankedRoutes.put(route.getEmissions(), new ArrayList<RouteModel>());
+				co2RankedRoutes.get(route.getEmissions()).add(route);
+			}
 		}
 
+		for (Map.Entry<Double, ArrayList<RouteModel>> entry : co2RankedRoutes.entrySet()){
+			logger.debug("CO2: " + entry.getKey());
+			for (RouteModel route : entry.getValue()){
+				rankedRoutes.add(route);
+				logger.debug("route Mode: " + route.getRoute().getAdditionalInfo().get("mode"));
+			}
+		}
+		//logger.debug("rankedRoutes: " + rankedRoutes.size() + " routes");
 		return rankedRoutes;
 		
 	}
@@ -423,8 +444,8 @@ public class Recommender {
 		String mes="";
 		for (int i = 0; i < targetList.size(); i++) {
 			for (RouteModel route : routes) {
-				logger.debug(targetList.get(i));
-				logger.debug(route.getRoute().getAdditionalInfo().get("mode"));
+				//logger.debug(targetList.get(i));
+				//logger.debug(route.getRoute().getAdditionalInfo().get("mode"));
 				if (route.getRoute().getAdditionalInfo().get("mode") == targetList.get(i)) {
 					target = targetList.get(i);
 					break;

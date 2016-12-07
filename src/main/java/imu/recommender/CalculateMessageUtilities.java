@@ -150,8 +150,10 @@ public class CalculateMessageUtilities {
         return (distance<GetProperties.getMaxWalkingDistance());
 
     }
+
     public static boolean withinBikeDistance(int distance) {
         return(distance< GetProperties.getMaxBikeDistance());
+
     }
     
     public static boolean CostComparetoDriving(String transport_route, String driving_route) {

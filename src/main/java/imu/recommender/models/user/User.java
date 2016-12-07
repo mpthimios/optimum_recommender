@@ -55,6 +55,9 @@ public class User {
 	@Embedded("mode_usage")
 	private ModeUsage mode_usage;
 	
+	@Embedded("route_preferences")
+	private ArrayList<RoutePreference> routePreferences;
+	
 	public User(){
 		//initialize variables
 		this.name = "John";
@@ -76,6 +79,7 @@ public class User {
 		this.facebook_data = new FacebookData();
 		this.owned_vehicles = null;
 		this.emissionsLastWeek = 0.0;
+		this.routePreferences = new ArrayList<RoutePreference>();
 	}
 	
 	public boolean emissionsIncreasing() {
@@ -411,6 +415,14 @@ public class User {
 
 	public void setMode_usage(ModeUsage mode_usage) {
 		this.mode_usage = mode_usage;
+	}
+
+	public ArrayList<RoutePreference> getRoutePreferences() {
+		return routePreferences;
+	}
+
+	public void setRoutePreferences(ArrayList<RoutePreference> routePreferences) {
+		this.routePreferences = routePreferences;
 	}
 
 	public String getBestPersuasiveStrategy(String personality){
