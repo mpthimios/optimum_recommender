@@ -102,18 +102,24 @@ public class CalculateEmissions implements Job {
                 double total_emissions = 0.0;
                 logger.debug(arr);
                 for (int i = 0; i < arr.length(); i++) {
-                    String [] all_modes = {"car", "pt", "bike", "walk"};
+                    String mode="";
                     double emissions = 0.0;
-                    Random random = new Random();
-
-                    // randomly selects an index from the arr
-                    int select = random.nextInt(all_modes.length);
-                    //Put the random selected mode to string
-                    arr.getJSONObject(i).put("mode", all_modes[select]);
 
                     JSONObject object = arr.getJSONObject(i);
-                    String mode = object.get("mode").toString();
-                    //String a = objects.get("");
+                    Integer sensorActivity = Integer.parseInt(object.get("sensorActivity").toString());
+
+                    if(sensorActivity ==1){
+                        mode = "bike";
+                    } else  if(sensorActivity==9 || sensorActivity == 10) {
+                        mode = "pt";
+                    } else if(sensorActivity==7|| sensorActivity==2 || sensorActivity==3 || sensorActivity==4){
+                        mode = "walk";
+                    } else  if(sensorActivity==8 || sensorActivity==11 || sensorActivity==12 || sensorActivity==0){
+                        mode = "car";
+                    }
+                    else{
+                        mode="question";
+                    }
                     //Get Distance
                     double distance = 100;
                     if (mode.equals("car") ){

@@ -85,26 +85,40 @@ public class CalculateModeUsePercentages implements Job {
     			//print result
     			logger.debug(response.toString());
     			
-				 JSONObject jsonObj  = new JSONObject(response.toString());
-				 logger.debug(jsonObj.getJSONArray("data"));
-				 JSONArray arr = jsonObj.getJSONArray("data");
-				 Integer n_car=0;
-				 Integer n_pt=0;
-				 Integer n_bike=0;
-				 Integer n_walk=0;
-				 logger.debug(arr);
-				 for (int i = 0; i < arr.length(); i++) {
-					 String [] all_modes = {"car", "pt", "bike", "walk"};
-					 Random random = new Random();
-	
-					 // randomly selects an index from the arr
-					 int select = random.nextInt(all_modes.length);
-					 //Put the random selected mode to string
-					 arr.getJSONObject(i).put("mode", all_modes[select]);
+				JSONObject jsonObj  = new JSONObject(response.toString());
+				logger.debug(jsonObj.getJSONArray("data"));
+				JSONArray arr = jsonObj.getJSONArray("data");
+				Integer n_car=0;
+				Integer n_pt=0;
+				Integer n_bike=0;
+				Integer n_walk=0;
+				logger.debug(arr);
+				//logger.debug(arr.length());
+				for (int i = 0; i < arr.length(); i++) {
+				 	 String mode="";
+					 //String [] all_modes = {"car", "pt", "bike", "walk"};
 	
 					 JSONObject object = arr.getJSONObject(i);
-					 String mode = object.get("mode").toString();
-					 //String a = objects.get("");
+
+					 Integer sensorActivity = Integer.parseInt(object.get("sensorActivity").toString());
+
+					 if(sensorActivity ==1){
+						 mode = "bike";
+					 } else if(sensorActivity==7|| sensorActivity==2 || sensorActivity==3 || sensorActivity==4){
+						 mode = "walk";
+					 } else  if(sensorActivity==5){
+						 mode ="tilting";
+					 } else  if(sensorActivity==6){
+						 mode ="question";
+					 } else  if(sensorActivity==8 || sensorActivity==11 || sensorActivity==12 || sensorActivity==0){
+						 mode = "car";
+					 } else  if(sensorActivity==9 || sensorActivity == 10) {
+						 mode = "pt";
+					 }
+					 else{
+						 mode="question";
+					 }
+
 					 if (mode.equals("car") ){
 						 n_car++;
 					 }
@@ -117,7 +131,6 @@ public class CalculateModeUsePercentages implements Job {
 					 if (mode.equals("walk") ){
 						 n_walk++;
 					 }
-					 //logger.debug(arr.getJSONObject(i).get("mode"));
 				 }
 				 //Calculate percentages
 				 double car_percent = ( (double)(n_car*100)/(double) arr.length());
