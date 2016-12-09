@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Random;
 
+import com.mongodb.DBObject;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +51,8 @@ public class CalculateModeUsePercentages implements Job {
 		}
 
     	DBCollection m = mongoDatastore.getCollection( User.class );
-    	List userTokens = m.distinct( "access_token", new BasicDBObject());
+    	//List userTokens = m.distinct( "access_token", new BasicDBObject());
+		List userIds = m.distinct( "id", new BasicDBObject());
     	
     	try{
 	    	URL obj = new URL(activitiesUrl);
@@ -66,10 +68,22 @@ public class CalculateModeUsePercentages implements Job {
 			return;
 		}
     	
-    	for (Object accessToken : userTokens ){
+    	for (Object id : userIds ){
     		try {
-    			logger.debug((String) accessToken);
-        		con.setRequestProperty("token",(String) accessToken);
+				logger.debug((String) id);
+				DBObject user = m.findOne(id);
+				Object accessToken = "";
+
+				try {
+					accessToken = user.get("access_token");
+					logger.debug((String) accessToken);
+				}
+				catch (Exception e){
+					accessToken = "lukaios";
+				}
+
+				//logger.debug((String) accessToken);
+        		con.setRequestProperty("token","lukaios");
         		int responseCode = con.getResponseCode();
     			logger.debug("\nSending 'GET' request to URL : " + activitiesUrl);
     			logger.debug("Response Code : " + responseCode);
@@ -150,7 +164,7 @@ public class CalculateModeUsePercentages implements Job {
 				 logger.debug(bike_percent);
 				 logger.debug(walk_percent);
 				 
-				 Query<User> query = mongoDatastore.createQuery(User.class).field("access_token").equal((String) accessToken);
+				 Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
 				 ModeUsage modeUsage = new ModeUsage();
 				 modeUsage.setWalk_percent(walk_percent);
 				 modeUsage.setPt_percent(pt_percent);
@@ -158,11 +172,59 @@ public class CalculateModeUsePercentages implements Job {
 				 modeUsage.setBike_percent(bike_percent);
 				 UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage", modeUsage);
 				 mongoDatastore.update(query, ops);
-				 
-			 } catch (Exception e) {
+
+
+			} catch (Exception e) {
 				 e.printStackTrace();
 			 }
 
     	}
+		//Calculate Average Mode Use percentages
+		DBCollection mongo = mongoDatastore.getCollection( User.class );
+		for (Object current_id : userIds ) {
+			try {
+				double total_car_perc=0.0;
+				double total_pt_perc=0.0;
+				double total_bike_perc=0.0;
+				double total_walk_perc=0.0;
+				Integer total_users = 0;
+				for (Object id : userIds ) {
+					try {
+						Query<User> user = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
+						if ( !( (String)current_id).equals( (String) id) ) {
+							try {
+								logger.debug(user.get().getMode_usage().getCar_percent());
+								total_car_perc = total_car_perc + user.get().getMode_usage().getCar_percent();
+								total_bike_perc = total_bike_perc + user.get().getMode_usage().getBike_percent();
+								total_pt_perc =total_pt_perc + user.get().getMode_usage().getPt_percent();
+								total_walk_perc = total_walk_perc + user.get().getMode_usage().getWalk_percent();
+								total_users++;
+							}
+							catch (Exception e){
+								total_users++;
+							}
+						}
+					} catch (Exception e) {
+						//
+						e.printStackTrace();
+					}
+				}
+				logger.debug(total_bike_perc);
+				logger.debug(total_car_perc);
+				double bikeUsageComparedToOthers = total_bike_perc/(double)total_users;
+				double ptUsageComparedToOthers = total_pt_perc/(double)total_users;
+				double walkUsageComparedToOthers = total_walk_perc/(double)total_users;
+				double carUsageComparedToOthers = total_car_perc/(double)total_users;
+				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
+				//Update the AverageEmissions field
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthers", ptUsageComparedToOthers));
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("carUsageComparedToOthers", carUsageComparedToOthers));
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthers", bikeUsageComparedToOthers));
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthers", walkUsageComparedToOthers));
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
     }
 }

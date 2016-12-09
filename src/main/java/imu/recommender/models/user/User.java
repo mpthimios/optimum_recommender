@@ -35,7 +35,8 @@ public class User {
 	private double bikeUsage;
 	private double carUsageComparedToOthers;
 	private double ptUsageComparedToOthers;
-	private double bikeUsageComparedToOthers;	
+	private double bikeUsageComparedToOthers;
+	private double walkUsageComparedToOthers;
 	private double emissionsLastWeek;
 	private  double AverageEmissions;
 
@@ -65,6 +66,7 @@ public class User {
 		this.access_token = "lukaios";
 		this.bikeUsage = 0.0;
 		this.bikeUsageComparedToOthers = 0.0;
+		this.walkUsageComparedToOthers = 0.0;
 		this.carUsage = 0.0;
 		this.carUsageComparedToOthers = 0.0;		
 		this.extra_data = "";
@@ -81,6 +83,7 @@ public class User {
 		this.owned_vehicles = null;
 		this.emissionsLastWeek = 0.0;
 		this.routePreferences = new ArrayList<RoutePreference>();
+		this.mode_usage = new ModeUsage();
 		this.AverageEmissions =0.0;
 	}
 	
@@ -377,6 +380,13 @@ public class User {
 
 	public void setBikeUsageComparedToOthers(double bikeUsageComparedToOthers) {
 		this.bikeUsageComparedToOthers = bikeUsageComparedToOthers;
+	}
+	public double getWalkUsageComparedToOthers() {
+		return walkUsageComparedToOthers;
+	}
+
+	public void setWalkUsageComparedToOthers(double walkUsageComparedToOthers) {
+		this.walkUsageComparedToOthers = walkUsageComparedToOthers;
 	}
 
 	public ArrayList<OwnedVehicle> getOwned_vehicles() {
