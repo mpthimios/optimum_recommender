@@ -37,6 +37,7 @@ public class User {
 	private double ptUsageComparedToOthers;
 	private double bikeUsageComparedToOthers;	
 	private double emissionsLastWeek;
+	private  double AverageEmissions;
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
 	
@@ -80,6 +81,7 @@ public class User {
 		this.owned_vehicles = null;
 		this.emissionsLastWeek = 0.0;
 		this.routePreferences = new ArrayList<RoutePreference>();
+		this.AverageEmissions =0.0;
 	}
 	
 	public boolean emissionsIncreasing() {
@@ -423,6 +425,14 @@ public class User {
 
 	public void setRoutePreferences(ArrayList<RoutePreference> routePreferences) {
 		this.routePreferences = routePreferences;
+	}
+
+	public double getAverageEmissions() {
+		return AverageEmissions;
+	}
+
+	public void setAverageEmissions(double AverageEmissions) {
+		this.AverageEmissions = AverageEmissions;
 	}
 
 	public String getBestPersuasiveStrategy(String personality){

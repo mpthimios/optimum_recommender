@@ -25,6 +25,7 @@ import sun.font.TrueTypeFont;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -103,10 +104,9 @@ public class CalculateMessageUtilities {
             }
         }
 
-        /*
-        if (EmissionComparetoOthers("user")){
+        if (EmissionComparetoOthers(user)){
             contextList.add("EmissionComparetoOthers");
-        } */
+        }
 
         //Find all messages after filtering
 
@@ -170,9 +170,22 @@ public class CalculateMessageUtilities {
 
     }
 
-    public static boolean EmissionComparetoOthers(String user) {
+    public static boolean EmissionComparetoOthers(User user) {
+        try{
+            double user_emissions = user.getEmissionsLastWeek();
+            double average_emissions_of_others = user.getAverageEmissions();
+            System.out.println(user_emissions);
+            if (user_emissions/average_emissions_of_others>1.0){
+                return true;
+            }
+            else {
+                return false;
+            }
 
-        return true;
+        }
+        catch (Exception e){
+            return false;
+        }
 
     }
 

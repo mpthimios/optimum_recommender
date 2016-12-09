@@ -2,10 +2,13 @@ package imu.recommender.jobs;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.user.ModeUsage;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
+import org.apache.log4j.lf5.util.StreamUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
@@ -53,6 +56,7 @@ public class CalculateEmissions implements Job {
 
         DBCollection m = mongoDatastore.getCollection( User.class );
         List userTokens = m.distinct( "access_token", new BasicDBObject());
+        List userIds = m.distinct( "id", new BasicDBObject());
 
         try{
             URL obj = new URL(activitiesUrl);
@@ -60,7 +64,7 @@ public class CalculateEmissions implements Job {
             con.setRequestMethod("GET");
             //Get activities of the last week of the user.
             final ZonedDateTime input = ZonedDateTime.now();
-            final ZonedDateTime startOfLastWeek = input.minusWeeks(1);
+            final ZonedDateTime startOfLastWeek = input.minusDays(GetProperties.getdays());
 
             long last_week = startOfLastWeek.toEpochSecond()*1000;
             long now = input.toEpochSecond()*1000;
@@ -77,9 +81,23 @@ public class CalculateEmissions implements Job {
             return;
         }
 
-        for (Object accessToken : userTokens ){
+        //for (Object accessToken : userTokens ){
+        for (Object id : userIds ){
             try {
-                logger.debug((String) accessToken);
+                logger.debug((String) id);
+                DBObject user = m.findOne(id);
+                Object accessToken = "";
+
+                try {
+                    accessToken = user.get("access_token");
+                    logger.debug((String) accessToken);
+                }
+                catch (Exception e){
+                    accessToken = "lukaios";
+                    logger.debug("---");
+                    logger.debug((String) accessToken);
+                }
+
                 con.setRequestProperty("token",(String) accessToken);
                 int responseCode = con.getResponseCode();
                 logger.debug("\nSending 'GET' request to URL : " + activitiesUrl);
@@ -139,7 +157,8 @@ public class CalculateEmissions implements Job {
                 }
 
 
-                Query<User> query = mongoDatastore.createQuery(User.class).field("access_token").equal((String) accessToken);
+                //Query<User> query = mongoDatastore.createQuery(User.class).field("access_token").equal((String) accessToken);
+                Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
                 logger.debug(total_emissions);
                 //Update the emissionsLastWeek field
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("emissionsLastWeek", total_emissions));
@@ -149,5 +168,42 @@ public class CalculateEmissions implements Job {
             }
 
         }
-    }
+        //Calculate Average Emissions
+        DBCollection mongo = mongoDatastore.getCollection( User.class );
+        for (Object current_id : userIds ) {
+            try {
+                DBObject current_user = mongo.findOne(current_id);
+                double total_emissions=0.0;
+                Integer total_users = 0;
+                for (Object id : userIds ) {
+                    try {
+                        Query<User> user = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
+                        if ( !( (String)current_id).equals( (String) id) ) {
+                            try {
+                                total_emissions = total_emissions + user.get().getEmissionsLastWeek();
+                                total_users++;
+                            }
+                            catch (Exception e){
+                                total_users++;
+                            }
+                        }
+                    } catch (Exception e) {
+                        //
+                        e.printStackTrace();
+                    }
+                }
+                double AverageEmissions = total_emissions/(double)total_users;
+                logger.debug(AverageEmissions);
+                Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
+                //Update the AverageEmissions field
+                mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("AverageEmissions", AverageEmissions));
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+            }
 }
