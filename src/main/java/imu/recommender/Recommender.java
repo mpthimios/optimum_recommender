@@ -5,12 +5,15 @@ import imu.recommender.helpers.*;
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import imu.recommender.models.message.Message;
+import imu.recommender.models.strategy.Strategy;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -24,6 +27,9 @@ import at.ac.ait.ariadne.routeformat.Route;
 import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import at.ac.ait.ariadne.routeformat.RouteSegment;
 import imu.recommender.models.user.User;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 
 public class Recommender {
 	
@@ -437,11 +443,13 @@ public class Recommender {
 	}
 	
 	private void selectTargetRouteandAddMessageForUser(User user){
-		//Select target route and add message
+		//Select target route and add message and strategy.
 		List<String> targetList = user.getTargetList();
 		logger.debug(targetList);
 		String target = "";
 		String mes="";
+		String message = "";
+		String strategy = "";
 		for (int i = 0; i < targetList.size(); i++) {
 			for (RouteModel route : routes) {
 				//logger.debug(targetList.get(i));
@@ -458,14 +466,18 @@ public class Recommender {
 			if (route.getRoute().getAdditionalInfo().get("mode") == target){
 				try {
 					mes = CalculateMessageUtilities.calculateForUser( this, route, user);
+					message = mes.split("_")[0];
+					strategy = mes.split("_")[1];
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 			else {
-				mes = "";
+				message = "";
+				strategy = "";
 			}
-			route.setMessage(mes);
+			route.setMessage(message);
+			route.setStrategy(strategy);
 			rankedRoutes2.add(route);
 		}
 		routes.clear();

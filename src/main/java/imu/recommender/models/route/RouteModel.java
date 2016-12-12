@@ -23,6 +23,8 @@ public class RouteModel {
 	private double userPreferencesRank = 0.0;
 	private double SystemRank = 0.0;
 	private String message = "";
+	private String strategy = "";
+
 
 	
 	public RouteModel (Route route){
@@ -214,6 +216,17 @@ public class RouteModel {
 		this.routeId = routeId;
 		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
 		additionalInfo.put("routeId", routeId);
+		this.route.setAdditionalInfo(additionalInfo);
+	}
+
+	public String getStrategy() {
+		return strategy;
+	}
+
+	public void setStrategy(String strategy) {
+		this.strategy = strategy;
+		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
+		additionalInfo.put("strategy", strategy);
 		this.route.setAdditionalInfo(additionalInfo);
 	}
 	

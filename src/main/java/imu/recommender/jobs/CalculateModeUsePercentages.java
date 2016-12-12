@@ -70,20 +70,9 @@ public class CalculateModeUsePercentages implements Job {
     	
     	for (Object id : userIds ){
     		try {
-				logger.debug((String) id);
 				DBObject user = m.findOne(id);
-				Object accessToken = "";
 
-				try {
-					accessToken = user.get("access_token");
-					logger.debug((String) accessToken);
-				}
-				catch (Exception e){
-					accessToken = "lukaios";
-				}
-
-				//logger.debug((String) accessToken);
-        		con.setRequestProperty("token","lukaios");
+        		con.setRequestProperty("user", (String) id.toString());
         		int responseCode = con.getResponseCode();
     			logger.debug("\nSending 'GET' request to URL : " + activitiesUrl);
     			logger.debug("Response Code : " + responseCode);
@@ -106,8 +95,6 @@ public class CalculateModeUsePercentages implements Job {
 				Integer n_pt=0;
 				Integer n_bike=0;
 				Integer n_walk=0;
-				logger.debug(arr);
-				//logger.debug(arr.length());
 				for (int i = 0; i < arr.length(); i++) {
 				 	 String mode="";
 					 //String [] all_modes = {"car", "pt", "bike", "walk"};
@@ -159,10 +146,6 @@ public class CalculateModeUsePercentages implements Job {
 //				 double walk_percent = 40.0;
 				 
 				 //percentages should be saved to mongo
-				 logger.debug(car_percent);
-				 logger.debug(pt_percent);
-				 logger.debug(bike_percent);
-				 logger.debug(walk_percent);
 				 
 				 Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
 				 ModeUsage modeUsage = new ModeUsage();
@@ -193,7 +176,6 @@ public class CalculateModeUsePercentages implements Job {
 						Query<User> user = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
 						if ( !( (String)current_id).equals( (String) id) ) {
 							try {
-								logger.debug(user.get().getMode_usage().getCar_percent());
 								total_car_perc = total_car_perc + user.get().getMode_usage().getCar_percent();
 								total_bike_perc = total_bike_perc + user.get().getMode_usage().getBike_percent();
 								total_pt_perc =total_pt_perc + user.get().getMode_usage().getPt_percent();
@@ -209,8 +191,6 @@ public class CalculateModeUsePercentages implements Job {
 						e.printStackTrace();
 					}
 				}
-				logger.debug(total_bike_perc);
-				logger.debug(total_car_perc);
 				double bikeUsageComparedToOthers = total_bike_perc/(double)total_users;
 				double ptUsageComparedToOthers = total_pt_perc/(double)total_users;
 				double walkUsageComparedToOthers = total_walk_perc/(double)total_users;

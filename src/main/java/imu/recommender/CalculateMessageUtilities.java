@@ -8,6 +8,7 @@ import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.helpers.WeatherInfo;
 import imu.recommender.models.message.Message;
 import imu.recommender.models.route.RouteModel;
+import imu.recommender.models.strategy.Strategy;
 import imu.recommender.models.user.User;
 
 import com.mongodb.*;
@@ -142,6 +143,13 @@ public class CalculateMessageUtilities {
             }
         }
         System.out.println(selected_message_text);
+        //increase the number_of_times_sent of the selected strategy
+        Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal((String) strategy);
+        Integer number_of_times_sent = strategyQuery.get().getNumber_of_times_sent();
+        number_of_times_sent ++;
+        mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_times_sent", number_of_times_sent));
+
+        selected_message_text = selected_message_text + "_" +strategy;
         return selected_message_text;
 
     }

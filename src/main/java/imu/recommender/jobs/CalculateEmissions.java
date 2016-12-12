@@ -98,7 +98,8 @@ public class CalculateEmissions implements Job {
                     logger.debug((String) accessToken);
                 }
 
-                con.setRequestProperty("token",(String) accessToken);
+                //con.setRequestProperty("token",(String) accessToken);
+                con.setRequestProperty("user", (String) id.toString());
                 int responseCode = con.getResponseCode();
                 logger.debug("\nSending 'GET' request to URL : " + activitiesUrl);
                 logger.debug("Response Code : " + responseCode);
