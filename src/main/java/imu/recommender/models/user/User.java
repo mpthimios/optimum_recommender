@@ -39,6 +39,16 @@ public class User {
 	private double walkUsageComparedToOthers;
 	private double emissionsLastWeek;
 	private  double AverageEmissions;
+	private  double sugProb;
+	private  double compProb;
+	private  double selfProb;
+	private Integer sugSuccess;
+	private Integer compSuccess;
+	private Integer selfSuccess;
+	private Integer sugAttempts;
+	private Integer compAttempts;
+	private Integer selfAttempts;
+
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
 	
@@ -85,6 +95,16 @@ public class User {
 		this.routePreferences = new ArrayList<RoutePreference>();
 		this.mode_usage = new ModeUsage();
 		this.AverageEmissions =0.0;
+		this.sugProb = 0.0;
+		this.sugAttempts = 0;
+		this.sugSuccess = 0;
+		this.compProb = 0.0;
+		this.compAttempts = 0;
+		this.compSuccess= 0;
+		this.selfProb = 0.0;
+		this.selfAttempts = 0;
+		this.selfSuccess = 0;
+
 	}
 	
 	public boolean emissionsIncreasing() {
@@ -443,6 +463,78 @@ public class User {
 
 	public void setAverageEmissions(double AverageEmissions) {
 		this.AverageEmissions = AverageEmissions;
+	}
+
+	public double getSugProb() {
+		return sugProb;
+	}
+
+	public void setSugProb(double sugProb) {
+		this.sugProb = sugProb;
+	}
+
+	public double getCompProb() {
+		return compProb;
+	}
+
+	public void setCompProb(double compProb) {
+		this.compProb = compProb;
+	}
+
+	public double getSelfProb() {
+		return selfProb;
+	}
+
+	public void setSelfProb(double selfProb) {
+		this.selfProb = selfProb;
+	}
+
+	public Integer getSugSuccess() {
+		return sugSuccess;
+	}
+
+	public void setSugSuccess(Integer sugSuccess) {
+		this.sugSuccess = sugSuccess;
+	}
+
+	public Integer getCompSuccess() {
+		return compSuccess;
+	}
+
+	public void setCompSuccess(Integer compSuccess) {
+		this.compSuccess = compSuccess;
+	}
+
+	public Integer getSelfSuccess() {
+		return selfSuccess;
+	}
+
+	public void setSelfSuccess(Integer selfSuccess) {
+		this.selfSuccess = selfSuccess;
+	}
+
+	public Integer getSugAttempts() {
+		return sugAttempts;
+	}
+
+	public void setSugAttempts(Integer sugAttempts) {
+		this.sugAttempts = sugAttempts;
+	}
+
+	public Integer getCompAttempts() {
+		return compAttempts;
+	}
+
+	public void setCompAttempts(Integer compAttempts) {
+		this.compAttempts = compAttempts;
+	}
+
+	public Integer getSelfAttempts() {
+		return selfAttempts;
+	}
+
+	public void setSelfAttempts(Integer selfAttempts) {
+		this.selfAttempts = selfAttempts;
 	}
 
 	public String getBestPersuasiveStrategy(String personality){

@@ -36,10 +36,8 @@ public class UpdateStrategiesProbabilities  implements Job{
         DBCollection m = mongoDatastore.getCollection( Strategy.class );
         //Update the probabilities of each strategy based on all users.
         List strategies = m.distinct( "persuasive_strategy", new BasicDBObject());
-        //List userIds = m.distinct( "id", new BasicDBObject());
-        System.out.println(strategies);
+
         for (Object id : strategies ) {
-            System.out.println(id);
             try {
                 //Get total attemps
                 Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal(id.toString());
@@ -60,16 +58,116 @@ public class UpdateStrategiesProbabilities  implements Job{
 
                 //--------------------------------------------------------------------------------
                 //Calculate probability of this strategy for each user.
-                /*DBCollection users = mongoDatastore.getCollection( Strategy.class );
+                DBCollection users = mongoDatastore.getCollection( User.class );
                 //Update the probabilities of each strategy based on all users.
                 List userIds = users.distinct( "id", new BasicDBObject());
                 System.out.println(userIds);
-                for (Object userid : strategies ) {
+                for (Object userid : userIds ) {
+                    System.out.println(id);
 
+                    if (id.toString().equals("suggestion ")) {
+                        System.out.println("----");
+                        Integer user_attempts;
+                        Integer user_success;
+                        //Get total attemps
+                        Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(userid);
+                        try {
+                            //Get total attemps and successes
+                            user_attempts = userQuery.get().getSugAttempts();
+                            user_success = userQuery.get().getSugSuccess();
 
-                }*/
+                        }
+                        catch (Exception e){
+                            //Create the fields
+                            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", 0));
+                            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", 0));
+                            user_attempts = userQuery.get().getSugAttempts();
+                            user_success = userQuery.get().getSugSuccess();
+                        }
+                        System.out.println(user_attempts);
+                        Double userProb = 0.0;
+                        for (int i=0;i<user_success;i++){
+                            userProb = calculateUserProbability(number_of_times_sent,number_of_success,1,user_attempts);
+                        }
+                        for (int i=0;i<user_attempts - user_success;i++){
+                            userProb = calculateUserProbability(number_of_times_sent,number_of_success,0,user_attempts);
+                        }
+                        System.out.println(userProb);
+                        //Update user probability of each strategy, user attempts and user success on mongodb
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugProb", userProb));
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", user_attempts));
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", user_success));
+                    }
+                    else if (id.toString().equals("comparison")) {
+                        Integer user_attempts;
+                        Integer user_success;
+                        //Get total attemps
+                        Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(userid);
+                        try {
+                            //Get total attemps and successes
+                            user_attempts = userQuery.get().getCompAttempts();
+                            user_success = userQuery.get().getCompSuccess();
+
+                        }
+                        catch (Exception e){
+                            //Create the fields
+                            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", 0));
+                            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", 0));
+                            user_attempts = userQuery.get().getCompAttempts();
+                            user_success = userQuery.get().getCompSuccess();
+                        }
+                        System.out.println(user_attempts);
+                        Double userProb = 0.0;
+                        for (int i=0;i<user_success;i++){
+                            userProb = calculateUserProbability(number_of_times_sent,number_of_success,1,user_attempts);
+                        }
+                        for (int i=0;i<user_attempts - user_success;i++){
+                            userProb = calculateUserProbability(number_of_times_sent,number_of_success,0,user_attempts);
+                        }
+                        System.out.println(userProb);
+                        //Update user probability of each strategy, user attempts and user success on mongodb
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compProb", userProb));
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", user_attempts));
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", user_success));
+                    }
+                    else if (id.toString().equals("self-monitoring")) {
+                        System.out.println("----");
+                        Integer user_attempts;
+                        Integer user_success;
+                        //Get total attemps
+                        Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(userid);
+                        try {
+                            //Get total attemps and successes
+                            user_attempts = userQuery.get().getSelfAttempts();
+                            user_success = userQuery.get().getSelfSuccess();
+
+                        }
+                        catch (Exception e){
+                            //Create the fields
+                            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", 0));
+                            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", 0));
+                            user_attempts = userQuery.get().getSelfAttempts();
+                            user_success = userQuery.get().getSelfSuccess();
+                        }
+                        System.out.println(user_attempts);
+                        Double userProb = 0.0;
+                        for (int i=0;i<user_success;i++){
+                            userProb = calculateUserProbability(number_of_times_sent,number_of_success,1,user_attempts);
+                        }
+                        for (int i=0;i<user_attempts - user_success;i++){
+                            userProb = calculateUserProbability(number_of_times_sent,number_of_success,0,user_attempts);
+                        }
+                        System.out.println(userProb);
+                        //Update user probability of each strategy, user attempts and user success on mongodb
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfProb", userProb));
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", user_attempts));
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", user_success));
+                    }
+
+                }
 
             } catch (Exception e) {
+                System.out.println("error");
 
             }
         }
@@ -81,23 +179,23 @@ public class UpdateStrategiesProbabilities  implements Job{
     //based Kaptein Approach (Binomial random variable)
     //n denotes the number of tries to persuade the user using the specific strategy and
     //p denotes the probability of success i.e. the probability of taking the recommended route.
-    public static int getBinomial(int n, double p) {
-        int x = 0;
+    public static double getBinomial(int n, int p) {
+        /*double x = 0.0;
         for(int i = 0; i < n; i++) {
             if(Math.random() < p)
                 x++;
-        }
-        return x;
+        }*/
+        return (double) p/(n+p);
     }
-    public static  int calculateUserProbability(String strategy, User user, int attempt){
+    public static  double calculateUserProbability(int total_attempts, int strategy_prob, int attempt, int user_attempts){
         //Get n, p
         //n plh8os prospa9eiwn gia thn sugkekrimenh strathgikh
         //p pi8anothta epituxias ths sugkekrimenhs strathgikhs
         //p=epituxia/plh8os
-        int n=30;
-        double p=0.8;
-        int StrategyProbability= getBinomial(n,p);
-        return getBinomial(attempt+n,n-attempt+n*(1.0-p));
+        //int n=30;
+        //double p=0.8;
+        double StrategyProbability= getBinomial(total_attempts, strategy_prob);
+        return getBinomial(attempt+user_attempts,total_attempts-attempt+user_attempts*(1-(int)StrategyProbability));
     }
 
 }

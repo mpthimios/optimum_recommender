@@ -148,7 +148,45 @@ public class CalculateMessageUtilities {
         Integer number_of_times_sent = strategyQuery.get().getNumber_of_times_sent();
         number_of_times_sent ++;
         mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_times_sent", number_of_times_sent));
-
+        //Increase the number of attemps for the current user
+        Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
+        Integer user_attempts;
+        if (strategy.equals("suggestion ") ) {
+            try {
+                user_attempts = userQuery.get().getSugAttempts();
+            }
+            catch (Exception e){
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", 0));
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", 0));
+                user_attempts = userQuery.get().getSugAttempts();
+            }
+            user_attempts = user_attempts + 1;
+            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", user_attempts));
+        }
+        else if (strategy.equals("comparison") ) {
+            try {
+                user_attempts = userQuery.get().getCompAttempts();
+            }
+            catch (Exception e){
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", 0));
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", 0));
+                user_attempts = userQuery.get().getCompAttempts();
+            }
+            user_attempts = user_attempts + 1;
+            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", user_attempts));
+        }
+        if (strategy.equals("self-monitoring") ) {
+            try {
+                user_attempts = userQuery.get().getSelfAttempts();
+            }
+            catch (Exception e){
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", 0));
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", 0));
+                user_attempts = userQuery.get().getSelfAttempts();
+            }
+            user_attempts = user_attempts + 1;
+            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", user_attempts));
+        }
         selected_message_text = selected_message_text + "_" +strategy;
         return selected_message_text;
 
