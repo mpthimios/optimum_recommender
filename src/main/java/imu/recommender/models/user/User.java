@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import imu.recommender.Recommender;
+import imu.recommender.helpers.GetProperties;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.*;
@@ -537,22 +538,104 @@ public class User {
 		this.selfAttempts = selfAttempts;
 	}
 
-	public String getBestPersuasiveStrategy(String personality){
+	public String getBestPersuasiveStrategy(String personality) {
+
+		Double Suggestion = 0.0;
+		Double Comparison = 0.0;
+		Double SelfMonitoring = 0.0;
+
+		Double UserSug;
+		Double UserComp;
+		Double UserSelf;
+
+		try {
+			UserSug = this.sugProb;
+			UserComp = this.compProb;
+			UserSelf = this.selfProb;
+
+		} catch (Exception e) {
+			UserSug = 0.0;
+			UserComp = 0.0;
+			UserSelf = 0.0;
+		}
+
 		String strategy = "";
-		if (personality.equals("Extraversion") ){
-			strategy="comparison";
+		switch (personality) {
+			case "Extraversion":
+				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
+					Suggestion = GetProperties.getSugEx();
+					Comparison = GetProperties.getCompEx();
+					SelfMonitoring = GetProperties.getSelfEx();
+
+				} else {
+					Suggestion = (UserSug + GetProperties.getSugEx()) / 2;
+					Comparison = (UserComp + GetProperties.getCompEx()) / 2;
+					SelfMonitoring = (UserSelf + GetProperties.getSelfEx()) / 2;
+				}
+				break;
+			case "Agreeableness":
+
+				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
+					Suggestion = GetProperties.getSugEx();
+					Comparison = GetProperties.getCompEx();
+					SelfMonitoring = GetProperties.getSelfEx();
+
+				} else {
+					Suggestion = (UserSug + GetProperties.getSugAg()) / 2;
+					Comparison = (UserComp + GetProperties.getCompAg()) / 2;
+					SelfMonitoring = (UserSelf + GetProperties.getSelfAg()) / 2;
+				}
+				break;
+			case "Openness":
+
+				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
+					Suggestion = GetProperties.getSugEx();
+					Comparison = GetProperties.getCompEx();
+					SelfMonitoring = GetProperties.getSelfEx();
+
+				} else {
+					Suggestion = (UserSug + GetProperties.getSugOp()) / 2;
+					Comparison = (UserComp + GetProperties.getCompOp()) / 2;
+					SelfMonitoring = (UserSelf + GetProperties.getSelfOp()) / 2;
+				}
+				break;
+			case "Conscientiousness":
+
+				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
+					Suggestion = GetProperties.getSugEx();
+					Comparison = GetProperties.getCompEx();
+					SelfMonitoring = GetProperties.getSelfEx();
+
+				} else {
+					Suggestion = (UserSug + GetProperties.getSugCons()) / 2;
+					Comparison = (UserComp + GetProperties.getCompCons()) / 2;
+					SelfMonitoring = (UserSelf + GetProperties.getSelfCons()) / 2;
+				}
+				break;
+			case "Neuroticism":
+
+				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
+					Suggestion = GetProperties.getSugEx();
+					Comparison = GetProperties.getCompEx();
+					SelfMonitoring = GetProperties.getSelfEx();
+
+				} else {
+					Suggestion = (UserSug + GetProperties.getSugN()) / 2;
+					Comparison = (UserComp + GetProperties.getCompN()) / 2;
+					SelfMonitoring = (UserSelf + GetProperties.getSelfN()) / 2;
+				}
+				break;
 		}
-		else if (personality.equals("Agreeableness") ){
-			strategy="self-monitoring";
+
+		Double max = Suggestion;
+		strategy = "suggestion ";
+		if (Comparison > max){
+			strategy = "comparison";
+			max= Comparison;
 		}
-		else if (personality.equals("Openness") ){
-			strategy="self-monitoring";
-		}
-		else if (personality.equals("Conscientiousness") ){
-			strategy="suggestion ";
-		}
-		else if (personality.equals("Neuroticism") ){
-			strategy="suggestion ";
+		if(SelfMonitoring>max){
+			strategy = "self-monitoring";
+			max=SelfMonitoring;
 		}
 
 		return strategy;
