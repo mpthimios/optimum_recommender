@@ -144,6 +144,7 @@ public class Recommender {
 	
 	public void rankRoutesForUser (User user){
 		//function aggregated
+
 		
 		List<RouteModel> rankedRoutesBasedonUserPreferences = rankBasedonUserPreferences(user, routes);
 		
@@ -159,6 +160,7 @@ public class Recommender {
 		logger.debug(votingSystem.results());
 		String[] sortedRoutesId = votingSystem.getSortedCandidateList();
 		List<RouteModel> FinalRankedRoutes = new ArrayList<RouteModel>(routes.size());
+
 		for (RouteModel route : routes){
 			String routeId = String.valueOf(route.getRouteId());
 			int routeIndex = Arrays.binarySearch(sortedRoutesId, routeId);
@@ -359,10 +361,16 @@ public class Recommender {
 		logger.debug(rankedRoutesMap);
 		logger.debug(entriesSortedByValues(rankedRoutesMap));
 
+		Map<Integer, Double> routeMap =  new LinkedHashMap<Integer, Double>();
+		for(int k=0; k<entriesSortedByValues(rankedRoutesMap).size(); k++){
+			routeMap.put( entriesSortedByValues(rankedRoutesMap).get(k).getKey(), entriesSortedByValues(rankedRoutesMap).get(k).getValue());
+		}
+
+		System.out.println(routeMap);
 
 		Map<Integer, RouteModel> rankedRoutesMap2 = new LinkedHashMap<Integer, RouteModel>();
 
-		for (Map.Entry<Integer, Double> entry : rankedRoutesMap.entrySet()){
+		for (Map.Entry<Integer, Double> entry : routeMap.entrySet()){
 			logger.debug("mode: " + entry.getKey() + " utility: " + entry.getValue());
 			rankedRoutesMap2.put(entry.getKey(), routes.get(entry.getKey()-1));
 		}
@@ -521,8 +529,7 @@ public class Recommender {
 			}
 			for (int i = 0; i < (max-behaviouralModelRank)+1; i++) {
 				ballots.add(new Ballot(String.valueOf(route.getRouteId())));
-			}
-			
+			}		
 		}
 		return ballots;
 	}
