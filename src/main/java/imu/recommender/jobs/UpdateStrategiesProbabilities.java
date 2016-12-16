@@ -127,7 +127,7 @@ public class UpdateStrategiesProbabilities  implements Job{
                             //searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "comparison");
                             DBCursor tripsIdsComp = trips.find(searchTripQuery);
                             Integer successComp = tripsIdsComp.count();
-                            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", successComp));
+                            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", successComp));
                             try {
                                 //Get total attemps and successes
                                 user_attempts = userQuery.get().getCompAttempts();
@@ -165,7 +165,7 @@ public class UpdateStrategiesProbabilities  implements Job{
                             //searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "self-monitoring");
                             DBCursor tripsIdsSelf = trips.find(searchTripQuery);
                             Integer successSelf = tripsIdsSelf.count();
-                            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", successSelf));
+                            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", successSelf));
                             try {
                                 //Get total attemps and successes
                                 user_attempts = userQuery.get().getSelfAttempts();
