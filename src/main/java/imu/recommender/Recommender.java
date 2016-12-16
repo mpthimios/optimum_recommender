@@ -168,16 +168,33 @@ public class Recommender {
 		System.out.println("-----");
 		//System.out.println(rankedRoutes2.get(3).getRoute().getAdditionalInfo());
 		System.out.println(rankedRoutes2.get(2).getRoute().getAdditionalInfo());
+
+		routes.clear();
+		routes = rankedRoutes2;
+		List<RouteModel> rankedBehaviouralRoutes = rankBasedonBehaviouralModel(rankedRoutes2);
+		double BehaviouralRank= 1.0;
+		List<RouteModel> rankedRoutes3 = new ArrayList<RouteModel>();
+		for (RouteModel route : rankedBehaviouralRoutes ){
+			RouteModel m = new RouteModel(route.getRoute());
+			//Route n = new Route();
+			Route n = new Route().setFrom(route.getRoute().getFrom()).setBoundingBox(route.getRoute().getBoundingBox().get()).setTo(route.getRoute().getTo()).setDistanceMeters(route.getRoute().getDistanceMeters()).setDurationSeconds(route.getRoute().getDurationSeconds()).setEndTime(route.getRoute().getEndTime()).setSegments(route.getRoute().getSegments()).setStartTime(route.getRoute().getStartTime()).setOptimizedFor(route.getRoute().getOptimizedFor().toString()).setId(route.getRoute().getId().toString());
+			Map<String, Object> additionalInfo = m.getRoute().getAdditionalInfo();
+			additionalInfo.put("BehaviouralRank", BehaviouralRank);
+			n.setAdditionalInfo(additionalInfo);
+			m.setRoute(n);
+			BehaviouralRank++;
+			rankedRoutes3.add(m);
+		}
 		//Implement Borda count
-		ArrayList<Ballot> b = getBallots(rankedRoutes2);
+		ArrayList<Ballot> b = getBallots(rankedRoutes3);
 		VotingSystem system = new Borda(b.toArray(new Ballot[b.size()]));
 		System.out.println(system.results());
 		String[] sortedRoutesId = system.getSortedCandidateList();
 		List<RouteModel> FinalrankedRoutes = new ArrayList<RouteModel>();
 		for (String e:sortedRoutesId){
-			for (int k=0;k<rankedRoutes2.size();k++) {
+			for (int k=0;k<rankedRoutes3.size();k++) {
 				if ( rankedRoutes2.get(k).getRoute().getAdditionalInfo().get("routeId").toString().equals(e)){
-					FinalrankedRoutes.add(rankedRoutes2.get(k));
+					FinalrankedRoutes.add(rankedRoutes3.get(k));
 					break;
 				}
 			}
@@ -399,10 +416,16 @@ public class Recommender {
 		System.out.println(rankedRoutesMap);
 		System.out.println(entriesSortedByValues(rankedRoutesMap));
 
+		Map<Integer, Double> routeMap =  new LinkedHashMap<Integer, Double>();
+		for(int k=0; k<entriesSortedByValues(rankedRoutesMap).size(); k++){
+			routeMap.put( entriesSortedByValues(rankedRoutesMap).get(k).getKey(), entriesSortedByValues(rankedRoutesMap).get(k).getValue());
+		}
+
+		System.out.println(routeMap);
 
 		Map<Integer, RouteModel> rankedRoutesMap2 = new LinkedHashMap<Integer, RouteModel>();
 
-		for (Map.Entry<Integer, Double> entry : rankedRoutesMap.entrySet()){
+		for (Map.Entry<Integer, Double> entry : routeMap.entrySet()){
 			logger.debug("mode: " + entry.getKey() + " utility: " + entry.getValue());
 			rankedRoutesMap2.put(entry.getKey(), routes.get(entry.getKey()-1));
 		}
@@ -552,10 +575,15 @@ public class Recommender {
 		for (RouteModel route : routes){
 			double userpref = Double.parseDouble(route.getRoute().getAdditionalInfo().get("userPreferencesRank").toString());
 			double system =  Double.parseDouble(route.getRoute().getAdditionalInfo().get("SystemRank").toString());
+			double behavioural =  Double.parseDouble(route.getRoute().getAdditionalInfo().get("BehaviouralRank").toString());
+
 			for (int i = 0; i < (max-userpref)+1; i++) {
 				ballots.add(new Ballot(route.getRoute().getAdditionalInfo().get("routeId").toString()));
 			}
 			for (int i = 0; i < (max-system)+1; i++) {
+				ballots.add(new Ballot(route.getRoute().getAdditionalInfo().get("routeId").toString()));
+			}
+			for (int i = 0; i < (max-behavioural)+1; i++) {
 				ballots.add(new Ballot(route.getRoute().getAdditionalInfo().get("routeId").toString()));
 			}
 
