@@ -105,19 +105,18 @@ public class RequestHandler extends HttpServlet{
 			logger.debug(userID);
 			user = User.findById(userID);
 			
-			if (user.getRoutePreferences().size() == 1){
-				RoutePreference routePreference = new RoutePreference();
-				routePreference.setLabel("car_preference");
-				routePreference.setBikeSharingPref(0.1);
-				routePreference.setPtPref(0.6);
-				routePreference.setCarPref(1.0);
-				routePreference.setWalkPref(10000.0);
-				user.getRoutePreferences().add(routePreference);
-			}
-			
-			Query query = mongoDatastore.createQuery(User.class).field("id").equal(userID);
-			UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("route_preferences", user.getRoutePreferences());
-			mongoDatastore.update(query, ops);
+//			if (user.getRoutePreferences().size() == 0){
+//				RoutePreference routePreference = new RoutePreference();
+//				routePreference.setLabel("car_preference");
+//				routePreference.setBikeSharingPref(0.1);
+//				routePreference.setPtPref(0.6);
+//				routePreference.setCarPref(1.0);
+//				routePreference.setWalkPref(10000.0);
+//				user.getRoutePreferences().add(routePreference);
+//				Query query = mongoDatastore.createQuery(User.class).field("id").equal(userID);
+//				UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("route_preferences", user.getRoutePreferences());
+//				mongoDatastore.update(query, ops);
+//			}
 			
 			Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
 			recommenderRoutes.filterDuplicates();

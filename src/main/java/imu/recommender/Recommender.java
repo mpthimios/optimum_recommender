@@ -51,7 +51,8 @@ public class Recommender {
 	}
 	
 	private void initialize(){
-		routes = new ArrayList<RouteModel>();		
+		routes = new ArrayList<RouteModel>();
+		logger.debug("---------Setting Routes----------");
 		for (int i = 0; i < originalRouteFormatRoutes.getRoutes().size(); i++) {
 			RouteModel recommenderRoute = new RouteModel(originalRouteFormatRoutes.getRoutes().get(i));
 			recommenderRoute.calculateEmissions();
@@ -61,15 +62,14 @@ public class Recommender {
 			}
 			else{
 				recommenderRoute.setBehaviouralModelUtility(0.0);
-			}
-			routes.add(recommenderRoute);
-			logger.debug("route mode: " + recommenderRoute.getRoute().getAdditionalInfo().get("mode") +
+			}			
+			logger.debug(i + ". route mode: " + recommenderRoute.getRoute().getAdditionalInfo().get("mode") +
 					" emissions: " + recommenderRoute.getEmissions());
 			recommenderRoute.setRouteId(i+1);
-			routes.add(recommenderRoute);
-			logger.debug("route mode: " + recommenderRoute.getRoute().getAdditionalInfo().get("mode"));
-			logger.debug("route id: " + recommenderRoute.getRoute().getAdditionalInfo().get("routeId"));
+			routes.add(recommenderRoute);			
 		}
+		logger.debug("routes size: " + routes.size());
+		logger.debug("---------END of Setting Routes----------");
 		filteredRoutes = new ArrayList<RouteModel>();
 	}
 	
@@ -101,8 +101,8 @@ public class Recommender {
 	}
 	
 	//filterRoutes for User function
-	public void filterRoutesForUser (User user){
-		
+	public void filterRoutesForUser(User user){
+		logger.debug("filtering routes for user - before size: " + routes.size());
 		for (int i = 0; i < routes.size(); i++) {
 			RouteModel recommenderRoute = routes.get(i);			
 			boolean car_owner = false;
@@ -116,6 +116,7 @@ public class Recommender {
 			logger.debug("MODE: " + mode);
 			if ((mode == RecommenderModes.CAR) || (mode == RecommenderModes.PARK_AND_RIDE)) {
 				if(!car_owner) {
+					logger.debug("filtered car route for non car owner");
 					continue;
 				}
 				else {
@@ -127,103 +128,66 @@ public class Recommender {
 				if((bike_owner) && (recommenderRoute.getRoute().getDistanceMeters()<GetProperties.getMaxBikeDistance())){
 					filteredRoutes.add(recommenderRoute);
 				}
+				else{
+					logger.debug("filtered bicycle route - bike owner: " + bike_owner + " route distance: " 
+							+ recommenderRoute.getRoute().getDistanceMeters() + " max bike distance: " + GetProperties.getMaxBikeDistance());
+				}
 			}
 			//Filter out walk modes for routes containing walking more than 1 Km
 			else if(mode == RecommenderModes.WALK){
-				logger.debug("recommenderRoute.getRoute().getDistanceMeters(): " + recommenderRoute.getRoute().getDistanceMeters());
-				logger.debug("GetProperties.getMaxWalkingDistance(): " + GetProperties.getMaxWalkingDistance());
 				if(recommenderRoute.getRoute().getDistanceMeters()<GetProperties.getMaxWalkingDistance()){
 					filteredRoutes.add(recommenderRoute);
-				}				
+				}
+				else{
+					logger.debug("filtered walk route - distance: " 
+							+ recommenderRoute.getRoute().getDistanceMeters() + " max walk distance: " + GetProperties.getMaxWalkingDistance());
+				}
 			}
 			else {
 				filteredRoutes.add(recommenderRoute);
 			}
 		}
+		routes.clear();
+		for (RouteModel entry : filteredRoutes){
+			routes.add(entry);				
+		}
+		logger.debug("filtering routes for user - after size: " + routes.size());
 	}
 	
 	public void rankRoutesForUser (User user){
 		//function aggregated
-		List<RouteModel> rankedRoutes = rankBasedonUserPreferences(user);
-		//List<RouteModel> rankedRoutes = this.rankBasedonCO2();
-		routes.clear();
-		routes = rankedRoutes;
-		List<RouteModel> rankedSystemRoutes = rankBasedonSystemView(user);
-		double SystemRank= 1.0;
-		int i=0;
-		routes.clear();
-		routes = rankedSystemRoutes;
-		List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
-		for (RouteModel route : rankedSystemRoutes ){
-			RouteModel m = new RouteModel(route.getRoute());
-			//Route n = new Route();
-			Route n = new Route().setFrom(route.getRoute().getFrom()).setBoundingBox(route.getRoute().getBoundingBox().get()).setTo(route.getRoute().getTo()).setDistanceMeters(route.getRoute().getDistanceMeters()).setDurationSeconds(route.getRoute().getDurationSeconds()).setEndTime(route.getRoute().getEndTime()).setSegments(route.getRoute().getSegments()).setStartTime(route.getRoute().getStartTime()).setOptimizedFor(route.getRoute().getOptimizedFor().toString()).setId(route.getRoute().getId().toString());
-			Map<String, Object> additionalInfo = m.getRoute().getAdditionalInfo();
-			additionalInfo.put("SystemRank", SystemRank);
-			n.setAdditionalInfo(additionalInfo);
-			m.setRoute(n);
-			SystemRank++;
-			rankedRoutes2.add(m);
-		}
-		System.out.println("-----");
-		//System.out.println(rankedRoutes2.get(3).getRoute().getAdditionalInfo());
-		System.out.println(rankedRoutes2.get(2).getRoute().getAdditionalInfo());
 
-		routes.clear();
-		routes = rankedRoutes2;
-		List<RouteModel> rankedBehaviouralRoutes = rankBasedonBehaviouralModel(rankedRoutes2);
-		double BehaviouralRank= 1.0;
-		List<RouteModel> rankedRoutes3 = new ArrayList<RouteModel>();
-		for (RouteModel route : rankedBehaviouralRoutes ){
-			RouteModel m = new RouteModel(route.getRoute());
-			//Route n = new Route();
-			Route n = new Route().setFrom(route.getRoute().getFrom()).setBoundingBox(route.getRoute().getBoundingBox().get()).setTo(route.getRoute().getTo()).setDistanceMeters(route.getRoute().getDistanceMeters()).setDurationSeconds(route.getRoute().getDurationSeconds()).setEndTime(route.getRoute().getEndTime()).setSegments(route.getRoute().getSegments()).setStartTime(route.getRoute().getStartTime()).setOptimizedFor(route.getRoute().getOptimizedFor().toString()).setId(route.getRoute().getId().toString());
-			Map<String, Object> additionalInfo = m.getRoute().getAdditionalInfo();
-			additionalInfo.put("BehaviouralRank", BehaviouralRank);
-			n.setAdditionalInfo(additionalInfo);
-			m.setRoute(n);
-			BehaviouralRank++;
-			rankedRoutes3.add(m);
-		}
+		
+		List<RouteModel> rankedRoutesBasedonUserPreferences = rankBasedonUserPreferences(user, routes);
+		
+		//List<RouteModel> rankedRoutes = this.rankBasedonCO2();		
+		
+		List<RouteModel> rankedRoutesBasedOnSystemUtility = rankBasedonSystemView(user, routes);
+		
+		List<RouteModel> rankedRoutesBasedOnBehaviouralModel = rankBasedonBehaviouralModel(user, routes);
+				
 		//Implement Borda count
-		ArrayList<Ballot> b = getBallots(rankedRoutes3);
-		VotingSystem system = new Borda(b.toArray(new Ballot[b.size()]));
-		System.out.println(system.results());
-		String[] sortedRoutesId = system.getSortedCandidateList();
-		List<RouteModel> FinalrankedRoutes = new ArrayList<RouteModel>();
-		for (String e:sortedRoutesId){
-			for (int k=0;k<rankedRoutes3.size();k++) {
-				if ( rankedRoutes2.get(k).getRoute().getAdditionalInfo().get("routeId").toString().equals(e)){
-					FinalrankedRoutes.add(rankedRoutes3.get(k));
-					break;
-				}
-			}
+		ArrayList<Ballot> ballot = getBallots(routes);
+		VotingSystem votingSystem = new Borda(ballot.toArray(new Ballot[ballot.size()]));
+		logger.debug(votingSystem.results());
+		String[] sortedRoutesId = votingSystem.getSortedCandidateList();
+		List<RouteModel> FinalRankedRoutes = new ArrayList<RouteModel>(Collections.nCopies(routes.size(), null));
+		for (String entry : sortedRoutesId){
+			logger.debug(entry);
 		}
-		System.out.println(FinalrankedRoutes);
-		System.out.println("----");
-		/*List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
-
-		TreeMap<Double, RouteModel> FinalRankedRoutes = new TreeMap<Double, RouteModel>();
-
 		for (RouteModel route : routes){
-			double SystemRank = route.getSystemRank();
-			double UserRank = route.getUserPreferencesRank();
-			double finalRank = (SystemRank + UserRank)/2;
-			System.out.println(finalRank);
-			FinalRankedRoutes.put(finalRank, route);
-
-		}
-
-		for (Map.Entry<Double, RouteModel> entry : FinalRankedRoutes.entrySet()){
-			rankedRoutes2.add(entry.getValue());
-		}*/
-
+			String routeId = String.valueOf(route.getRouteId());		
+			int routeIndex = Arrays.binarySearch(sortedRoutesId, routeId);
+			FinalRankedRoutes.set(routeIndex, route);
+		}		
+		logger.debug(FinalRankedRoutes);
+		
 		routes.clear();
-		routes = FinalrankedRoutes;
+		routes = FinalRankedRoutes;
 		selectTargetRouteandAddMessageForUser(user);
 	}
 	
-	private List<RouteModel> rankBasedonBehaviouralModel(List<RouteModel> routes){
+	private List<RouteModel> rankBasedonBehaviouralModel(User user, List<RouteModel> routes){
 
 		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
 		TreeMap<Double, ArrayList<RouteModel>> tmp = new TreeMap<Double, ArrayList<RouteModel>>();
@@ -239,18 +203,19 @@ public class Recommender {
 			}
 		}
 		
-		for (Map.Entry<Double, ArrayList<RouteModel>> entry : tmp.entrySet()){
-			logger.debug("CO2: " + entry.getKey());
+		double rank = 0.0;
+		for (Map.Entry<Double, ArrayList<RouteModel>> entry : tmp.entrySet()){			
 			for (RouteModel route : entry.getValue()){
+				route.setBehaviouralModelRank(rank);
 				rankedRoutes.add(route);
-				logger.debug("route Mode: " + route.getRoute().getAdditionalInfo().get("mode"));
+				rank++;
 			}
 		}
 
 		return rankedRoutes;
 	}
 	
-	private List<RouteModel> rankBasedonUserPreferences(User user){
+	private List<RouteModel> rankBasedonUserPreferences(User user, List<RouteModel> routes){
 		//if there are no preferences for this time of day get preferences for any time of day
 		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
 
@@ -260,9 +225,9 @@ public class Recommender {
 			userPreferedModes.put(user.getMode_usage().getBike_percent(), RecommenderModes.BICYCLE);
 			userPreferedModes.put(user.getMode_usage().getWalk_percent(), RecommenderModes.WALK);
 			userPreferedModes.put(user.getMode_usage().getPt_percent(), RecommenderModes.PUBLIC_TRANSPORT);
-			userPreferedModes.put(10.0, RecommenderModes.BIKE_AND_RIDE);
-			userPreferedModes.put(12.0, RecommenderModes.PARK_AND_RIDE_WITH_BIKE);
-			userPreferedModes.put(6.0, RecommenderModes.PARK_AND_RIDE);
+//			userPreferedModes.put(10.0, RecommenderModes.BIKE_AND_RIDE);
+//			userPreferedModes.put(12.0, RecommenderModes.PARK_AND_RIDE_WITH_BIKE);
+//			userPreferedModes.put(6.0, RecommenderModes.PARK_AND_RIDE);
 		}
 		catch (Exception e){
 			//if there are no preferences for any time of day get the default
@@ -282,37 +247,26 @@ public class Recommender {
 		
 		for (RouteModel route : routes){
 			Integer number = route.getMode();
-			rankedRoutesMap.replace(number,route);
-			//rank.add(number,route);
+			rankedRoutesMap.replace(number,route);			
 		}
 		
+		double userPreferenceRank = 1.0;
 		for (Map.Entry<Integer, RouteModel> entry : rankedRoutesMap.entrySet()){
-			rankedRoutes.add(entry.getValue());
+			RouteModel route = entry.getValue();
+			route.setUserPreferenceRank(userPreferenceRank);
+			rankedRoutes.add(route);
+			userPreferenceRank++;
 		}
 
-		double userPreferencesRank= 1.0;
-
-		List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
-		for (RouteModel route : rankedRoutes ){
-			RouteModel m = new RouteModel(route.getRoute());
-			Route n = new Route().setFrom(route.getRoute().getFrom()).setBoundingBox(route.getRoute().getBoundingBox().get()).setTo(route.getRoute().getTo()).setDistanceMeters(route.getRoute().getDistanceMeters()).setDurationSeconds(route.getRoute().getDurationSeconds()).setEndTime(route.getRoute().getEndTime()).setSegments(route.getRoute().getSegments()).setStartTime(route.getRoute().getStartTime()).setOptimizedFor(route.getRoute().getOptimizedFor().toString()).setId(route.getRoute().getId().toString());
-			Map<String, Object> additionalInfo = m.getRoute().getAdditionalInfo();
-			additionalInfo.put("userPreferencesRank", userPreferencesRank);
-			n.setAdditionalInfo(additionalInfo);
-			m.setRoute(n);
-			userPreferencesRank++;
-			rankedRoutes2.add(m);
-		}
-		return rankedRoutes2;
+		return rankedRoutes;
 		
 	}
 
-	private List<RouteModel> rankBasedonSystemView(User user){
+	private List<RouteModel> rankBasedonSystemView(User user, List<RouteModel> routes){
 
 		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
-		Map<Integer, Double> rankedRoutesMap = new HashMap<Integer, Double>();
-		//MyComparator comp=new MyComparator(rankedRoutesMap);
-		//TreeMap<Integer, Double> rankedRoutesMap1 = new TreeMap<Integer, Double>();
+		LinkedHashMap<RouteModel, Double> rankedRoutesMap = new LinkedHashMap<RouteModel, Double>();
+		
 		double max_emissions=0.0;
 		//Find max emissions
 		for (RouteModel route : routes){
@@ -323,11 +277,10 @@ public class Recommender {
 		int r_id=1;
 		for (RouteModel route : routes){
 			//Get distance of route
-			Integer route_distance=route.getRoute().getDistanceMeters();
+			Integer route_distance = route.getRoute().getDistanceMeters();
 			//Get the mode of route
-			String mode = route.getRoute().getAdditionalInfo().get("mode").toString();
-			route.setRouteId(r_id);
-			r_id++;
+			int mode = route.getMode();
+			
 			Integer routeId = route.getRouteId();
 			//Return 1 if context exists else return 0
 			double BikeDistance = boolToDouble(CalculateMessageUtilities.withinBikeDistance(route_distance));
@@ -342,98 +295,92 @@ public class Recommender {
 			//Calculate utility of route based on the mode
 			double context_utility = 0.0;
 			double emissions_utility = 0.0;
-			double utility = 0.0;
-			if(mode.equals("walk")){
-				if (ManyCar == 1.0){
-					context_utility = ( 0.4218*WalkDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
-				}
-				else if (ManyPT == 1.0){
-					context_utility = ( 0.4074*WalkDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
-				}
-				else {
-					context_utility = ( 0.4*WalkDistance + 0.3*Duration + 0.1*Emissions +0.2*NiceWeather)/4.0;
-				}
-				emissions_utility = 0.0;
-				utility = (context_utility + (1-emissions_utility) )/2;
-				//rankedRoutesMap.put(RecommenderModes.WALK, utility);
-				rankedRoutesMap.put(routeId,utility);
+			double utility = 0.0;			
+			switch (mode) {
+				case (int)RecommenderModes.WALK:
+					if (ManyCar == 1.0){
+						context_utility = ( 0.4218*WalkDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
+					}
+					else if (ManyPT == 1.0){
+						context_utility = ( 0.4074*WalkDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
+					}
+					else {
+						context_utility = ( 0.4*WalkDistance + 0.3*Duration + 0.1*Emissions +0.2*NiceWeather)/4.0;
+					}
+					emissions_utility = 0.0;
+					utility = (context_utility + (1-emissions_utility) )/2;
+					//rankedRoutesMap.put(RecommenderModes.WALK, utility);
+					rankedRoutesMap.put(route, utility);
+					break;
+				case (int)RecommenderModes.BICYCLE:
+				case (int)RecommenderModes.BIKE_SHARING:					
+					if (ManyCar == 1.0){
+						context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
+					}
+					else if (ManyPT == 1.0){
+						context_utility = ( 0.4074*BikeDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
+					}
+					else {
+						context_utility = ( 0.4*BikeDistance + 0.3*Duration + 0.1*Emissions +0.2*NiceWeather)/4.0;
+					}
+					emissions_utility = 0.0;
+					utility = (context_utility + (1-emissions_utility) )/2;					
+					rankedRoutesMap.put(route, utility);
+					break;
+				case (int)RecommenderModes.BIKE_AND_RIDE:
+					if (ManyCar == 1.0) {
+						context_utility = (0.0901 * ManyCar + 0.5152 * Duration + 0.179 * Emissions + 0.2157 * NiceWeather) / 4.0;
+					}
+					else if (ManyPT == 1.0) {
+						context_utility = (0.049 * ManyCar + 0.5193 * Duration + 0.1958 * Emissions + 0.2359 * NiceWeather) / 4.0;
+					}
+					else{
+						context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0777*Emissions +0.1321*NiceWeather)/4.0;
+					}
+					emissions_utility = route.getEmissions()/max_emissions;
+					utility = (context_utility + (1-emissions_utility) )/2;
+					//rankedRoutesMap.put( RecommenderModes.BIKE_AND_RIDE, utility);
+					rankedRoutesMap.put(route, utility);
+					break;
+				case (int)RecommenderModes.PUBLIC_TRANSPORT:
+					context_utility = ( 0.5125*Duration + 0.0949*ManyCar + 0.315*Emissions +0.0775*NiceWeather)/4.0;
+					emissions_utility = route.getEmissions()/max_emissions;
+					utility = (context_utility + (1-emissions_utility) )/2;
+					//rankedRoutesMap.put( RecommenderModes.PUBLIC_TRANSPORT, utility);
+					rankedRoutesMap.put(route, utility);
+					break;
+				case (int)RecommenderModes.PARK_AND_RIDE:
+				case (int)RecommenderModes.PARK_AND_RIDE_WITH_BIKE:
+					context_utility = ( 0.5152*Duration + 0.0901*ManyCar + 0.179*Emissions +0.2157*NiceWeather)/4.0;
+					emissions_utility = route.getEmissions()/max_emissions;
+					utility = (context_utility + (1-emissions_utility) )/2;
+					//rankedRoutesMap.put( RecommenderModes.PARK_AND_RIDE, utility);
+					rankedRoutesMap.put(route, utility);
+					break;
+				case (int)RecommenderModes.CAR:
+					context_utility = 0.0001;
+					emissions_utility = route.getEmissions()/max_emissions;
+					utility = (context_utility + (1-emissions_utility) )/2;
+					//rankedRoutesMap.put( RecommenderModes.CAR,utility);
+					rankedRoutesMap.put(route, utility);
+				default:					
+					rankedRoutesMap.put(route, 0.0);
+					break;
 			}
-			else if(mode.equals("bicycle") || mode.equals("bikeSharing")){
-				if (ManyCar == 1.0){
-					context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
-				}
-				else if (ManyPT == 1.0){
-					context_utility = ( 0.4074*BikeDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
-				}
-				else {
-					context_utility = ( 0.4*BikeDistance + 0.3*Duration + 0.1*Emissions +0.2*NiceWeather)/4.0;
-				}
-				emissions_utility = 0.0;
-				utility = (context_utility + (1-emissions_utility) )/2;
-				//rankedRoutesMap.put(RecommenderModes.BICYCLE, utility);
-				rankedRoutesMap.put(routeId,utility);
-			}
-			else if(mode.equals("bike&ride")){
-				if (ManyCar == 1.0) {
-					context_utility = (0.0901 * ManyCar + 0.5152 * Duration + 0.179 * Emissions + 0.2157 * NiceWeather) / 4.0;
-				}
-				else if (ManyPT == 1.0) {
-					context_utility = (0.049 * ManyCar + 0.5193 * Duration + 0.1958 * Emissions + 0.2359 * NiceWeather) / 4.0;
-				}
-				else{
-					context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0777*Emissions +0.1321*NiceWeather)/4.0;
-				}
-				emissions_utility = route.getEmissions()/max_emissions;
-				utility = (context_utility + (1-emissions_utility) )/2;
-				//rankedRoutesMap.put( RecommenderModes.BIKE_AND_RIDE, utility);
-				rankedRoutesMap.put(routeId,utility);
-			}
-			else if(mode.equals("pt")){
-				context_utility = ( 0.5125*Duration + 0.0949*ManyCar + 0.315*Emissions +0.0775*NiceWeather)/4.0;
-				emissions_utility = route.getEmissions()/max_emissions;
-				utility = (context_utility + (1-emissions_utility) )/2;
-				//rankedRoutesMap.put( RecommenderModes.PUBLIC_TRANSPORT, utility);
-				rankedRoutesMap.put(routeId,utility);
-			}
-			else if(mode.equals("park&ride")){
-				context_utility = ( 0.5152*Duration + 0.0901*ManyCar + 0.179*Emissions +0.2157*NiceWeather)/4.0;
-				emissions_utility = route.getEmissions()/max_emissions;
-				utility = (context_utility + (1-emissions_utility) )/2;
-				//rankedRoutesMap.put( RecommenderModes.PARK_AND_RIDE, utility);
-				rankedRoutesMap.put(routeId,utility);
-			}
-			else if(mode.equals("car")){
-				context_utility = 0.0001;
-				emissions_utility = route.getEmissions()/max_emissions;
-				utility = (context_utility + (1-emissions_utility) )/2;
-				//rankedRoutesMap.put( RecommenderModes.CAR,utility);
-				rankedRoutesMap.put(routeId,utility);
-			}
+			
 			//prepei na ta pros8esw ola pairnei mono an exoun allh timh
 			//rankedRoutesMap.put(route,utility);
+		}		
+		
+		rankedRoutesMap = entriesSortedByValues(rankedRoutesMap);
+		
+		double rank = 0.0;
+		for (Map.Entry<RouteModel, Double> entry : rankedRoutesMap.entrySet()){		
+			entry.getKey().setSystemRank(rank);
+			rankedRoutes.add(entry.getKey());
+			rank++;			
 		}
-
-		System.out.println(rankedRoutesMap);
-		System.out.println(entriesSortedByValues(rankedRoutesMap));
-
-		Map<Integer, Double> routeMap =  new LinkedHashMap<Integer, Double>();
-		for(int k=0; k<entriesSortedByValues(rankedRoutesMap).size(); k++){
-			routeMap.put( entriesSortedByValues(rankedRoutesMap).get(k).getKey(), entriesSortedByValues(rankedRoutesMap).get(k).getValue());
-		}
-
-		System.out.println(routeMap);
-
-		Map<Integer, RouteModel> rankedRoutesMap2 = new LinkedHashMap<Integer, RouteModel>();
-
-		for (Map.Entry<Integer, Double> entry : routeMap.entrySet()){
-			logger.debug("mode: " + entry.getKey() + " utility: " + entry.getValue());
-			rankedRoutesMap2.put(entry.getKey(), routes.get(entry.getKey()-1));
-		}
-
-		for (Map.Entry<Integer, RouteModel> entry : rankedRoutesMap2.entrySet()){
-			rankedRoutes.add(entry.getValue());
-		}
-
+		
 		return rankedRoutes;
 	}
 
@@ -452,12 +399,13 @@ public class Recommender {
 				co2RankedRoutes.get(route.getEmissions()).add(route);
 			}
 		}
-
+		double rank = 0.0;
 		for (Map.Entry<Double, ArrayList<RouteModel>> entry : co2RankedRoutes.entrySet()){
 			logger.debug("CO2: " + entry.getKey());
 			for (RouteModel route : entry.getValue()){
-				rankedRoutes.add(route);
-				logger.debug("route Mode: " + route.getRoute().getAdditionalInfo().get("mode"));
+				route.setCO2EmissionsRank(rank);
+				rankedRoutes.add(route);				
+				rank++;
 			}
 		}
 		//logger.debug("rankedRoutes: " + rankedRoutes.size() + " routes");
@@ -571,42 +519,41 @@ public class Recommender {
 		//Add routes as candidates
 		ArrayList<Ballot> ballots = new ArrayList<Ballot>();
 		int max= routes.size();
-
-		for (RouteModel route : routes){
-			double userpref = Double.parseDouble(route.getRoute().getAdditionalInfo().get("userPreferencesRank").toString());
-			double system =  Double.parseDouble(route.getRoute().getAdditionalInfo().get("SystemRank").toString());
-			double behavioural =  Double.parseDouble(route.getRoute().getAdditionalInfo().get("BehaviouralRank").toString());
-
-			for (int i = 0; i < (max-userpref)+1; i++) {
-				ballots.add(new Ballot(route.getRoute().getAdditionalInfo().get("routeId").toString()));
+		logger.debug("--------Setting Ballots----------");
+		for (RouteModel route : routes){			
+			double userPreferenceRank = route.getUserPreferenceRank();
+			double systemRank =  route.getSystemRank();
+			double behaviouralModelRank =  route.getBehaviouralModelRank();
+			logger.debug(" route mode: " + route.getMode() + " userPreferenceRank: " + userPreferenceRank +
+					" systemRank: " + systemRank + " behaviouralModelRank: " + behaviouralModelRank);
+			for (int i = 0; i < (max-userPreferenceRank)+1; i++) {
+				ballots.add(new Ballot(String.valueOf(route.getRouteId())));
 			}
-			for (int i = 0; i < (max-system)+1; i++) {
-				ballots.add(new Ballot(route.getRoute().getAdditionalInfo().get("routeId").toString()));
+			for (int i = 0; i < (max-systemRank)+1; i++) {
+				ballots.add(new Ballot(String.valueOf(route.getRouteId())));
 			}
-			for (int i = 0; i < (max-behavioural)+1; i++) {
-				ballots.add(new Ballot(route.getRoute().getAdditionalInfo().get("routeId").toString()));
-			}
-
+			for (int i = 0; i < (max-behaviouralModelRank)+1; i++) {
+				ballots.add(new Ballot(String.valueOf(route.getRouteId())));
+			}		
 		}
-
+		logger.debug("--------END Setting Ballots----------");
 		return ballots;
-
 	}
 
 	static <K,V extends Comparable<? super V>>
-	List<Map.Entry<K, V>> entriesSortedByValues(Map<K,V> map) {
+	LinkedHashMap<K, V> entriesSortedByValues(LinkedHashMap<K,V> map) {
 
-		List<Map.Entry<K,V>> sortedEntries = new ArrayList<Map.Entry<K,V>>(map.entrySet());
-
-		Collections.sort(sortedEntries,
-				new Comparator<Map.Entry<K,V>>() {
-					@Override
-					public int compare(Map.Entry<K,V> e1, Map.Entry<K,V> e2) {
-						return e2.getValue().compareTo(e1.getValue());
-					}
-				}
-		);
-
+		List<Map.Entry<K, V>> entries =
+				  new ArrayList<Map.Entry<K, V>>(map.entrySet());
+		Collections.sort(entries, new Comparator<Map.Entry<K, V>>() {
+		  public int compare(Map.Entry<K, V> a, Map.Entry<K, V> b){
+		    return a.getValue().compareTo(b.getValue());
+		  }
+		});
+		LinkedHashMap<K, V> sortedEntries = new LinkedHashMap<K, V>();
+		for (Map.Entry<K, V> entry : entries) {
+			sortedEntries.put(entry.getKey(), entry.getValue());
+		}
 		return sortedEntries;
 	}
 

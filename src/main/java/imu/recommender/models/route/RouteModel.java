@@ -22,6 +22,9 @@ public class RouteModel {
 	private int mode;
 	private double userPreferencesRank = 0.0;
 	private double SystemRank = 0.0;
+	private double UserPreferenceRank = 0.0;
+	private double BehaviouralModelRank = 0.0;
+	private double CO2EmissionsRank = 0.0;
 	private String message = "";
 	private String strategy = "";
 
@@ -44,7 +47,6 @@ public class RouteModel {
 		}
 		String mode="";
 
-		logger.debug("adding mode");
 		if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE")  ){
 			this.setMode(RecommenderModes.PARK_AND_RIDE_WITH_BIKE);
 			mode = RecommenderModes.recommenderModesStr[this.getMode()];			
@@ -93,8 +95,6 @@ public class RouteModel {
 		Map<String, Object> additionalInfoRouteRequest = route.getAdditionalInfo();
 		additionalInfoRouteRequest.put("mode", mode);
 		route.setAdditionalInfo(additionalInfoRouteRequest);
-		
-
 	}
 	
 	public void calculateEmissions(){
@@ -114,8 +114,7 @@ public class RouteModel {
 	private double CalculateSegmentEmissions(Integer distance, String travel_mode, String detailed_mode) {
 		double emissions=0.0;
 		
-		logger.debug("calculating emissions for: ");
-		logger.debug("distance: " + distance + " travel_mode: " + travel_mode + " detailed_mode: " + detailed_mode);
+		//logger.debug("distance: " + distance + " travel_mode: " + travel_mode + " detailed_mode: " + detailed_mode);
 		if (travel_mode.equals("FOOT") ){
 			emissions = 0;
 		}
@@ -229,6 +228,29 @@ public class RouteModel {
 		additionalInfo.put("strategy", strategy);
 		this.route.setAdditionalInfo(additionalInfo);
 	}
-	
-	
+
+	public double getUserPreferenceRank() {
+		return UserPreferenceRank;
+	}
+
+	public void setUserPreferenceRank(double userPreferenceRank) {
+		UserPreferenceRank = userPreferenceRank;
+	}
+
+	public double getBehaviouralModelRank() {
+		return BehaviouralModelRank;
+	}
+
+	public void setBehaviouralModelRank(double behaviouralModelRank) {
+		BehaviouralModelRank = behaviouralModelRank;
+	}
+
+	public double getCO2EmissionsRank() {
+		return CO2EmissionsRank;
+	}
+
+	public void setCO2EmissionsRank(double cO2EmissionsRank) {
+		CO2EmissionsRank = cO2EmissionsRank;
+	}
+		
 }
