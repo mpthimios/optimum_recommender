@@ -22,6 +22,7 @@ public class Message {
     private String target;
     private Integer number_of_successes;
     private Double utility;
+    private String parameters;
 
     public Message(){
 
@@ -32,6 +33,7 @@ public class Message {
         this.message_text = "Today it’s sunny! Take the opportunity to use your bicycle to save CO2 emissions.";
         this.target = "bike";
         this.number_of_successes = 0;
+        this.parameters = "no";
         //this.className = "imu.recommender.models.message.Message";
     }
 
@@ -86,4 +88,11 @@ public class Message {
         this.utility = utility;
     }
 
+    public String getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(String parameters) {
+        this.parameters = parameters;
+    }
 }

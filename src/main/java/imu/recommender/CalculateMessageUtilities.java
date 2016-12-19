@@ -21,6 +21,7 @@ import org.bitpipeline.lib.owm.WeatherStatusResponse;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
+import org.omg.CORBA.ContextList;
 import sun.font.TrueTypeFont;
 
 import java.lang.reflect.Array;
@@ -116,33 +117,92 @@ public class CalculateMessageUtilities {
         //contextList.add("NiceWeather");
         System.out.println(contextList);
         System.out.println(strategy);
+        String selected_message_text= "";
+        String selected_message_params= "";
+
+        //Get the user percentages that are true
+        List<String> PercentageList = new ArrayList<String>();
+        double emissions = user.getEmissionsLastWeek();
+        if(emissions>200){
+            PercentageList.add("CO2Em");
+        }
+        double PCar = user.getCarUsageComparedToOthers();
+        double PWalkGW = user.getWalkUsageComparedToOthers();
+        double PBikeGW = user.getBikeUsageComparedToOthers();
+        double PPtGW = user.getPtUsageComparedToOthers();
+        if (PCar > GetProperties.getPCar()){
+            PercentageList.add("PCar");
+        }
+        if (PWalkGW > GetProperties.getPWalkGW()){
+            PercentageList.add("PWalkGW");
+        }
+        if (PBikeGW > GetProperties.getPBikeGW()){
+            PercentageList.add("PBikeGW");
+        }
+        if (PPtGW > GetProperties.getPPtGW()){
+            PercentageList.add("PPtGW");
+        }
+        PercentageList.add("no");
         Query<Message> query = mongoDatastore.createQuery(Message.class);
         query.and(
-                //query.criteria("persuasive_strategy").equal("suggestion"),
-                //query.criteria("context").equal("NiceWeather"),
                 query.criteria("persuasive_strategy").equal(strategy),
-                //query.criteria("className").equal("imu.recommender.models.message.Message")
-                //query.criteria("")
                 query.criteria("context").equal(new BasicDBObject("$in", contextList)),
+                query.criteria("parameters").equal(new BasicDBObject("$in", PercentageList)),
                 query.criteria("target").equal(target)
         );
 
         List<Message> mes = query.asList();
-        System.out.println(mes);
         Double max_message_utility = 0.0;
-        String selected_message_text= "";
-        //Calculate utility for each Message
+        //Select a list of messages with the maximum utility based on context
+        List<Message> messages = new ArrayList<Message>();
         for (Message message : mes ) {
-            System.out.println(message.getMessage_text());
-            //Set random messageUtility
-            Double messageUtility = Math.random();
+            //Calculate message utility based on context.
+            Double messageUtility = calculateUtility(message.getContext(), target, user);
             message.setUtility(messageUtility);
+
             if (messageUtility > max_message_utility) {
                 max_message_utility = messageUtility;
-                selected_message_text = message.getMessage_text();
+                messages.clear();
+                messages.add(message);
+            }
+            else if (messageUtility.equals(max_message_utility)){
+                messages.add(message);
             }
         }
+        //Select the message that will be displayed on the user
+        for (Message m: messages ) {
+            //Set random messageUtility
+            Double messageUtility = Math.random();
+            m.setUtility(messageUtility);
+            if (messageUtility > max_message_utility) {
+                max_message_utility = messageUtility;
+                selected_message_text = m.getMessage_text();
+                selected_message_params = m.getParameters();
+            }
+        }
+
+
+        if ( !selected_message_params.equals("no") ){
+            if (selected_message_params.equals("CO2Em")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getEmissionsLastWeek()));
+            }
+            if (selected_message_params.equals("PCar")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getCarUsageComparedToOthers()));
+            }
+            if (selected_message_params.equals("PWalkGW")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getWalkUsageComparedToOthers()));
+            }
+            if (selected_message_params.equals("PBikeGW")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getBikeUsageComparedToOthers()));
+            }
+            if (selected_message_params.equals("PPtGW")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getPtUsageComparedToOthers()));
+            }
+        }
+
+
         System.out.println(selected_message_text);
+
         //increase the number_of_times_sent of the selected strategy
         Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal((String) strategy);
         Integer number_of_times_sent = strategyQuery.get().getNumber_of_times_sent();
@@ -244,6 +304,187 @@ public class CalculateMessageUtilities {
 
         }
         return cartrip;
+    }
+
+    private static double calculateUtility( String context, String mode, User user){
+        double utility=0.0;
+        switch (mode) {
+            case "walk":
+                if (user.tooManyCarRoutes()) {
+                    if (context.equals("WalkDistance")) {
+                        utility = 0.4218;
+                    }
+                    if (context.equals("Duration")) {
+                        utility = 0.3228;
+                    }
+                    if (context.equals("TooManyCarRoutes")) {
+                        utility = 0.0456;
+                    }
+                    if (context.equals("EmissionComparetoOthers")) {
+                        utility = 0.0777;
+                    }
+                    if (context.equals("NiceWeather")) {
+                        utility = 0.1321;
+                    }
+                }
+                if (user.tooManyPublicTransportRoutes()) {
+                    if (context.equals("WalkDistance")) {
+                        utility = 0.4074;
+                    }
+                    if (context.equals("Duration")) {
+                        utility = 0.3157;
+                    }
+                    if (context.equals("TooManyTransportRoutes")) {
+                        utility = 0.0353;
+                    }
+                    if (context.equals("EmissionComparetoOthers")) {
+                        utility = 0.0776;
+                    }
+                    if (context.equals("NiceWeather")) {
+                        utility = 0.164;
+                    }
+                } else {
+                    if (context.equals("WalkDistance")) {
+                        utility = 0.4;
+                    }
+                    if (context.equals("Duration")) {
+                        utility = 0.3;
+                    }
+                    if (context.equals("EmissionComparetoOthers")) {
+                        utility = 0.1;
+                    }
+                    if (context.equals("NiceWeather")) {
+                        utility = 0.1;
+                    }
+
+                }
+                break;
+            case "bicycle":
+            case "bikeSharing":
+                if (user.tooManyCarRoutes()) {
+                    if (context.equals("BikeDistance")) {
+                        utility = 0.422;
+                    }
+                    if (context.equals("Duration")) {
+                        utility = 0.3228;
+                    }
+                    if (context.equals("TooManyCarRoutes")) {
+                        utility = 0.0456;
+                    }
+                    if (context.equals("EmissionComparetoOthers")) {
+                        utility = 0.0777;
+                    }
+                    if (context.equals("NiceWeather")) {
+                        utility = 0.1321;
+                    }
+                }
+                if (user.tooManyPublicTransportRoutes()) {
+                    if (context.equals("BikeDistance")) {
+                        utility = 0.4074;
+                    }
+                    if (context.equals("Duration")) {
+                        utility = 0.3157;
+                    }
+                    if (context.equals("TooManyTransportRoutes")) {
+                        utility = 0.0353;
+                    }
+                    if (context.equals("EmissionComparetoOthers")) {
+                        utility = 0.0776;
+                    }
+                    if (context.equals("NiceWeather")) {
+                        utility = 0.164;
+                    }
+                } else {
+                    if (context.equals("BikeDistance")) {
+                        utility = 0.4;
+                    }
+                    if (context.equals("Duration")) {
+                        utility = 0.3;
+                    }
+                    if (context.equals("EmissionComparetoOthers")) {
+                        utility = 0.1;
+                    }
+                    if (context.equals("NiceWeather")) {
+                        utility = 0.2;
+                    }
+
+                }
+                break;
+            case "bike&ride":
+                if (user.tooManyCarRoutes()) {
+                    if (context.equals("Duration")) {
+                        utility = 0.5152;
+                    }
+                    if (context.equals("TooManyCarRoutes")) {
+                        utility = 0.0901;
+                    }
+                    if (context.equals("EmissionComparetoOthers")) {
+                        utility = 0.179;
+                    }
+                    if (context.equals("NiceWeather")) {
+                        utility = 0.2157;
+                    }
+                }
+                if (user.tooManyPublicTransportRoutes()) {
+                    if (context.equals("Duration")) {
+                        utility = 0.5193;
+                    }
+                    if (context.equals("TooManyCarRoutes")) {
+                        utility = 0.049;
+                    }
+                    if (context.equals("EmissionComparetoOthers")) {
+                        utility = 0.1958;
+                    }
+                    if (context.equals("NiceWeather")) {
+                        utility = 0.2359;
+                    }
+                } else {
+                    if (context.equals("BikeDistance")) {
+                        utility = 0.422;
+                    }
+                    if (context.equals("Duration")) {
+                        utility = 0.3228;
+                    }
+                    if (context.equals("EmissionComparetoOthers")) {
+                        utility = 0.0777;
+                    }
+                    if (context.equals("NiceWeather")) {
+                        utility = 0.1321;
+                    }
+                }
+                break;
+            case "pt":
+                if (context.equals("Duration")) {
+                    utility = 0.5125;
+                }
+                if (context.equals("EmissionComparetoOthers")) {
+                    utility = 0.315;
+                }
+                if (context.equals("NiceWeather")) {
+                    utility = 0.0775;
+                }
+                if (context.equals("TooManyCarRoutes")) {
+                    utility = 0.0949;
+                }
+
+                break;
+            case "park&ride":
+                if (context.equals("Duration")) {
+                    utility = 0.5152;
+                }
+                if (context.equals("EmissionComparetoOthers")) {
+                    utility = 0.179;
+                }
+                if (context.equals("NiceWeather")) {
+                    utility = 0.2157;
+                }
+                if (context.equals("TooManyCarRoutes")) {
+                    utility = 0.0901;
+                }
+                break;
+        }
+
+        return utility;
     }
 
 

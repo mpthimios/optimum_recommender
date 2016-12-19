@@ -41,6 +41,42 @@ public class GetProperties implements ServletContextListener {
     private static double SugCons;
     private static double SugN;
     private static double SugOp;
+    private static double PCar;
+    private static double PBikeGW;
+    private static double PWalkGW;
+    private static double PPtGW;
+
+    public static double getPCar() {
+        return PCar;
+    }
+
+    public static void setPCar(double PCar) {
+        GetProperties.PCar = PCar;
+    }
+
+    public static double getPBikeGW() {
+        return PBikeGW;
+    }
+
+    public static void setPBikeGW(double PBikeGW) {
+        GetProperties.PBikeGW = PBikeGW;
+    }
+
+    public static double getPWalkGW() {
+        return PWalkGW;
+    }
+
+    public static void setPWalkGW(double PWalkGW) {
+        GetProperties.PWalkGW = PWalkGW;
+    }
+
+    public static double getPPtGW() {
+        return PPtGW;
+    }
+
+    public static void setPPtGW(double PPtGW) {
+        GetProperties.PPtGW = PPtGW;
+    }
 
     public String getUsernameValues() throws IOException {
 
