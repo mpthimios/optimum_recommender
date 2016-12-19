@@ -51,7 +51,8 @@ public class Recommender {
 	}
 	
 	private void initialize(){
-		routes = new ArrayList<RouteModel>();		
+		routes = new ArrayList<RouteModel>();
+		logger.debug("---------Setting Routes----------");
 		for (int i = 0; i < originalRouteFormatRoutes.getRoutes().size(); i++) {
 			RouteModel recommenderRoute = new RouteModel(originalRouteFormatRoutes.getRoutes().get(i));
 			recommenderRoute.calculateEmissions();
@@ -61,15 +62,14 @@ public class Recommender {
 			}
 			else{
 				recommenderRoute.setBehaviouralModelUtility(0.0);
-			}
-			routes.add(recommenderRoute);
-			logger.debug("route mode: " + recommenderRoute.getRoute().getAdditionalInfo().get("mode") +
+			}			
+			logger.debug(i + ". route mode: " + recommenderRoute.getRoute().getAdditionalInfo().get("mode") +
 					" emissions: " + recommenderRoute.getEmissions());
 			recommenderRoute.setRouteId(i+1);
-			routes.add(recommenderRoute);
-			logger.debug("route mode: " + recommenderRoute.getRoute().getAdditionalInfo().get("mode"));
-			logger.debug("route id: " + recommenderRoute.getRoute().getAdditionalInfo().get("routeId"));
+			routes.add(recommenderRoute);			
 		}
+		logger.debug("routes size: " + routes.size());
+		logger.debug("---------END of Setting Routes----------");
 		filteredRoutes = new ArrayList<RouteModel>();
 	}
 	
@@ -102,7 +102,7 @@ public class Recommender {
 	
 	//filterRoutes for User function
 	public void filterRoutesForUser(User user){
-		
+		logger.debug("filtering routes for user - before size: " + routes.size());
 		for (int i = 0; i < routes.size(); i++) {
 			RouteModel recommenderRoute = routes.get(i);			
 			boolean car_owner = false;
@@ -116,6 +116,7 @@ public class Recommender {
 			logger.debug("MODE: " + mode);
 			if ((mode == RecommenderModes.CAR) || (mode == RecommenderModes.PARK_AND_RIDE)) {
 				if(!car_owner) {
+					logger.debug("filtered car route for non car owner");
 					continue;
 				}
 				else {
@@ -127,19 +128,30 @@ public class Recommender {
 				if((bike_owner) && (recommenderRoute.getRoute().getDistanceMeters()<GetProperties.getMaxBikeDistance())){
 					filteredRoutes.add(recommenderRoute);
 				}
+				else{
+					logger.debug("filtered bicycle route - bike owner: " + bike_owner + " route distance: " 
+							+ recommenderRoute.getRoute().getDistanceMeters() + " max bike distance: " + GetProperties.getMaxBikeDistance());
+				}
 			}
 			//Filter out walk modes for routes containing walking more than 1 Km
 			else if(mode == RecommenderModes.WALK){
-				logger.debug("recommenderRoute.getRoute().getDistanceMeters(): " + recommenderRoute.getRoute().getDistanceMeters());
-				logger.debug("GetProperties.getMaxWalkingDistance(): " + GetProperties.getMaxWalkingDistance());
 				if(recommenderRoute.getRoute().getDistanceMeters()<GetProperties.getMaxWalkingDistance()){
 					filteredRoutes.add(recommenderRoute);
-				}				
+				}
+				else{
+					logger.debug("filtered walk route - distance: " 
+							+ recommenderRoute.getRoute().getDistanceMeters() + " max walk distance: " + GetProperties.getMaxWalkingDistance());
+				}
 			}
 			else {
 				filteredRoutes.add(recommenderRoute);
 			}
 		}
+		routes.clear();
+		for (RouteModel entry : filteredRoutes){
+			routes.add(entry);				
+		}
+		logger.debug("filtering routes for user - after size: " + routes.size());
 	}
 	
 	public void rankRoutesForUser (User user){
@@ -159,15 +171,16 @@ public class Recommender {
 		VotingSystem votingSystem = new Borda(ballot.toArray(new Ballot[ballot.size()]));
 		logger.debug(votingSystem.results());
 		String[] sortedRoutesId = votingSystem.getSortedCandidateList();
-		List<RouteModel> FinalRankedRoutes = new ArrayList<RouteModel>(routes.size());
-
+		List<RouteModel> FinalRankedRoutes = new ArrayList<RouteModel>(Collections.nCopies(routes.size(), null));
+		for (String entry : sortedRoutesId){
+			logger.debug(entry);
+		}
 		for (RouteModel route : routes){
-			String routeId = String.valueOf(route.getRouteId());
+			String routeId = String.valueOf(route.getRouteId());		
 			int routeIndex = Arrays.binarySearch(sortedRoutesId, routeId);
-			FinalRankedRoutes.add(routeIndex, route);
+			FinalRankedRoutes.set(routeIndex, route);
 		}		
 		logger.debug(FinalRankedRoutes);
-		logger.debug("----");
 		
 		routes.clear();
 		routes = FinalRankedRoutes;
@@ -190,11 +203,12 @@ public class Recommender {
 			}
 		}
 		
-		for (Map.Entry<Double, ArrayList<RouteModel>> entry : tmp.entrySet()){
-			logger.debug("CO2: " + entry.getKey());
+		double rank = 0.0;
+		for (Map.Entry<Double, ArrayList<RouteModel>> entry : tmp.entrySet()){			
 			for (RouteModel route : entry.getValue()){
+				route.setBehaviouralModelRank(rank);
 				rankedRoutes.add(route);
-				logger.debug("route Mode: " + route.getRoute().getAdditionalInfo().get("mode"));
+				rank++;
 			}
 		}
 
@@ -251,7 +265,7 @@ public class Recommender {
 	private List<RouteModel> rankBasedonSystemView(User user, List<RouteModel> routes){
 
 		List<RouteModel> rankedRoutes = new ArrayList<RouteModel>();
-		Map<Integer, Double> rankedRoutesMap = new HashMap<Integer, Double>();
+		LinkedHashMap<RouteModel, Double> rankedRoutesMap = new LinkedHashMap<RouteModel, Double>();
 		
 		double max_emissions=0.0;
 		//Find max emissions
@@ -266,8 +280,7 @@ public class Recommender {
 			Integer route_distance = route.getRoute().getDistanceMeters();
 			//Get the mode of route
 			int mode = route.getMode();
-			//route.setRouteId(r_id);
-			//r_id++;
+			
 			Integer routeId = route.getRouteId();
 			//Return 1 if context exists else return 0
 			double BikeDistance = boolToDouble(CalculateMessageUtilities.withinBikeDistance(route_distance));
@@ -282,9 +295,9 @@ public class Recommender {
 			//Calculate utility of route based on the mode
 			double context_utility = 0.0;
 			double emissions_utility = 0.0;
-			double utility = 0.0;
+			double utility = 0.0;			
 			switch (mode) {
-				case RecommenderModes.WALK:
+				case (int)RecommenderModes.WALK:
 					if (ManyCar == 1.0){
 						context_utility = ( 0.4218*WalkDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
 					}
@@ -297,10 +310,10 @@ public class Recommender {
 					emissions_utility = 0.0;
 					utility = (context_utility + (1-emissions_utility) )/2;
 					//rankedRoutesMap.put(RecommenderModes.WALK, utility);
-					rankedRoutesMap.put(routeId,utility);
+					rankedRoutesMap.put(route, utility);
 					break;
-				case RecommenderModes.BICYCLE:
-				case RecommenderModes.BIKE_SHARING:					
+				case (int)RecommenderModes.BICYCLE:
+				case (int)RecommenderModes.BIKE_SHARING:					
 					if (ManyCar == 1.0){
 						context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
 					}
@@ -312,9 +325,9 @@ public class Recommender {
 					}
 					emissions_utility = 0.0;
 					utility = (context_utility + (1-emissions_utility) )/2;					
-					rankedRoutesMap.put(routeId,utility);
+					rankedRoutesMap.put(route, utility);
 					break;
-				case RecommenderModes.BIKE_AND_RIDE:
+				case (int)RecommenderModes.BIKE_AND_RIDE:
 					if (ManyCar == 1.0) {
 						context_utility = (0.0901 * ManyCar + 0.5152 * Duration + 0.179 * Emissions + 0.2157 * NiceWeather) / 4.0;
 					}
@@ -327,58 +340,47 @@ public class Recommender {
 					emissions_utility = route.getEmissions()/max_emissions;
 					utility = (context_utility + (1-emissions_utility) )/2;
 					//rankedRoutesMap.put( RecommenderModes.BIKE_AND_RIDE, utility);
-					rankedRoutesMap.put(routeId,utility);
+					rankedRoutesMap.put(route, utility);
 					break;
-				case RecommenderModes.PUBLIC_TRANSPORT:
+				case (int)RecommenderModes.PUBLIC_TRANSPORT:
 					context_utility = ( 0.5125*Duration + 0.0949*ManyCar + 0.315*Emissions +0.0775*NiceWeather)/4.0;
 					emissions_utility = route.getEmissions()/max_emissions;
 					utility = (context_utility + (1-emissions_utility) )/2;
 					//rankedRoutesMap.put( RecommenderModes.PUBLIC_TRANSPORT, utility);
-					rankedRoutesMap.put(routeId,utility);
+					rankedRoutesMap.put(route, utility);
 					break;
-				case RecommenderModes.PARK_AND_RIDE:
-				case RecommenderModes.PARK_AND_RIDE_WITH_BIKE:
+				case (int)RecommenderModes.PARK_AND_RIDE:
+				case (int)RecommenderModes.PARK_AND_RIDE_WITH_BIKE:
 					context_utility = ( 0.5152*Duration + 0.0901*ManyCar + 0.179*Emissions +0.2157*NiceWeather)/4.0;
 					emissions_utility = route.getEmissions()/max_emissions;
 					utility = (context_utility + (1-emissions_utility) )/2;
 					//rankedRoutesMap.put( RecommenderModes.PARK_AND_RIDE, utility);
-					rankedRoutesMap.put(routeId,utility);
+					rankedRoutesMap.put(route, utility);
 					break;
-				case RecommenderModes.CAR:
+				case (int)RecommenderModes.CAR:
 					context_utility = 0.0001;
 					emissions_utility = route.getEmissions()/max_emissions;
 					utility = (context_utility + (1-emissions_utility) )/2;
 					//rankedRoutesMap.put( RecommenderModes.CAR,utility);
-					rankedRoutesMap.put(routeId,utility);
-				default:
+					rankedRoutesMap.put(route, utility);
+				default:					
+					rankedRoutesMap.put(route, 0.0);
 					break;
 			}
 			
 			//prepei na ta pros8esw ola pairnei mono an exoun allh timh
 			//rankedRoutesMap.put(route,utility);
+		}		
+		
+		rankedRoutesMap = entriesSortedByValues(rankedRoutesMap);
+		
+		double rank = 0.0;
+		for (Map.Entry<RouteModel, Double> entry : rankedRoutesMap.entrySet()){		
+			entry.getKey().setSystemRank(rank);
+			rankedRoutes.add(entry.getKey());
+			rank++;			
 		}
-
-		logger.debug(rankedRoutesMap);
-		logger.debug(entriesSortedByValues(rankedRoutesMap));
-
-		Map<Integer, Double> routeMap =  new LinkedHashMap<Integer, Double>();
-		for(int k=0; k<entriesSortedByValues(rankedRoutesMap).size(); k++){
-			routeMap.put( entriesSortedByValues(rankedRoutesMap).get(k).getKey(), entriesSortedByValues(rankedRoutesMap).get(k).getValue());
-		}
-
-		System.out.println(routeMap);
-
-		Map<Integer, RouteModel> rankedRoutesMap2 = new LinkedHashMap<Integer, RouteModel>();
-
-		for (Map.Entry<Integer, Double> entry : routeMap.entrySet()){
-			logger.debug("mode: " + entry.getKey() + " utility: " + entry.getValue());
-			rankedRoutesMap2.put(entry.getKey(), routes.get(entry.getKey()-1));
-		}
-
-		for (Map.Entry<Integer, RouteModel> entry : rankedRoutesMap2.entrySet()){
-			rankedRoutes.add(entry.getValue());
-		}
-
+		
 		return rankedRoutes;
 	}
 
@@ -397,12 +399,13 @@ public class Recommender {
 				co2RankedRoutes.get(route.getEmissions()).add(route);
 			}
 		}
-
+		double rank = 0.0;
 		for (Map.Entry<Double, ArrayList<RouteModel>> entry : co2RankedRoutes.entrySet()){
 			logger.debug("CO2: " + entry.getKey());
 			for (RouteModel route : entry.getValue()){
-				rankedRoutes.add(route);
-				logger.debug("route Mode: " + route.getRoute().getAdditionalInfo().get("mode"));
+				route.setCO2EmissionsRank(rank);
+				rankedRoutes.add(route);				
+				rank++;
 			}
 		}
 		//logger.debug("rankedRoutes: " + rankedRoutes.size() + " routes");
@@ -516,11 +519,13 @@ public class Recommender {
 		//Add routes as candidates
 		ArrayList<Ballot> ballots = new ArrayList<Ballot>();
 		int max= routes.size();
-
-		for (RouteModel route : routes){
+		logger.debug("--------Setting Ballots----------");
+		for (RouteModel route : routes){			
 			double userPreferenceRank = route.getUserPreferenceRank();
 			double systemRank =  route.getSystemRank();
 			double behaviouralModelRank =  route.getBehaviouralModelRank();
+			logger.debug(" route mode: " + route.getMode() + " userPreferenceRank: " + userPreferenceRank +
+					" systemRank: " + systemRank + " behaviouralModelRank: " + behaviouralModelRank);
 			for (int i = 0; i < (max-userPreferenceRank)+1; i++) {
 				ballots.add(new Ballot(String.valueOf(route.getRouteId())));
 			}
@@ -531,23 +536,24 @@ public class Recommender {
 				ballots.add(new Ballot(String.valueOf(route.getRouteId())));
 			}		
 		}
+		logger.debug("--------END Setting Ballots----------");
 		return ballots;
 	}
 
 	static <K,V extends Comparable<? super V>>
-	List<Map.Entry<K, V>> entriesSortedByValues(Map<K,V> map) {
+	LinkedHashMap<K, V> entriesSortedByValues(LinkedHashMap<K,V> map) {
 
-		List<Map.Entry<K,V>> sortedEntries = new ArrayList<Map.Entry<K,V>>(map.entrySet());
-
-		Collections.sort(sortedEntries,
-				new Comparator<Map.Entry<K,V>>() {
-					@Override
-					public int compare(Map.Entry<K,V> e1, Map.Entry<K,V> e2) {
-						return e2.getValue().compareTo(e1.getValue());
-					}
-				}
-		);
-
+		List<Map.Entry<K, V>> entries =
+				  new ArrayList<Map.Entry<K, V>>(map.entrySet());
+		Collections.sort(entries, new Comparator<Map.Entry<K, V>>() {
+		  public int compare(Map.Entry<K, V> a, Map.Entry<K, V> b){
+		    return a.getValue().compareTo(b.getValue());
+		  }
+		});
+		LinkedHashMap<K, V> sortedEntries = new LinkedHashMap<K, V>();
+		for (Map.Entry<K, V> entry : entries) {
+			sortedEntries.put(entry.getKey(), entry.getValue());
+		}
 		return sortedEntries;
 	}
 
