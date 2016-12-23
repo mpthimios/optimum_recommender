@@ -31,6 +31,7 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
+
 public class Recommender {
 	
 	private Logger logger = Logger.getLogger(Recommender.class);
@@ -283,8 +284,8 @@ public class Recommender {
 			
 			Integer routeId = route.getRouteId();
 			//Return 1 if context exists else return 0
-			double BikeDistance = boolToDouble(CalculateMessageUtilities.withinBikeDistance(route_distance));
-			double WalkDistance = boolToDouble(CalculateMessageUtilities.withinWalkingDistance(route_distance));
+			double BikeDistance = boolToDouble(Context.withinBikeDistance(route_distance));
+			double WalkDistance = boolToDouble(Context.withinWalkingDistance(route_distance));
 			double ManyPT = boolToDouble(user.tooManyPublicTransportRoutes());
 			double ManyCar = boolToDouble(user.tooManyCarRoutes());
 			double Emissions = boolToDouble(user.emissionsIncreasing());
@@ -421,22 +422,28 @@ public class Recommender {
 		String mes="";
 		String message = "";
 		String strategy = "";
+		List<String> contextList = new ArrayList<>();
 		for (int i = 0; i < targetList.size(); i++) {
 			for (RouteModel route : routes) {
-				//logger.debug(targetList.get(i));
-				//logger.debug(route.getRoute().getAdditionalInfo().get("mode"));
+
 				if (route.getRoute().getAdditionalInfo().get("mode") == targetList.get(i)) {
 					target = targetList.get(i);
-					break;
+					try {
+						contextList = Context.getRelevantContextForUser(this, route, user);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					if ( Context.GetRelevantContext(target, contextList)== Boolean.TRUE ){
+						break;
+					}
 				}
 			}
 		}
-		logger.debug(target);
 		List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
 		for (RouteModel route : routes) {
 			if (route.getRoute().getAdditionalInfo().get("mode") == target){
 				try {
-					mes = CalculateMessageUtilities.calculateForUser( this, route, user);
+					mes = CalculateMessageUtilities.calculateForUser( contextList, user, target);
 					message = mes.split("_")[0];
 					strategy = mes.split("_")[1];
 				} catch (Exception e) {

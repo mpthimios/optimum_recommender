@@ -55,51 +55,42 @@ public class CalculateEmissions implements Job {
         }
 
         DBCollection m = mongoDatastore.getCollection( User.class );
-        List userTokens = m.distinct( "access_token", new BasicDBObject());
         List userIds = m.distinct( "id", new BasicDBObject());
 
-        try{
-            URL obj = new URL(activitiesUrl);
-            con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
-            //Get activities of the last week of the user.
-            final ZonedDateTime input = ZonedDateTime.now();
-            final ZonedDateTime startOfLastWeek = input.minusDays(GetProperties.getdays());
+        //Get activities of the last week of the user.
+        final ZonedDateTime input = ZonedDateTime.now();
+        final ZonedDateTime startOfLastWeek = input.minusDays(GetProperties.getdays());
 
-            long last_week = startOfLastWeek.toEpochSecond()*1000;
-            long now = input.toEpochSecond()*1000;
-            String urlParameters = "from="+last_week+"&to="+now;
-            con.setRequestProperty("urlParameters", urlParameters);
+        long last_week = startOfLastWeek.toEpochSecond()*1000;
+        long now = input.toEpochSecond()*1000;
 
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return;
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return;
-        }
 
         //for (Object accessToken : userTokens ){
         for (Object id : userIds ){
             try {
                 logger.debug((String) id);
                 DBObject user = m.findOne(id);
-                Object accessToken = "";
 
-                try {
-                    accessToken = user.get("access_token");
-                    logger.debug((String) accessToken);
-                }
-                catch (Exception e){
-                    accessToken = "lukaios";
-                    logger.debug("---");
-                    logger.debug((String) accessToken);
+                try{
+                    URL obj = new URL(activitiesUrl+"?user="+id.toString()+"&from="+last_week+"&to="+now);
+                    con = (HttpURLConnection) obj.openConnection();
+                    con.setRequestMethod("GET");
+
+                    String urlParameters = "from="+last_week+"&to="+now;
+                    con.setRequestProperty("urlParameters", urlParameters);
+
+                } catch (MalformedURLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return;
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return;
                 }
 
                 //con.setRequestProperty("token",(String) accessToken);
-                con.setRequestProperty("user", (String) id.toString());
+                //con.setRequestProperty("user", (String) id.toString());
                 int responseCode = con.getResponseCode();
                 logger.debug("\nSending 'GET' request to URL : " + activitiesUrl);
                 logger.debug("Response Code : " + responseCode);
@@ -119,6 +110,10 @@ public class CalculateEmissions implements Job {
                 logger.debug(jsonObj.getJSONArray("data"));
                 JSONArray arr = jsonObj.getJSONArray("data");
                 double total_emissions = 0.0;
+                double min_car = 0;
+                double min_bike= 0;
+                double min_pt = 0;
+                double min_walk = 0;
                 logger.debug(arr);
                 for (int i = 0; i < arr.length(); i++) {
                     String mode="";
@@ -126,6 +121,7 @@ public class CalculateEmissions implements Job {
 
                     JSONObject object = arr.getJSONObject(i);
                     Integer sensorActivity = Integer.parseInt(object.get("sensorActivity").toString());
+                    double duration = Double.parseDouble(object.get("duration").toString())/ 60000;
 
                     if(sensorActivity ==1){
                         mode = "bike";
@@ -143,19 +139,34 @@ public class CalculateEmissions implements Job {
                     double distance = 100;
                     if (mode.equals("car") ){
                         emissions = ( (double)(distance*110)/1000 );
+                        min_car= min_car + duration;
                     }
                     if (mode.equals("pt") ){
                         emissions = ( (distance*25.5)/1000 );
+                        min_pt = min_pt + duration;
                     }
                     if (mode.equals("bike") ){
                         emissions = 0;
+                        min_bike = min_bike + duration;
                     }
                     if (mode.equals("walk") ){
                         emissions = 0;
+                        min_walk = min_walk + duration;
                     }
                     total_emissions = total_emissions + emissions;
                     //logger.debug(arr.getJSONObject(i).get("mode"));
                 }
+
+                //Calculate average minutes per day for each mode
+                double average_min_car = ( (double)(min_car)/(double) GetProperties.getDuration());
+                double average_min_pt = ( (double)(min_pt)/(double) GetProperties.getDuration());
+                double average_min_bike = ( (double)(min_bike)/(double) GetProperties.getDuration());
+                double average_min_walk = ( (double)(min_walk)/(double) GetProperties.getDuration() );
+
+                System.out.println(average_min_bike);
+                System.out.println(average_min_car);
+                System.out.println(average_min_walk);
+                System.out.println(average_min_pt);
 
 
                 //Query<User> query = mongoDatastore.createQuery(User.class).field("access_token").equal((String) accessToken);
@@ -163,6 +174,12 @@ public class CalculateEmissions implements Job {
                 logger.debug(total_emissions);
                 //Update the emissionsLastWeek field
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("emissionsLastWeek", total_emissions));
+
+                //Update the AverageEmissions field
+                mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("MinBiked", average_min_bike));
+                mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("MinDrived", average_min_car));
+                mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("MinWalked", average_min_walk));
+                mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("MinPT", average_min_pt));
 
             } catch (Exception e) {
                 e.printStackTrace();

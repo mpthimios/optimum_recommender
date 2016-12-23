@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.mongodb.DBObject;
+import imu.recommender.helpers.GetProperties;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,26 +54,25 @@ public class CalculateModeUsePercentages implements Job {
     	DBCollection m = mongoDatastore.getCollection( User.class );
     	//List userTokens = m.distinct( "access_token", new BasicDBObject());
 		List userIds = m.distinct( "id", new BasicDBObject());
-    	
-    	try{
-	    	URL obj = new URL(activitiesUrl);
-			con = (HttpURLConnection) obj.openConnection();
-			con.setRequestMethod("GET");
-    	} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
-    	
+
     	for (Object id : userIds ){
+			try{
+				URL obj = new URL(activitiesUrl+"?user="+id.toString());
+				con = (HttpURLConnection) obj.openConnection();
+				con.setRequestMethod("GET");
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			}
     		try {
 				DBObject user = m.findOne(id);
 
-        		con.setRequestProperty("user", (String) id.toString());
+        		//con.setRequestProperty("user", (String) id.toString());
         		int responseCode = con.getResponseCode();
     			logger.debug("\nSending 'GET' request to URL : " + activitiesUrl);
     			logger.debug("Response Code : " + responseCode);
@@ -95,6 +95,7 @@ public class CalculateModeUsePercentages implements Job {
 				Integer n_pt=0;
 				Integer n_bike=0;
 				Integer n_walk=0;
+
 				for (int i = 0; i < arr.length(); i++) {
 				 	 String mode="";
 					 //String [] all_modes = {"car", "pt", "bike", "walk"};
@@ -122,6 +123,7 @@ public class CalculateModeUsePercentages implements Job {
 
 					 if (mode.equals("car") ){
 						 n_car++;
+
 					 }
 					 if (mode.equals("pt") ){
 						 n_pt++;
@@ -138,8 +140,8 @@ public class CalculateModeUsePercentages implements Job {
 				 double pt_percent = ( (double)(n_pt*100)/(double) arr.length());
 				 double bike_percent = ( (double)(n_bike*100)/(double) arr.length());
 				 double walk_percent = ( (double)(n_walk*100)/(double) arr.length());
-				 
-				 //test
+
+				//test
 //				 double car_percent = 10.0;
 //				 double pt_percent = 20.0;
 //				 double bike_percent = 30.0;

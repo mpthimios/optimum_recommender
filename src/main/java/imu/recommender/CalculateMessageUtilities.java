@@ -3,6 +3,7 @@ package imu.recommender;
 import at.ac.ait.ariadne.routeformat.Route;
 import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import at.ac.ait.ariadne.routeformat.RoutingRequest;
+import com.thoughtworks.proxy.toys.nullobject.Null;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.helpers.WeatherInfo;
@@ -28,95 +29,26 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class CalculateMessageUtilities {
 
-    public static String calculateForUser(Recommender route, RouteModel trip, User user) throws Exception {
-        //Get trip properties
-        Integer route_distance=trip.getRoute().getDistanceMeters();
-        Float lat = trip.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0).floatValue();
-        Float lon = trip.getRoute().getFrom().getCoordinate().geometry.coordinates.get(1).floatValue();
-        String city = "Vienna";
-        //String city = trip.getFrom().getAddress().get().getCity().get();
-        Integer duration = trip.getRoute().getDurationSeconds();
+    public static String calculateForUser(List<String> contextList, User user, String target) throws Exception {
 
         //Get personality of user
         String personality = user.getUserPersonalityType(user.getId());
         //Get the most convincing persuasive strategy
-        String strategy = user.getBestPersuasiveStrategy(personality);
+        List<String> strategies = user.getBestPersuasiveStrategy(personality);
+        String strategy = strategies.get(0);
+        System.out.println(strategy);
 
         //Connect to mongodb
         Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 
         List<String> targetList = new ArrayList<String>();
-        //Select the messages that the target of message is the same with the mode of route
-        String target = trip.getRoute().getAdditionalInfo().get("mode").toString();
-        //targetList.add("all");
-        //targetList.add("pt");
-        //targetList.add(trip.getRoute().getAdditionalInfo().get("mode").toString());
 
-        List<String> contextList = new ArrayList<String>();
 
-        //Check if the distance of route is walking
-        if(withinWalkingDistance(route_distance)){
-            System.out.println("Walking Distance");
-            contextList.add("WalkingDistance");
-        }
-
-        //Check if the distance of route is biking
-        if(withinBikeDistance(route_distance)){
-            System.out.println("Bike Distance");
-            contextList.add("BikeDistance");
-
-        }
-        if (WeatherInfo.isWeatherNice(lat, lon, city)) {
-            System.out.println("Nice Weather");
-            contextList.add("NiceWeather");
-        }
-
-        //Check the weather if withinBikeDistance or withinWalkingDistance is True
-       /* if(withinWalkingDistance(route_distance) || withinBikeDistance(route_distance) ) {
-            if (WeatherInfo.isWeatherNice(lat, lon, city)) {
-                System.out.println("Nice Weather");
-                contextList.add("NiceWeather");
-            }
-        }*/
-        /*if (emissionsIncreasing("user")){
-            searchQuery.append("context", "emissionsIncreasing");
-        }*/
-        if (user.tooManyPublicTransportRoutes()){
-            contextList.add("TooManyTransportRoutes");
-        }
-        if (user.tooManyCarRoutes()){
-            contextList.add("TooManyCarRoutes");
-        }
-        RouteModel carTrip = CarTrip(route);
-        if ( carTrip!= null && trip.getRoute().getAdditionalInfo().get("mode").equals("pt")) {
-            Integer driving_distance = carTrip.getRoute().getDistanceMeters();
-            if (CostComparetoDriving("transport", "drive")) {
-                contextList.add("Cost");
-            }
-            Integer driving_duration = carTrip.getRoute().getDurationSeconds();
-            if (DurationComparetoDriving(duration, driving_duration)) {
-                contextList.add("Duration");
-            }
-        }
-
-        if (EmissionComparetoOthers(user)){
-            contextList.add("EmissionComparetoOthers");
-        }
-
-        //Find all messages after filtering
-
-        //Message m = new Message();
-        //mongoDatastore.save(m);
-        //contextList.add("NiceWeather");
-        System.out.println(contextList);
-        System.out.println(strategy);
         String selected_message_text= "";
         String selected_message_params= "";
 
@@ -130,6 +62,10 @@ public class CalculateMessageUtilities {
         double PWalkGW = user.getWalkUsageComparedToOthers();
         double PBikeGW = user.getBikeUsageComparedToOthers();
         double PPtGW = user.getPtUsageComparedToOthers();
+        double MinWalked = user.getMinWalked();
+        double MinBiked = user.getMinBiked();
+        double MinPT = user.getMinPT();
+
         if (PCar > GetProperties.getPCar()){
             PercentageList.add("PCar");
         }
@@ -142,6 +78,24 @@ public class CalculateMessageUtilities {
         if (PPtGW > GetProperties.getPPtGW()){
             PercentageList.add("PPtGW");
         }
+        if (MinWalked > GetProperties.getMinWalked()){
+            PercentageList.add("MinWalked");
+        }
+        if (MinBiked > GetProperties.getMinBiked()){
+            PercentageList.add("MinBiked");
+        }
+        if (MinPT > GetProperties.getMinPT()){
+            PercentageList.add("MinPT");
+        }
+        /*if (MinBikeSharing > GetProperties.getMinBikeSharing()){
+            PercentageList.add("MinBikeSharing");
+        }
+        if (MinBikeRide > GetProperties.getMinBikeRide()){
+            PercentageList.add("MinBikeRide");
+        }
+        if (MinParkRide > GetProperties.getMinParkRide()){
+            PercentageList.add("MinParkRide");
+        }*/
         PercentageList.add("no");
         Query<Message> query = mongoDatastore.createQuery(Message.class);
         query.and(
@@ -152,6 +106,22 @@ public class CalculateMessageUtilities {
         );
 
         List<Message> mes = query.asList();
+        //If no message exists change strategy(select the next more persuasive strategy)
+        int i=1;
+        while (mes.isEmpty() && i<strategies.size() ){
+            strategy = strategies.get(i);
+            query = mongoDatastore.createQuery(Message.class);
+            query.and(
+                    query.criteria("persuasive_strategy").equal(strategy),
+                    query.criteria("context").equal(new BasicDBObject("$in", contextList)),
+                    query.criteria("parameters").equal(new BasicDBObject("$in", PercentageList)),
+                    query.criteria("target").equal(target)
+            );
+
+            mes = query.asList();
+            i++;
+        }
+
         Double max_message_utility = 0.0;
         //Select a list of messages with the maximum utility based on context
         List<Message> messages = new ArrayList<Message>();
@@ -197,6 +167,15 @@ public class CalculateMessageUtilities {
             }
             if (selected_message_params.equals("PPtGW")){
                 selected_message_text = selected_message_text.replace("X", Double.toString(user.getPtUsageComparedToOthers()));
+            }
+            if (selected_message_params.equals("MinWalked")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getMinWalked()));
+            }
+            if (selected_message_params.equals("MinBiked")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getMinBiked()));
+            }
+            if (selected_message_params.equals("MinPT")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getMinPT()));
             }
         }
 
@@ -250,60 +229,6 @@ public class CalculateMessageUtilities {
         selected_message_text = selected_message_text + "_" +strategy;
         return selected_message_text;
 
-    }
-
-    public static boolean withinWalkingDistance(int distance) {
-        return (distance<GetProperties.getMaxWalkingDistance());
-
-    }
-
-    public static boolean withinBikeDistance(int distance) {
-        return(distance< GetProperties.getMaxBikeDistance());
-
-    }
-    
-    public static boolean CostComparetoDriving(String transport_route, String driving_route) {
-        //get distance from routes and calculate cost
-        Double transport_cost = 1.4;
-        Double driving_cost = 5.0;
-        return driving_cost - transport_cost >= 2.0;
-
-    }
-
-    public static boolean DurationComparetoDriving(Integer transport_duration, Integer driving_duration) {
-
-        return transport_duration - driving_duration <=GetProperties.getDuration();
-
-    }
-
-    public static boolean EmissionComparetoOthers(User user) {
-        try{
-            double user_emissions = user.getEmissionsLastWeek();
-            double average_emissions_of_others = user.getAverageEmissions();
-            System.out.println(user_emissions);
-            if (user_emissions/average_emissions_of_others>1.0){
-                return true;
-            }
-            else {
-                return false;
-            }
-
-        }
-        catch (Exception e){
-            return false;
-        }
-
-    }
-
-    public static RouteModel CarTrip(Recommender route){
-        RouteModel cartrip = null;
-        for (int i = 0; i < route.getRoutes().size(); i++) {
-            if (route.getRoutes().get(i).getRoute().getAdditionalInfo().get("mode").equals("car")) {
-                cartrip = route.getRoutes().get(i);
-            }
-
-        }
-        return cartrip;
     }
 
     private static double calculateUtility( String context, String mode, User user){

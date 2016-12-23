@@ -45,6 +45,13 @@ public class GetProperties implements ServletContextListener {
     private static double PBikeGW;
     private static double PWalkGW;
     private static double PPtGW;
+    private static double MinWalked;
+    private static double MinBiked;
+    private static double MinPT;
+    private static double MinDrived;
+    private static double MinBikeSharing;
+    private static double MinBikeRide;
+    private static double MinParkRide;
 
     public static double getPCar() {
         return PCar;
@@ -76,6 +83,62 @@ public class GetProperties implements ServletContextListener {
 
     public static void setPPtGW(double PPtGW) {
         GetProperties.PPtGW = PPtGW;
+    }
+
+    public static double getMinWalked() {
+        return MinWalked;
+    }
+
+    public static void setMinWalked(double minWalked) {
+        MinWalked = minWalked;
+    }
+
+    public static double getMinBiked() {
+        return MinBiked;
+    }
+
+    public static void setMinBiked(double minBiked) {
+        MinBiked = minBiked;
+    }
+
+    public static double getMinPT() {
+        return MinPT;
+    }
+
+    public static void setMinPT(double minPT) {
+        MinPT = minPT;
+    }
+
+    public static double getMinDrived() {
+        return MinDrived;
+    }
+
+    public static void setMinDrived(double minDrived) {
+        MinDrived = minDrived;
+    }
+
+    public static double getMinBikeSharing() {
+        return MinBikeSharing;
+    }
+
+    public static void setMinBikeSharing(double minBikeSharing) {
+        MinBikeSharing = minBikeSharing;
+    }
+
+    public static double getMinBikeRide() {
+        return MinBikeRide;
+    }
+
+    public static void setMinBikeRide(double minBikeRide) {
+        MinBikeRide = minBikeRide;
+    }
+
+    public static double getMinParkRide() {
+        return MinParkRide;
+    }
+
+    public static void setMinParkRide(double minParkRide) {
+        MinParkRide = minParkRide;
     }
 
     public String getUsernameValues() throws IOException {
@@ -152,6 +215,119 @@ public class GetProperties implements ServletContextListener {
             String weatherId = sc.getInitParameter("weatherId");
             logger.debug("weatherId: " + weatherId);
             GetProperties.weatherId = String.valueOf (weatherId);
+
+            String duration = sc.getInitParameter("Duration");
+            logger.debug("duration: " + duration);
+            GetProperties.Duration = Integer.parseInt(duration);
+
+            String days = sc.getInitParameter("days");
+            logger.debug("days: " + days);
+            GetProperties.days = Integer.parseInt(days);
+
+            String CompEx = sc.getInitParameter("CompEx");
+            logger.debug("CompEx: " + CompEx);
+            GetProperties.CompEx = Double.parseDouble(CompEx);
+
+            String CompAg = sc.getInitParameter("CompAg");
+            logger.debug("CompAg: " + CompEx);
+            GetProperties.CompAg = Double.parseDouble(CompAg);
+
+            String CompCons = sc.getInitParameter("CompCons");
+            logger.debug("CompCons: " + CompCons);
+            GetProperties.CompCons = Double.parseDouble(CompCons);
+
+            String CompN = sc.getInitParameter("CompN");
+            logger.debug("CompN: " + CompN);
+            GetProperties.CompN = Double.parseDouble(CompN);
+
+            String CompOp = sc.getInitParameter("CompOp");
+            logger.debug("CompOp: " + CompOp);
+            GetProperties.CompOp = Double.parseDouble(CompOp);
+
+            String SelfEx = sc.getInitParameter("SelfEx");
+            logger.debug("SelfEx: " + SelfEx);
+            GetProperties.SelfEx = Double.parseDouble(SelfEx);
+
+            String SelfAg = sc.getInitParameter("SelfAg");
+            logger.debug("SelfAg: " + SelfEx);
+            GetProperties.SelfAg = Double.parseDouble(SelfAg);
+
+            String SelfCons = sc.getInitParameter("SelfCons");
+            logger.debug("SelfCons: " + SelfCons);
+            GetProperties.SelfCons = Double.parseDouble(SelfCons);
+
+            String SelfN = sc.getInitParameter("SelfN");
+            logger.debug("SelfN: " + SelfN);
+            GetProperties.SelfN = Double.parseDouble(SelfN);
+
+            String SelfOp = sc.getInitParameter("SelfOp");
+            logger.debug("SelfOp: " + SelfOp);
+            GetProperties.SelfOp = Double.parseDouble(SelfOp);
+
+            String SugEx = sc.getInitParameter("SugEx");
+            logger.debug("SugEx: " + SugEx);
+            GetProperties.SelfEx = Double.parseDouble(SelfEx);
+
+            String SugAg = sc.getInitParameter("SugAg");
+            logger.debug("SugAg: " + SugEx);
+            GetProperties.SugAg = Double.parseDouble(SugAg);
+
+            String SugCons = sc.getInitParameter("SugCons");
+            logger.debug("SugCons: " + SugCons);
+            GetProperties.SugCons = Double.parseDouble(SugCons);
+
+            String SugN = sc.getInitParameter("SugN");
+            logger.debug("SugN: " + SugN);
+            GetProperties.SugN = Double.parseDouble(SugN);
+
+            String SugOp = sc.getInitParameter("SugOp");
+            logger.debug("SugOp: " + SugOp);
+            GetProperties.SugOp = Double.parseDouble(SugOp);
+
+            String PCar = sc.getInitParameter("PCar");
+            logger.debug("PCar: " + PCar);
+            GetProperties.PCar = Double.parseDouble(PCar);
+
+            String PWalkGW = sc.getInitParameter("PWalkGW");
+            logger.debug("PWalkGW: " + PWalkGW);
+            GetProperties.PWalkGW = Double.parseDouble(PWalkGW);
+
+            String PBikeGW = sc.getInitParameter("PBikeGW");
+            logger.debug("PBikeGW: " + PBikeGW);
+            GetProperties.PBikeGW = Double.parseDouble(PBikeGW);
+
+            String PPtGW = sc.getInitParameter("PPtGW");
+            logger.debug("PPtGW: " + PPtGW);
+            GetProperties.PPtGW = Double.parseDouble(PPtGW);
+
+            String MinWalked = sc.getInitParameter("MinWalked");
+            logger.debug("MinWalked: " + MinWalked);
+            GetProperties.MinWalked = Double.parseDouble(MinWalked);
+
+            String MinBiked = sc.getInitParameter("MinBiked");
+            logger.debug("MinBiked: " + MinBiked);
+            GetProperties.MinBiked = Double.parseDouble(MinBiked);
+
+            String MinPT = sc.getInitParameter("MinPT");
+            logger.debug("MinPT: " + MinPT);
+            GetProperties.MinPT = Double.parseDouble(MinPT);
+
+            String MinDrived = sc.getInitParameter("MinDrived");
+            logger.debug("MinDrived: " + MinDrived);
+            GetProperties.MinDrived = Double.parseDouble(MinDrived);
+
+            String MinBikeSharing = sc.getInitParameter("MinBikeSharing");
+            logger.debug("MinBikeSharing: " + MinBikeSharing);
+            GetProperties.MinBikeSharing = Double.parseDouble(MinBikeSharing);
+
+            String MinBikeRide = sc.getInitParameter("MinBikeRide");
+            logger.debug("MinBikeRide: " + MinBikeRide);
+            GetProperties.MinBikeRide = Double.parseDouble(MinBikeRide);
+
+            String MinParkRide = sc.getInitParameter("MinParkRide");
+            logger.debug("MinParkRide: " + MinParkRide);
+            GetProperties.MinParkRide = Double.parseDouble(MinParkRide);
+
 		}
 		catch (Exception e){
 			e.printStackTrace();

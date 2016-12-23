@@ -1,10 +1,7 @@
 package imu.recommender.models.user;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import imu.recommender.Recommender;
 import imu.recommender.helpers.GetProperties;
@@ -49,6 +46,13 @@ public class User {
 	private Integer sugAttempts;
 	private Integer compAttempts;
 	private Integer selfAttempts;
+	private  double MinWalked;
+	private double MinBiked;
+	private double MinPT;
+	private double MinDrived;
+	private String PreferredMode;
+	private Integer MaxPreferredBikeDistance;
+	private Integer MaxPreferredWalkDistance;
 
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
@@ -105,6 +109,13 @@ public class User {
 		this.selfProb = 0.0;
 		this.selfAttempts = 0;
 		this.selfSuccess = 0;
+		this.MinWalked = 0.0;
+		this.MinPT = 0.0;
+		this.MinDrived = 0.0;
+		this.MinBiked = 0.0;
+		this.PreferredMode = "";
+		this.MaxPreferredBikeDistance = 3;
+		this.MaxPreferredWalkDistance = 3;
 
 	}
 	
@@ -538,7 +549,7 @@ public class User {
 		this.selfAttempts = selfAttempts;
 	}
 
-	public String getBestPersuasiveStrategy(String personality) {
+	public  List<String> getBestPersuasiveStrategy(String personality) {
 
 		Double Suggestion = 0.0;
 		Double Comparison = 0.0;
@@ -568,9 +579,9 @@ public class User {
 					SelfMonitoring = GetProperties.getSelfEx();
 
 				} else {
-					Suggestion = (UserSug + GetProperties.getSugEx()) / 2;
-					Comparison = (UserComp + GetProperties.getCompEx()) / 2;
-					SelfMonitoring = (UserSelf + GetProperties.getSelfEx()) / 2;
+					Suggestion = (UserSug + GetProperties.getSugEx()) / 2.0;
+					Comparison = (UserComp + GetProperties.getCompEx()) / 2.0;
+					SelfMonitoring = (UserSelf + GetProperties.getSelfEx()) / 2.0;
 				}
 				break;
 			case "Agreeableness":
@@ -581,9 +592,9 @@ public class User {
 					SelfMonitoring = GetProperties.getSelfEx();
 
 				} else {
-					Suggestion = (UserSug + GetProperties.getSugAg()) / 2;
-					Comparison = (UserComp + GetProperties.getCompAg()) / 2;
-					SelfMonitoring = (UserSelf + GetProperties.getSelfAg()) / 2;
+					Suggestion = (UserSug + GetProperties.getSugAg()) / 2.0;
+					Comparison = (UserComp + GetProperties.getCompAg()) / 2.0;
+					SelfMonitoring = (UserSelf + GetProperties.getSelfAg()) / 2.0;
 				}
 				break;
 			case "Openness":
@@ -594,9 +605,9 @@ public class User {
 					SelfMonitoring = GetProperties.getSelfEx();
 
 				} else {
-					Suggestion = (UserSug + GetProperties.getSugOp()) / 2;
-					Comparison = (UserComp + GetProperties.getCompOp()) / 2;
-					SelfMonitoring = (UserSelf + GetProperties.getSelfOp()) / 2;
+					Suggestion = (UserSug + GetProperties.getSugOp()) / 2.0;
+					Comparison = (UserComp + GetProperties.getCompOp()) / 2.0;
+					SelfMonitoring = (UserSelf + GetProperties.getSelfOp()) / 2.0;
 				}
 				break;
 			case "Conscientiousness":
@@ -607,9 +618,9 @@ public class User {
 					SelfMonitoring = GetProperties.getSelfEx();
 
 				} else {
-					Suggestion = (UserSug + GetProperties.getSugCons()) / 2;
-					Comparison = (UserComp + GetProperties.getCompCons()) / 2;
-					SelfMonitoring = (UserSelf + GetProperties.getSelfCons()) / 2;
+					Suggestion = (UserSug + GetProperties.getSugCons()) / 2.0;
+					Comparison = (UserComp + GetProperties.getCompCons()) / 2.0;
+					SelfMonitoring = (UserSelf + GetProperties.getSelfCons()) / 2.0;
 				}
 				break;
 			case "Neuroticism":
@@ -620,25 +631,25 @@ public class User {
 					SelfMonitoring = GetProperties.getSelfEx();
 
 				} else {
-					Suggestion = (UserSug + GetProperties.getSugN()) / 2;
-					Comparison = (UserComp + GetProperties.getCompN()) / 2;
-					SelfMonitoring = (UserSelf + GetProperties.getSelfN()) / 2;
+					Suggestion = (UserSug + GetProperties.getSugN()) / 2.0;
+					Comparison = (UserComp + GetProperties.getCompN()) / 2.0;
+					SelfMonitoring = (UserSelf + GetProperties.getSelfN()) / 2.0;
 				}
 				break;
 		}
 
-		Double max = Suggestion;
-		strategy = "suggestion ";
-		if (Comparison > max){
-			strategy = "comparison";
-			max= Comparison;
-		}
-		if(SelfMonitoring>max){
-			strategy = "self-monitoring";
-			max=SelfMonitoring;
-		}
+        List<String> rankedStrategies = new ArrayList<String>();
+        TreeMap<String, Double> rankedStrategiesMap = new TreeMap<String, Double>();
 
-		return strategy;
+        rankedStrategiesMap.put("suggestion ", Suggestion);
+        rankedStrategiesMap.put("comparison", Comparison);
+        rankedStrategiesMap.put("self-monitoring", SelfMonitoring);
+
+        for (Map.Entry<String, Double> entry : rankedStrategiesMap.entrySet()){
+            rankedStrategies.add(entry.getKey());
+        }
+
+		return rankedStrategies;
 
 	}
 
@@ -661,5 +672,60 @@ public class User {
 		}
 		return reversed;
 	}
-	
+
+	public double getMinWalked() {
+		return MinWalked;
+	}
+
+	public void setMinWalked(double minWalked) {
+		MinWalked = minWalked;
+	}
+
+	public double getMinBiked() {
+		return MinBiked;
+	}
+
+	public void setMinBiked(double minBiked) {
+		MinBiked = minBiked;
+	}
+
+	public double getMinPT() {
+		return MinPT;
+	}
+
+	public void setMinPT(double minPT) {
+		MinPT = minPT;
+	}
+
+	public double getMinDrived() {
+		return MinDrived;
+	}
+
+	public void setMinDrived(double minDrived) {
+		MinDrived = minDrived;
+	}
+
+	public String getPreferredMode() {
+		return PreferredMode;
+	}
+
+	public void setPreferredMode(String preferredMode) {
+		PreferredMode = preferredMode;
+	}
+
+	public Integer getMaxPreferredBikeDistance() {
+		return MaxPreferredBikeDistance;
+	}
+
+	public void setMaxPreferredBikeDistance(Integer maxPreferredBikeDistance) {
+		MaxPreferredBikeDistance = maxPreferredBikeDistance;
+	}
+
+	public Integer getMaxPreferredWalkDistance() {
+		return MaxPreferredWalkDistance;
+	}
+
+	public void setMaxPreferredWalkDistance(Integer maxPreferredWalkDistance) {
+		MaxPreferredWalkDistance = maxPreferredWalkDistance;
+	}
 }
