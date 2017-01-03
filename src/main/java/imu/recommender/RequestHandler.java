@@ -128,6 +128,7 @@ public class RequestHandler extends HttpServlet{
 		catch (Exception e){
 			e.printStackTrace();
 			logger.debug("user not found");
+			
 			Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
 			RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
 			logger.debug(response_route);

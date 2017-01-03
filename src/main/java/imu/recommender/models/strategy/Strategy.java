@@ -7,6 +7,7 @@ import org.mongodb.morphia.annotations.Id;
 /**
  * Created by evangelie on 12/12/2016.
  */
+
 @Entity("OptimumPersuasiveStrategies")
 public class Strategy {
     @Id
