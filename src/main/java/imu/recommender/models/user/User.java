@@ -1,17 +1,19 @@
 package imu.recommender.models.user;
 
-import java.util.*;
-import java.net.UnknownHostException;
-
-import imu.recommender.Recommender;
 import imu.recommender.helpers.GetProperties;
+import imu.recommender.helpers.MongoConnectionHelper;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.*;
-
-import imu.recommender.helpers.MongoConnectionHelper;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
+
+import java.util.*;
+import java.util.TreeMap;
+import java.util.Collections;
+import java.util.Map;
+
+import java.net.UnknownHostException;
 
 @Entity("OptimumUsers")
 
@@ -53,6 +55,8 @@ public class User {
 	private String PreferredMode;
 	private Integer MaxPreferredBikeDistance;
 	private Integer MaxPreferredWalkDistance;
+	private double CarPercentagePreviousWeek;
+	private double PercentageReduceDriving;
 
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
@@ -116,6 +120,8 @@ public class User {
 		this.PreferredMode = "";
 		this.MaxPreferredBikeDistance = 3;
 		this.MaxPreferredWalkDistance = 3;
+		this.CarPercentagePreviousWeek = 0;
+		this.PercentageReduceDriving = 80;
 
 	}
 	
@@ -587,9 +593,9 @@ public class User {
 			case "Agreeableness":
 
 				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
-					Suggestion = GetProperties.getSugEx();
-					Comparison = GetProperties.getCompEx();
-					SelfMonitoring = GetProperties.getSelfEx();
+					Suggestion = GetProperties.getSugAg();
+					Comparison = GetProperties.getCompAg();
+					SelfMonitoring = GetProperties.getSelfAg();
 
 				} else {
 					Suggestion = (UserSug + GetProperties.getSugAg()) / 2.0;
@@ -600,9 +606,9 @@ public class User {
 			case "Openness":
 
 				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
-					Suggestion = GetProperties.getSugEx();
-					Comparison = GetProperties.getCompEx();
-					SelfMonitoring = GetProperties.getSelfEx();
+					Suggestion = GetProperties.getSugOp();
+					Comparison = GetProperties.getCompOp();
+					SelfMonitoring = GetProperties.getSelfOp();
 
 				} else {
 					Suggestion = (UserSug + GetProperties.getSugOp()) / 2.0;
@@ -613,9 +619,9 @@ public class User {
 			case "Conscientiousness":
 
 				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
-					Suggestion = GetProperties.getSugEx();
-					Comparison = GetProperties.getCompEx();
-					SelfMonitoring = GetProperties.getSelfEx();
+					Suggestion = GetProperties.getSugCons();
+					Comparison = GetProperties.getCompCons();
+					SelfMonitoring = GetProperties.getSelfCons();
 
 				} else {
 					Suggestion = (UserSug + GetProperties.getSugCons()) / 2.0;
@@ -626,9 +632,9 @@ public class User {
 			case "Neuroticism":
 
 				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
-					Suggestion = GetProperties.getSugEx();
-					Comparison = GetProperties.getCompEx();
-					SelfMonitoring = GetProperties.getSelfEx();
+					Suggestion = GetProperties.getSugN();
+					Comparison = GetProperties.getCompN();
+					SelfMonitoring = GetProperties.getSelfN();
 
 				} else {
 					Suggestion = (UserSug + GetProperties.getSugN()) / 2.0;
@@ -727,5 +733,12 @@ public class User {
 
 	public void setMaxPreferredWalkDistance(Integer maxPreferredWalkDistance) {
 		MaxPreferredWalkDistance = maxPreferredWalkDistance;
+	}
+	public double getCarPercentagePreviousWeek() {
+		return CarPercentagePreviousWeek;
+	}
+
+	public void setCarPercentagePreviousWeek(double CarPercentagePreviousWeek) {
+		CarPercentagePreviousWeek = CarPercentagePreviousWeek;
 	}
 }

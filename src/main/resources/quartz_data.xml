@@ -38,8 +38,20 @@
             <cron>
                 <name>TestJob3</name>
                 <job-name>TestJob3</job-name>
-                <cron-expression>0 0 12 1/1 * ? *</cron-expression>
-                <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
+                <!--<cron-expression>0 0 12 1/1 * ? *</cron-expression>-->
+                <cron-expression>0/5 * * * * ?</cron-expression>
+            </cron>
+        </trigger>
+        <job>
+            <name>TestJob4</name>
+            <job-class>imu.recommender.jobs.CalculateReduceDrivingPercentage</job-class>
+        </job>
+        <trigger>
+            <cron>
+                <name>TestJob4</name>
+                <job-name>TestJob4</job-name>
+                <!--<cron-expression>0 0 12 1/1 * ? *</cron-expression> -->
+                <cron-expression>0/5 * * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>

@@ -382,7 +382,7 @@ public class CalculateMessageUtilities {
                 if (context.equals("Duration")) {
                     utility = 0.5125;
                 }
-                if (context.equals("EmissionComparetoOthers")) {
+                if (context.equals("emissionsIncreasing")) {
                     utility = 0.315;
                 }
                 if (context.equals("NiceWeather")) {
