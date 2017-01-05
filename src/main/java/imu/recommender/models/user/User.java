@@ -81,6 +81,7 @@ public class User {
 	
 	public User(){
 		//initialize variables
+		this.id="6EEGP034JBLydaotzqZrCs65jRdpfR4s";
 		this.name = "John";
 		this.access_token = "lukaios";
 		this.bikeUsage = 0.0;
@@ -647,7 +648,7 @@ public class User {
         List<String> rankedStrategies = new ArrayList<String>();
         TreeMap<String, Double> rankedStrategiesMap = new TreeMap<String, Double>();
 
-        rankedStrategiesMap.put("suggestion ", Suggestion);
+        rankedStrategiesMap.put("suggestion", Suggestion);
         rankedStrategiesMap.put("comparison", Comparison);
         rankedStrategiesMap.put("self-monitoring", SelfMonitoring);
 

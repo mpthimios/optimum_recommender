@@ -15,6 +15,7 @@ import imu.recommender.models.user.User;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 
+import org.apache.log4j.Logger;
 import org.bitpipeline.lib.owm.OwmClient;
 import org.bitpipeline.lib.owm.WeatherData;
 import org.bitpipeline.lib.owm.WeatherForecastResponse;
@@ -33,6 +34,8 @@ import java.util.*;
 
 
 public class CalculateMessageUtilities {
+	
+	private static Logger logger = Logger.getLogger(CalculateMessageUtilities.class);
 
     public static String calculateForUser(List<String> contextList, User user, String target) throws Exception {
 
@@ -40,8 +43,7 @@ public class CalculateMessageUtilities {
         String personality = user.getUserPersonalityType(user.getId());
         //Get the most convincing persuasive strategy
         List<String> strategies = user.getBestPersuasiveStrategy(personality);
-        String strategy = strategies.get(0);
-        System.out.println(strategy);
+        String strategy = strategies.get(0);        
 
         //Connect to mongodb
         Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
@@ -99,17 +101,19 @@ public class CalculateMessageUtilities {
         PercentageList.add("no");
         Query<Message> query = mongoDatastore.createQuery(Message.class);
         query.and(
-                query.criteria("persuasive_strategy").equal(strategy),
-                query.criteria("context").equal(new BasicDBObject("$in", contextList)),
-                query.criteria("parameters").equal(new BasicDBObject("$in", PercentageList)),
-                query.criteria("target").equal(target)
+                query.criteria("persuasive_strategy").equal(strategy)
+                //query.criteria("context").equal(new BasicDBObject("$in", contextList)),
+                //query.criteria("parameters").equal(new BasicDBObject("$in", PercentageList)),
+                //query.criteria("target").equal(target)
         );
 
         List<Message> mes = query.asList();
+        logger.debug("found " + mes.size() + " messages that match the search criteria");
         //If no message exists change strategy(select the next more persuasive strategy)
         int i=1;
         while (mes.isEmpty() && i<strategies.size() ){
             strategy = strategies.get(i);
+            logger.debug("message list is empty, trying next persuasive strategy: -" + strategy + "-");
             query = mongoDatastore.createQuery(Message.class);
             query.and(
                     query.criteria("persuasive_strategy").equal(strategy),
@@ -180,54 +184,66 @@ public class CalculateMessageUtilities {
         }
 
 
-        System.out.println(selected_message_text);
-
-        //increase the number_of_times_sent of the selected strategy
-        Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal((String) strategy);
-        Integer number_of_times_sent = strategyQuery.get().getNumber_of_times_sent();
-        number_of_times_sent ++;
-        mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_times_sent", number_of_times_sent));
-        //Increase the number of attemps for the current user
-        Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
-        Integer user_attempts;
-        if (strategy.equals("suggestion ") ) {
-            try {
-                user_attempts = userQuery.get().getSugAttempts();
-            }
-            catch (Exception e){
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", 0));
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", 0));
-                user_attempts = userQuery.get().getSugAttempts();
-            }
-            user_attempts = user_attempts + 1;
-            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", user_attempts));
+        logger.debug(selected_message_text);
+        logger.debug("-"+strategy+"-");
+        
+        try {
+	        //increase the number_of_times_sent of the selected strategy
+	        Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal(strategy);
+	        Strategy dbStrategy = strategyQuery.get();
+	        logger.debug("number of times sent: " + dbStrategy.getNumber_of_times_sent());
+	        Integer number_of_times_sent = strategyQuery.get().getNumber_of_times_sent();
+	        number_of_times_sent ++;
+	        mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_times_sent", number_of_times_sent));
+	        //Increase the number of attemps for the current user
+	        Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
+	        Integer user_attempts;
+	        if (strategy.equals("suggestion") ) {
+	            try {
+	                user_attempts = userQuery.get().getSugAttempts();
+	            }
+	            catch (Exception e){
+	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", 0));
+	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", 0));
+	                user_attempts = userQuery.get().getSugAttempts();
+	            }
+	            user_attempts = user_attempts + 1;
+	            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", user_attempts));
+	        }
+	        else if (strategy.equals("comparison") ) {
+	            try {
+	                user_attempts = userQuery.get().getCompAttempts();
+	            }
+	            catch (Exception e){
+	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", 0));
+	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", 0));
+	                user_attempts = userQuery.get().getCompAttempts();
+	            }
+	            user_attempts = user_attempts + 1;
+	            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", user_attempts));
+	        }
+	        if (strategy.equals("self-monitoring") ) {
+	            try {
+	                user_attempts = userQuery.get().getSelfAttempts();
+	            }
+	            catch (Exception e){
+	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", 0));
+	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", 0));
+	                user_attempts = userQuery.get().getSelfAttempts();
+	            }
+	            user_attempts = user_attempts + 1;
+	            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", user_attempts));
+	        }
+	        selected_message_text = selected_message_text + "_" +strategy;
+	        return selected_message_text;
         }
-        else if (strategy.equals("comparison") ) {
-            try {
-                user_attempts = userQuery.get().getCompAttempts();
-            }
-            catch (Exception e){
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", 0));
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", 0));
-                user_attempts = userQuery.get().getCompAttempts();
-            }
-            user_attempts = user_attempts + 1;
-            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", user_attempts));
+        catch(Exception e){
+        	Strategy newStrategy = new Strategy();
+        	mongoDatastore.save(newStrategy);
+        	
+        	e.printStackTrace();
+        	return "";
         }
-        if (strategy.equals("self-monitoring") ) {
-            try {
-                user_attempts = userQuery.get().getSelfAttempts();
-            }
-            catch (Exception e){
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", 0));
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", 0));
-                user_attempts = userQuery.get().getSelfAttempts();
-            }
-            user_attempts = user_attempts + 1;
-            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", user_attempts));
-        }
-        selected_message_text = selected_message_text + "_" +strategy;
-        return selected_message_text;
 
     }
 
