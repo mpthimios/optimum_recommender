@@ -9,9 +9,9 @@ import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
 import java.net.UnknownHostException;
+import java.util.*;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.*;
 
 @Entity("OptimumUsers")
 
@@ -120,7 +120,7 @@ public class User {
 		this.MaxPreferredBikeDistance = 3;
 		this.MaxPreferredWalkDistance = 3;
 		this.CarPercentagePreviousWeek = 0;
-		this.PercentageReduceDriving = 80;
+		this.PercentageReduceDriving = 80.0;
 
 	}
 	
@@ -644,16 +644,18 @@ public class User {
 		}
 
         List<String> rankedStrategies = new ArrayList<String>();
-        TreeMap<String, Double> rankedStrategiesMap = new TreeMap<String, Double>();
+
+		LinkedHashMap<String, Double> rankedStrategiesMap = new LinkedHashMap<String, Double>();
 
         rankedStrategiesMap.put("suggestion", Suggestion);
         rankedStrategiesMap.put("comparison", Comparison);
-        rankedStrategiesMap.put("self-monitoring", SelfMonitoring);
+        rankedStrategiesMap.put("self-monitoring",SelfMonitoring);
+
+		rankedStrategiesMap = entriesSortedByValues(rankedStrategiesMap);
 
         for (Map.Entry<String, Double> entry : rankedStrategiesMap.entrySet()){
             rankedStrategies.add(entry.getKey());
         }
-
 		return rankedStrategies;
 
 	}
@@ -739,5 +741,29 @@ public class User {
 
 	public void setCarPercentagePreviousWeek(double CarPercentagePreviousWeek) {
 		CarPercentagePreviousWeek = CarPercentagePreviousWeek;
+	}
+	public double getPercentageReduceDriving() {
+		return PercentageReduceDriving;
+	}
+
+	public void setPercentageReduceDriving(double percentageReduceDriving) {
+		this.PercentageReduceDriving = percentageReduceDriving;
+	}
+
+	static <K,V extends Comparable<? super V>>
+	LinkedHashMap<K, V> entriesSortedByValues(LinkedHashMap<K,V> map) {
+
+		List<Map.Entry<K, V>> entries =
+				new ArrayList<Map.Entry<K, V>>(map.entrySet());
+		Collections.sort(entries, new Comparator<Map.Entry<K, V>>() {
+			public int compare(Map.Entry<K, V> a, Map.Entry<K, V> b){
+				return b.getValue().compareTo(a.getValue());
+			}
+		});
+		LinkedHashMap<K, V> sortedEntries = new LinkedHashMap<K, V>();
+		for (Map.Entry<K, V> entry : entries) {
+			sortedEntries.put(entry.getKey(), entry.getValue());
+		}
+		return sortedEntries;
 	}
 }

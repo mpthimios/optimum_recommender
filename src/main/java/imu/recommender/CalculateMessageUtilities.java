@@ -3,29 +3,12 @@ package imu.recommender;
 import com.mongodb.*;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
-import imu.recommender.helpers.WeatherInfo;
 import imu.recommender.models.message.Message;
 import imu.recommender.models.strategy.Strategy;
 import imu.recommender.models.user.User;
-
-import com.mongodb.*;
-import com.mongodb.util.JSON;
-
 import org.apache.log4j.Logger;
-import org.bitpipeline.lib.owm.OwmClient;
-import org.bitpipeline.lib.owm.WeatherData;
-import org.bitpipeline.lib.owm.WeatherForecastResponse;
-import org.bitpipeline.lib.owm.WeatherStatusResponse;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
-import org.mongodb.morphia.query.UpdateOperations;
-import org.omg.CORBA.ContextList;
-import sun.font.TrueTypeFont;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.net.UnknownHostException;
 import java.util.*;
 
 
@@ -63,6 +46,7 @@ public class CalculateMessageUtilities {
         double MinWalked = user.getMinWalked();
         double MinBiked = user.getMinBiked();
         double MinPT = user.getMinPT();
+        double PReduceDriving = user.getPercentageReduceDriving();
 
         if (PCar > GetProperties.getPCar()){
             PercentageList.add("PCar");
@@ -94,6 +78,9 @@ public class CalculateMessageUtilities {
         if (MinParkRide > GetProperties.getMinParkRide()){
             PercentageList.add("MinParkRide");
         }*/
+        if (PReduceDriving > 55.0){
+            PercentageList.add("PReduceDriving");
+        }
         PercentageList.add("no");
         Query<Message> query = mongoDatastore.createQuery(Message.class);
         query.and(
@@ -140,12 +127,13 @@ public class CalculateMessageUtilities {
             }
         }
         //Select the message that will be displayed on the user
+        Double max_message_utility2 = 0.0;
         for (Message m: messages ) {
             //Set random messageUtility
             Double messageUtility = Math.random();
             m.setUtility(messageUtility);
-            if (messageUtility > max_message_utility) {
-                max_message_utility = messageUtility;
+            if (messageUtility > max_message_utility2) {
+                max_message_utility2 = messageUtility;
                 selected_message_text = m.getMessage_text();
                 selected_message_params = m.getParameters();
             }
@@ -176,6 +164,9 @@ public class CalculateMessageUtilities {
             }
             if (selected_message_params.equals("MinPT")){
                 selected_message_text = selected_message_text.replace("X", Double.toString(user.getMinPT()));
+            }
+            if (selected_message_params.equals("PReduceDriving")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getPercentageReduceDriving()));
             }
         }
 

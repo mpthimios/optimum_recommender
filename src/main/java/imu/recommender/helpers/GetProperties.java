@@ -229,7 +229,7 @@ public class GetProperties implements ServletContextListener {
             GetProperties.CompEx = Double.parseDouble(CompEx);
 
             String CompAg = sc.getInitParameter("CompAg");
-            logger.debug("CompAg: " + CompEx);
+            logger.debug("CompAg: " + CompAg);
             GetProperties.CompAg = Double.parseDouble(CompAg);
 
             String CompCons = sc.getInitParameter("CompCons");
@@ -249,7 +249,7 @@ public class GetProperties implements ServletContextListener {
             GetProperties.SelfEx = Double.parseDouble(SelfEx);
 
             String SelfAg = sc.getInitParameter("SelfAg");
-            logger.debug("SelfAg: " + SelfEx);
+            logger.debug("SelfAg: " + SelfAg);
             GetProperties.SelfAg = Double.parseDouble(SelfAg);
 
             String SelfCons = sc.getInitParameter("SelfCons");
@@ -269,7 +269,7 @@ public class GetProperties implements ServletContextListener {
             GetProperties.SelfEx = Double.parseDouble(SelfEx);
 
             String SugAg = sc.getInitParameter("SugAg");
-            logger.debug("SugAg: " + SugEx);
+            logger.debug("SugAg: " + SugAg);
             GetProperties.SugAg = Double.parseDouble(SugAg);
 
             String SugCons = sc.getInitParameter("SugCons");
