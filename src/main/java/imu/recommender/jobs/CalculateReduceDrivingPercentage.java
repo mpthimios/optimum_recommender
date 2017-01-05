@@ -5,32 +5,25 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
-import imu.recommender.models.user.ModeUsage;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
-import org.apache.log4j.lf5.util.StreamUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
-import org.mongodb.morphia.query.UpdateOperations;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import java.time.Instant;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by evangelie on 11/11/2016.

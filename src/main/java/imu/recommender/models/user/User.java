@@ -8,12 +8,10 @@ import org.mongodb.morphia.annotations.*;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
-import java.util.*;
-import java.util.TreeMap;
-import java.util.Collections;
-import java.util.Map;
-
 import java.net.UnknownHostException;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.*;
 
 @Entity("OptimumUsers")
 

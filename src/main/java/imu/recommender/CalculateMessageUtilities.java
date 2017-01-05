@@ -1,14 +1,10 @@
 package imu.recommender;
 
-import at.ac.ait.ariadne.routeformat.Route;
-import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
-import at.ac.ait.ariadne.routeformat.RoutingRequest;
-import com.thoughtworks.proxy.toys.nullobject.Null;
+import com.mongodb.*;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.helpers.WeatherInfo;
 import imu.recommender.models.message.Message;
-import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.strategy.Strategy;
 import imu.recommender.models.user.User;
 
@@ -34,7 +30,7 @@ import java.util.*;
 
 
 public class CalculateMessageUtilities {
-	
+
 	private static Logger logger = Logger.getLogger(CalculateMessageUtilities.class);
 
     public static String calculateForUser(List<String> contextList, User user, String target) throws Exception {
@@ -43,7 +39,7 @@ public class CalculateMessageUtilities {
         String personality = user.getUserPersonalityType(user.getId());
         //Get the most convincing persuasive strategy
         List<String> strategies = user.getBestPersuasiveStrategy(personality);
-        String strategy = strategies.get(0);        
+        String strategy = strategies.get(0);
 
         //Connect to mongodb
         Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
@@ -101,10 +97,10 @@ public class CalculateMessageUtilities {
         PercentageList.add("no");
         Query<Message> query = mongoDatastore.createQuery(Message.class);
         query.and(
-                query.criteria("persuasive_strategy").equal(strategy)
-                //query.criteria("context").equal(new BasicDBObject("$in", contextList)),
-                //query.criteria("parameters").equal(new BasicDBObject("$in", PercentageList)),
-                //query.criteria("target").equal(target)
+                query.criteria("persuasive_strategy").equal(strategy),
+                query.criteria("context").equal(new BasicDBObject("$in", contextList)),
+                query.criteria("parameters").equal(new BasicDBObject("$in", PercentageList)),
+                query.criteria("target").equal(target)
         );
 
         List<Message> mes = query.asList();
@@ -186,7 +182,7 @@ public class CalculateMessageUtilities {
 
         logger.debug(selected_message_text);
         logger.debug("-"+strategy+"-");
-        
+
         try {
 	        //increase the number_of_times_sent of the selected strategy
 	        Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal(strategy);
@@ -240,7 +236,7 @@ public class CalculateMessageUtilities {
         catch(Exception e){
         	Strategy newStrategy = new Strategy();
         	mongoDatastore.save(newStrategy);
-        	
+
         	e.printStackTrace();
         	return "";
         }

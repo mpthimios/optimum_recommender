@@ -1,22 +1,16 @@
-import org.junit.Test;
-import org.junit.Assert;
-import org.hamcrest.CoreMatchers;
-import org.junit.matchers.JUnitMatchers.*;
-import org.hamcrest.CoreMatchers.*;
-import java.util.*;
-import imu.recommender.CalculateMessageUtilities;
-
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-
-import org.mongodb.morphia.dao.BasicDAO;
-import org.mongodb.morphia.mapping.DefaultCreator;
-
-import imu.recommender.models.user.User;
+import imu.recommender.CalculateMessageUtilities;
 import imu.recommender.models.user.Personality;
+import imu.recommender.models.user.User;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.CoreMatchers.*;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.matchers.JUnitMatchers.*;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Morphia;
+import java.util.*;
 
 
 
