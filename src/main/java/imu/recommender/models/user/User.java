@@ -9,9 +9,8 @@ import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
 import java.net.UnknownHostException;
-import java.util.*;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Entity("OptimumUsers")
 
@@ -35,6 +34,8 @@ public class User {
 	private double ptUsageComparedToOthers;
 	private double bikeUsageComparedToOthers;
 	private double walkUsageComparedToOthers;
+	private double bikeUsageComparedToOthersGW;
+	private double walkUsageComparedToOthersGW;
 	private double emissionsLastWeek;
 	private  double AverageEmissions;
 	private  double sugProb;
@@ -85,6 +86,8 @@ public class User {
 		this.bikeUsage = 0.0;
 		this.bikeUsageComparedToOthers = 0.0;
 		this.walkUsageComparedToOthers = 0.0;
+		this.bikeUsageComparedToOthersGW = 0.0;
+		this.walkUsageComparedToOthersGW = 0.0;
 		this.carUsage = 0.0;
 		this.carUsageComparedToOthers = 0.0;		
 		this.extra_data = "";
@@ -424,6 +427,21 @@ public class User {
 
 	public void setWalkUsageComparedToOthers(double walkUsageComparedToOthers) {
 		this.walkUsageComparedToOthers = walkUsageComparedToOthers;
+	}
+
+	public double getBikeUsageComparedToOthersGW() {
+		return bikeUsageComparedToOthersGW;
+	}
+
+	public void setBikeUsageComparedToOthersGW(double bikeUsageComparedToOthersGW) {
+		this.bikeUsageComparedToOthersGW = bikeUsageComparedToOthersGW;
+	}
+	public double getWalkUsageComparedToOthersGW() {
+		return walkUsageComparedToOthersGW;
+	}
+
+	public void setWalkUsageComparedToOthersGW(double walkUsageComparedToOthersGW) {
+		this.walkUsageComparedToOthersGW = walkUsageComparedToOthersGW;
 	}
 
 	public ArrayList<OwnedVehicle> getOwned_vehicles() {

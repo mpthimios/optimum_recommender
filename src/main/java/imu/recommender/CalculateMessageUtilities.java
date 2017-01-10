@@ -11,12 +11,11 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import java.util.*;
 
-
 public class CalculateMessageUtilities {
 
 	private static Logger logger = Logger.getLogger(CalculateMessageUtilities.class);
 
-    public static String calculateForUser(List<String> contextList, User user, String target) throws Exception {
+    public static String calculateForUser(List<String> contextList, User user, String target, Datastore mongoDatastore) throws Exception {
 
         //Get personality of user
         String personality = user.getUserPersonalityType(user.getId());
@@ -25,9 +24,7 @@ public class CalculateMessageUtilities {
         String strategy = strategies.get(0);
 
         //Connect to mongodb
-        Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
-
-        List<String> targetList = new ArrayList<String>();
+        //Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 
 
         String selected_message_text= "";
@@ -40,13 +37,15 @@ public class CalculateMessageUtilities {
             PercentageList.add("CO2Em");
         }
         double PCar = user.getCarUsageComparedToOthers();
-        double PWalkGW = user.getWalkUsageComparedToOthers();
-        double PBikeGW = user.getBikeUsageComparedToOthers();
+        double PWalkGW = user.getWalkUsageComparedToOthersGW();
+        double PBikeGW = user.getBikeUsageComparedToOthersGW();
         double PPtGW = user.getPtUsageComparedToOthers();
         double MinWalked = user.getMinWalked();
         double MinBiked = user.getMinBiked();
         double MinPT = user.getMinPT();
         double PReduceDriving = user.getPercentageReduceDriving();
+        double PWalkSD = user.getWalkUsageComparedToOthers();
+        double PBikeSD = user.getBikeUsageComparedToOthers();
 
         if (PCar > GetProperties.getPCar()){
             PercentageList.add("PCar");
@@ -80,6 +79,12 @@ public class CalculateMessageUtilities {
         }*/
         if (PReduceDriving > 55.0){
             PercentageList.add("PReduceDriving");
+        }
+        if (PWalkSD > GetProperties.getPWalkGW()){
+            PercentageList.add("PWalkSD");
+        }
+        if (PBikeSD > GetProperties.getPBikeGW()){
+            PercentageList.add("PBikeSD");
         }
         PercentageList.add("no");
         Query<Message> query = mongoDatastore.createQuery(Message.class);
@@ -148,10 +153,10 @@ public class CalculateMessageUtilities {
                 selected_message_text = selected_message_text.replace("X", Double.toString(user.getCarUsageComparedToOthers()));
             }
             if (selected_message_params.equals("PWalkGW")){
-                selected_message_text = selected_message_text.replace("X", Double.toString(user.getWalkUsageComparedToOthers()));
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getWalkUsageComparedToOthersGW()));
             }
             if (selected_message_params.equals("PBikeGW")){
-                selected_message_text = selected_message_text.replace("X", Double.toString(user.getBikeUsageComparedToOthers()));
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getBikeUsageComparedToOthersGW()));
             }
             if (selected_message_params.equals("PPtGW")){
                 selected_message_text = selected_message_text.replace("X", Double.toString(user.getPtUsageComparedToOthers()));
@@ -168,6 +173,12 @@ public class CalculateMessageUtilities {
             if (selected_message_params.equals("PReduceDriving")){
                 selected_message_text = selected_message_text.replace("X", Double.toString(user.getPercentageReduceDriving()));
             }
+            if (selected_message_params.equals("PWalkSD")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getWalkUsageComparedToOthers()));
+            }
+            if (selected_message_params.equals("PBikeSD")){
+                selected_message_text = selected_message_text.replace("X", Double.toString(user.getBikeUsageComparedToOthers()));
+            }
         }
 
 
@@ -178,7 +189,7 @@ public class CalculateMessageUtilities {
 	        //increase the number_of_times_sent of the selected strategy
 	        Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal(strategy);
 	        Strategy dbStrategy = strategyQuery.get();
-	        logger.debug("number of times sent: " + dbStrategy.getNumber_of_times_sent());
+	        logger.debug("number of times sent: " + strategyQuery.get().getNumber_of_times_sent());
 	        Integer number_of_times_sent = strategyQuery.get().getNumber_of_times_sent();
 	        number_of_times_sent ++;
 	        mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_times_sent", number_of_times_sent));

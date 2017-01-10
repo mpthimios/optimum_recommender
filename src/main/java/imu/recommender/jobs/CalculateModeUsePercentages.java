@@ -28,6 +28,8 @@ import com.mongodb.DBCollection;
 
 import imu.recommender.RequestHandler;
 import imu.recommender.helpers.MongoConnectionHelper;
+import imu.recommender.helpers.WeatherInfo;
+
 import imu.recommender.models.user.ModeUsage;
 import imu.recommender.models.user.User;
 
@@ -95,6 +97,8 @@ public class CalculateModeUsePercentages implements Job {
 				Integer n_pt=0;
 				Integer n_bike=0;
 				Integer n_walk=0;
+				Integer n_bike_GW=0;
+				Integer n_walk_GW=0;
 
 				for (int i = 0; i < arr.length(); i++) {
 				 	 String mode="";
@@ -103,6 +107,13 @@ public class CalculateModeUsePercentages implements Job {
 					 JSONObject object = arr.getJSONObject(i);
 
 					 Integer sensorActivity = Integer.parseInt(object.get("sensorActivity").toString());
+					 //Get location and date
+					float lat = 12;
+					float longitude = 23;
+					Integer start = 12;
+					Integer end = 13;
+
+					Boolean NiceWeather = WeatherInfo.isHistoricalWeatherNice(lat, longitude, start, end);
 
 					 if(sensorActivity ==1){
 						 mode = "bike";
@@ -130,9 +141,15 @@ public class CalculateModeUsePercentages implements Job {
 					 }
 					 if (mode.equals("bike") ){
 						 n_bike++;
+						 if(NiceWeather){
+						 	n_bike_GW++;
+						 }
 					 }
 					 if (mode.equals("walk") ){
 						 n_walk++;
+						 if(NiceWeather){
+							 n_walk_GW++;
+						 }
 					 }
 				 }
 				 //Calculate percentages
@@ -140,6 +157,8 @@ public class CalculateModeUsePercentages implements Job {
 				 double pt_percent = ( (double)(n_pt*100)/(double) arr.length());
 				 double bike_percent = ( (double)(n_bike*100)/(double) arr.length());
 				 double walk_percent = ( (double)(n_walk*100)/(double) arr.length());
+				 double bike_percent_GW = ( (double)(n_bike_GW*100)/(double) arr.length());
+				 double walk_percent_GW = ( (double)(n_walk_GW*100)/(double) arr.length());
 
 				//test
 //				 double car_percent = 10.0;
@@ -155,6 +174,8 @@ public class CalculateModeUsePercentages implements Job {
 				 modeUsage.setPt_percent(pt_percent);
 				 modeUsage.setCar_percent(car_percent);
 				 modeUsage.setBike_percent(bike_percent);
+				 modeUsage.setWalk_percentGW(walk_percent_GW);
+				 modeUsage.setBike_percentGW(bike_percent_GW);
 				 UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage", modeUsage);
 				 mongoDatastore.update(query, ops);
 
@@ -172,6 +193,8 @@ public class CalculateModeUsePercentages implements Job {
 				double total_pt_perc=0.0;
 				double total_bike_perc=0.0;
 				double total_walk_perc=0.0;
+				double total_bike_perc_GW=0.0;
+				double total_walk_perc_GW=0.0;
 				Integer total_users = 0;
 				for (Object id : userIds ) {
 					try {
@@ -182,6 +205,8 @@ public class CalculateModeUsePercentages implements Job {
 								total_bike_perc = total_bike_perc + user.get().getMode_usage().getBike_percent();
 								total_pt_perc =total_pt_perc + user.get().getMode_usage().getPt_percent();
 								total_walk_perc = total_walk_perc + user.get().getMode_usage().getWalk_percent();
+								total_walk_perc_GW = total_walk_perc_GW + user.get().getMode_usage().getWalk_percentGW();
+								total_bike_perc_GW = total_bike_perc_GW + user.get().getMode_usage().getBike_percentGW();
 								total_users++;
 							}
 							catch (Exception e){
@@ -197,12 +222,16 @@ public class CalculateModeUsePercentages implements Job {
 				double ptUsageComparedToOthers = total_pt_perc/(double)total_users;
 				double walkUsageComparedToOthers = total_walk_perc/(double)total_users;
 				double carUsageComparedToOthers = total_car_perc/(double)total_users;
+				double walkUsageComparedToOthersGW = total_walk_perc_GW/(double)total_users;
+				double bikeUsageComparedToOthersGW = total_bike_perc_GW/(double)total_users;
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
 				//Update the AverageEmissions field
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthers", ptUsageComparedToOthers));
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("carUsageComparedToOthers", carUsageComparedToOthers));
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthers", bikeUsageComparedToOthers));
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthers", walkUsageComparedToOthers));
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthersGW", bikeUsageComparedToOthersGW));
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthersGW", walkUsageComparedToOthersGW));
 
 			} catch (Exception e) {
 				e.printStackTrace();

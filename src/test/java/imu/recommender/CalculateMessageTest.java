@@ -1,7 +1,9 @@
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import imu.recommender.CalculateMessageUtilities;
+import imu.recommender.helpers.*;
 import imu.recommender.models.user.Personality;
+import imu.recommender.models.user.ModeUsage;
 import imu.recommender.models.user.User;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.CoreMatchers.*;
@@ -10,18 +12,12 @@ import org.junit.Test;
 import org.junit.matchers.JUnitMatchers.*;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.query.UpdateOperations;
 import java.util.*;
-import imu.recommender.helpers.*;
-
 import java.io.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.Properties;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Properties;
+
+import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
+import imu.recommender.Recommender;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class CalculateMessageTest{
@@ -34,7 +30,7 @@ public class CalculateMessageTest{
 
         String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
         //Connect to our test mongo db
-        String connectionStr = "mongodb://83.212.113.64:27017";
+        String connectionStr = "mongodb://OptimumUser1:Optimum123!@83.212.113.64:32085";
         MongoClient mongoSingleton = new MongoClient(new MongoClientURI(connectionStr) );
         Morphia morphia = new Morphia();
         Datastore mongoDatastore = morphia.createDatastore(mongoSingleton, "Optimum");
@@ -45,17 +41,29 @@ public class CalculateMessageTest{
         user.setSelfProb(0.0);
         user.setCompProb(0.0);
         Personality personality = new Personality();
-        personality.setTypeStr("Conscientiousness");
+        personality.setQ1(5.0);
+        personality.setQ2(5.0);
+        personality.setQ3(1.0);
+        personality.setQ4(5.0);
+        personality.setQ5(5.0);
+        personality.setQ6(1.0);
+        personality.setQ7(1.0);
+        personality.setQ8(5.0);
+        personality.setQ9(1.0);
+        personality.setQ10(1.0);
         user.setPersonality(personality);
         //Find the message
-        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target);
+        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target, mongoDatastore);
         System.out.println(mes);
         Assert.assertThat(mes,CoreMatchers.anyOf(CoreMatchers.is("Today it s sunny! Take the opportunity to walk to save CO2 emissions._suggestion"),CoreMatchers.is("Nice weather for walking._suggestion")));
     }
 
-    /*@Test
+    @Test
     //Test case 2
     public void CalculateMessageTest2() throws Exception{
+        GetProperties.setCompEx(0.212);
+        GetProperties.setSugEx(0.118);
+        GetProperties.setSelfEx(0.145);
         String target= "bicycle";
         List<String> contextList = new ArrayList<String>();
         contextList.add("NiceWeather");
@@ -64,7 +72,7 @@ public class CalculateMessageTest{
 
         String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
         //Connect to our test mongo db
-        String connectionStr = "mongodb://83.212.113.64:27017";
+        String connectionStr = "mongodb://OptimumUser1:Optimum123!@83.212.113.64:32085";
         MongoClient mongoSingleton = new MongoClient(new MongoClientURI(connectionStr) );
         Morphia morphia = new Morphia();
         Datastore mongoDatastore = morphia.createDatastore(mongoSingleton, "Optimum");
@@ -73,14 +81,26 @@ public class CalculateMessageTest{
         user.setSugProb(0.0);
         user.setSelfProb(0.0);
         user.setCompProb(0.0);
+        //Set personality Extraversion
         Personality personality = new Personality();
-        personality.setTypeStr("Extraversion");
+        personality.setQ1(1.0);
+        personality.setQ2(5.0);
+        personality.setQ3(5.0);
+        personality.setQ4(5.0);
+        personality.setQ5(5.0);
+        personality.setQ6(5.0);
+        personality.setQ7(1.0);
+        personality.setQ8(1.0);
+        personality.setQ9(1.0);
+        personality.setQ10(1.0);
         user.setPersonality(personality);
+
+        user.setBikeUsageComparedToOthers(80.0);
         //Find the message
-        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target);
+        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target, mongoDatastore);
         System.out.println(mes);
-        Assert.assertThat(mes, CoreMatchers.is("80% of users biked for similar distances._comparison "));
-    }*/
+        Assert.assertThat(mes, CoreMatchers.is("80.0% of users biked for similar distances_comparison"));
+    }
 
     @Test
     //Test case 3
@@ -96,7 +116,7 @@ public class CalculateMessageTest{
 
         String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
         //Connect to our test mongo db
-        String connectionStr = "mongodb://83.212.113.64:27017";
+        String connectionStr = "mongodb://OptimumUser1:Optimum123!@83.212.113.64:32085";
         MongoClient mongoSingleton = new MongoClient(new MongoClientURI(connectionStr) );
         Morphia morphia = new Morphia();
         Datastore mongoDatastore = morphia.createDatastore(mongoSingleton, "Optimum");
@@ -120,9 +140,10 @@ public class CalculateMessageTest{
         user.setPersonality(personality);
         System.out.println(user.getPersonality().getTypeStr());
 
-        user.setBikeUsageComparedToOthers(90.0);
+        user.setBikeUsageComparedToOthers(0.0);
+        user.setBikeUsageComparedToOthersGW(90.0);
         //Find the message
-        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target);
+        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target, mongoDatastore);
         System.out.println(mes);
         Assert.assertThat(mes, CoreMatchers.is("90.0% of users biked when the weather was as good as today!_comparison"));
     }
@@ -141,16 +162,16 @@ public class CalculateMessageTest{
 
         String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
         //Connect to our test mongo db
-        String connectionStr = "mongodb://83.212.113.64:27017";
+        String connectionStr = "mongodb://OptimumUser1:Optimum123!@83.212.113.64:32085";
         MongoClient mongoSingleton = new MongoClient(new MongoClientURI(connectionStr) );
         Morphia morphia = new Morphia();
         Datastore mongoDatastore = morphia.createDatastore(mongoSingleton, "Optimum");
         User user = (User) mongoDatastore.find(User.class).field("id").equal(userID).get();
-        //Set strategy
+        //Set strategy suggestion
         user.setSugProb(0.0);
         user.setSelfProb(0.0);
         user.setCompProb(0.0);
-        //Set personality Extraversion
+        //Set personality Conscientiousness
         Personality personality = new Personality();
         personality.setQ1(1.0);
         personality.setQ2(5.0);
@@ -170,39 +191,60 @@ public class CalculateMessageTest{
         user.setEmissionsLastWeek(0);
 
         //Find the message
-        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target);
+        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target, mongoDatastore);
         System.out.println(mes);
         Assert.assertThat(mes, CoreMatchers.is("Nice weather!When the weather was good you biked 2.0 minutes per day on average._self-monitoring"));
     }
 
-    /*@Test
+    @Test
     //Test case 5
     public void CalculateMessageTest5() throws Exception{
-        String target= "pt";
+
+        List<String> targetList = new ArrayList<String>();
+        targetList.add("pt");
+        targetList.add("bicycle");
+        String message="";
         List<String> contextList = new ArrayList<String>();
         contextList.add("TooManyTransportRoutes");
         contextList.add("BikeDistance");
 
         String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
         //Connect to our test mongo db
-        String connectionStr = "mongodb://83.212.113.64:27017";
+        String connectionStr = "mongodb://OptimumUser1:Optimum123!@83.212.113.64:32085";
         MongoClient mongoSingleton = new MongoClient(new MongoClientURI(connectionStr) );
         Morphia morphia = new Morphia();
         Datastore mongoDatastore = morphia.createDatastore(mongoSingleton, "Optimum");
         User user = (User) mongoDatastore.find(User.class).field("id").equal(userID).get();
+        //Change user persuadability
         //Set strategy suggestion
         user.setSugProb(0.0);
         user.setSelfProb(0.0);
         user.setCompProb(0.0);
+        //Set personality Extraversion
         Personality personality = new Personality();
-        personality.setTypeStr("Conscientiousness");
+        personality.setQ1(5.0);
+        personality.setQ2(5.0);
+        personality.setQ3(1.0);
+        personality.setQ4(5.0);
+        personality.setQ5(5.0);
+        personality.setQ6(1.0);
+        personality.setQ7(1.0);
+        personality.setQ8(5.0);
+        personality.setQ9(1.0);
+        personality.setQ10(1.0);
         user.setPersonality(personality);
+        System.out.println(user.getPersonality().getTypeStr());
 
         //Find the message
-        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target);
-        System.out.println(mes);
-        Assert.assertThat(mes, CoreMatchers.is("It s not too far. Take your bike instead of car and reach your weekly goal._suggestion "));
-    }*/
+        int j=0;
+        while (message != "_suggestion" && message != "_comparison" && message != "_self-monitoring" && j<targetList.size() ) {
+            String target = targetList.get(j);
+            message = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore);
+            j++;
+        }
+        System.out.println(message);
+        Assert.assertThat(message, CoreMatchers.anyOf( CoreMatchers.is("It s not too far. Take your bike instead of car and reach your weekly goal._suggestion"),CoreMatchers.is("You are near to your destination. It s an opportunity to bike._suggestion") ) );
+    }
     @Test
     //Test case 6
     public void CalculateMessageTest6() throws Exception{
@@ -215,7 +257,7 @@ public class CalculateMessageTest{
 
         String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
         //Connect to our test mongo db
-        String connectionStr = "mongodb://83.212.113.64:27017";
+        String connectionStr = "mongodb://OptimumUser1:Optimum123!@83.212.113.64:32085";
         MongoClient mongoSingleton = new MongoClient(new MongoClientURI(connectionStr) );
         Morphia morphia = new Morphia();
         Datastore mongoDatastore = morphia.createDatastore(mongoSingleton, "Optimum");
@@ -242,7 +284,7 @@ public class CalculateMessageTest{
         user.setPercentageReduceDriving(60.0);
 
         //Find the message
-        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target);
+        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target, mongoDatastore);
         System.out.println(mes);
         Assert.assertThat(mes, CoreMatchers.is("Take public transport. 60.0 % of users have already reduced driving._comparison"));
     }
@@ -262,7 +304,7 @@ public class CalculateMessageTest{
 
         String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
         //Connect to our test mongo db
-        String connectionStr = "mongodb://83.212.113.64:27017";
+        String connectionStr = "mongodb://OptimumUser1:Optimum123!@83.212.113.64:32085";
         MongoClient mongoSingleton = new MongoClient(new MongoClientURI(connectionStr) );
         Morphia morphia = new Morphia();
         Datastore mongoDatastore = morphia.createDatastore(mongoSingleton, "Optimum");
@@ -290,7 +332,7 @@ public class CalculateMessageTest{
         user.setEmissionsLastWeek(0.0);
 
         //Find the message
-        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target);
+        String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target, mongoDatastore);
         System.out.println(mes);
         Assert.assertThat(mes, CoreMatchers.is("Last week your emissions are increasing. Try more!_self-monitoring"));
     }

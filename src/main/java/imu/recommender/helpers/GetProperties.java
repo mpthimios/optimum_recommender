@@ -1,16 +1,15 @@
 package imu.recommender.helpers;
 
+import org.apache.log4j.Logger;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Properties;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.apache.log4j.Logger;
 /**
  * Created by evangelie on 21/10/2016.
  */
@@ -470,7 +469,7 @@ public class GetProperties implements ServletContextListener {
         return SugCons;
     }
 
-    public static void setSugCons(double Sugons) {
+    public static void setSugCons(double SugCons) {
         GetProperties.SugCons = SugCons;
     }
 

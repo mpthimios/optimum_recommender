@@ -74,7 +74,7 @@ public class RequestHandler extends HttpServlet{
 
 	private static boolean PRINT_JSON = true;
 	private Logger logger = Logger.getLogger(RequestHandler.class);
-	private String exampleFile = "src/main/resources/route.txt";	
+	private String exampleFile = "src/main/resources/route.txt";
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {

@@ -423,6 +423,7 @@ public class Recommender {
 		String message = "";
 		String strategy = "";
 		List<String> contextList = new ArrayList<>();
+		List<String> FinaltargetList = new ArrayList<>();
 		for (int i = 0; i < targetList.size(); i++) {
 			for (RouteModel route : routes) {
 
@@ -434,29 +435,40 @@ public class Recommender {
 						e.printStackTrace();
 					}
 					if ( Context.GetRelevantContext(target, contextList)== Boolean.TRUE ){
-						break;
+						//break;
+						FinaltargetList.add(target);
 					}
 				}
 			}
 		}
 		List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
-		for (RouteModel route : routes) {
-			if (route.getRoute().getAdditionalInfo().get("mode") == target){
-				try {
-					mes = CalculateMessageUtilities.calculateForUser( contextList, user, target);
-					message = mes.split("_")[0];
-					strategy = mes.split("_")[1];
-				} catch (Exception e) {
-					e.printStackTrace();
+		int j=0;
+		while (message.isEmpty() && j<FinaltargetList.size() ) {
+			target = FinaltargetList.get(j);
+			for (RouteModel route : routes) {
+				if (route.getRoute().getAdditionalInfo().get("mode") == target) {
+					try {
+						//Connect to mongodb
+						Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+						contextList = Context.getRelevantContextForUser(this, route, user);
+						mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore);
+						message = mes.split("_")[0];
+						strategy = mes.split("_")[1];
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} else {
+					message = "";
+					strategy = "";
+				}
+				if(!message.isEmpty()) {
+					route.setMessage(message);
+					route.setStrategy(strategy);
+					rankedRoutes2.add(route);
+					break;
 				}
 			}
-			else {
-				message = "";
-				strategy = "";
-			}
-			route.setMessage(message);
-			route.setStrategy(strategy);
-			rankedRoutes2.add(route);
+			j++;
 		}
 		routes.clear();
 		routes=rankedRoutes2;
