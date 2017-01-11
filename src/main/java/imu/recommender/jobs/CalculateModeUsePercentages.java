@@ -1,20 +1,14 @@
 package imu.recommender.jobs;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Random;
-
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import imu.recommender.helpers.GetProperties;
+import imu.recommender.helpers.MongoConnectionHelper;
+import imu.recommender.helpers.WeatherInfo;
+import imu.recommender.models.user.ModeUsage;
+import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
@@ -23,15 +17,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-
-import imu.recommender.RequestHandler;
-import imu.recommender.helpers.MongoConnectionHelper;
-import imu.recommender.helpers.WeatherInfo;
-
-import imu.recommender.models.user.ModeUsage;
-import imu.recommender.models.user.User;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.List;
 
 public class CalculateModeUsePercentages implements Job {
 	

@@ -182,10 +182,10 @@ public class User {
 	    return m;		
 	}
 	
-	public String getUserPersonalityType(String id) throws UnknownHostException {
+	public String getUserPersonalityType(String id, Datastore mongoDatastore) throws UnknownHostException {
 
-		Datastore mongoDatastore;
-		mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+		//Datastore mongoDatastore;
+		//mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 
 		if (!this.personality.isScores_calculated()){
 			//calculate scores

@@ -103,12 +103,7 @@ public class UpdateStrategiesProbabilities  implements Job{
                                 user_success = userQuery.get().getSugSuccess();
                             }
                             Double userProb = 0.0;
-                            for (int i = 0; i < user_success; i++) {
-                                userProb = calculateUserProbability(number_of_times_sent, number_of_success, 1, user_attempts);
-                            }
-                            for (int i = 0; i < user_attempts - user_success; i++) {
-                                userProb = calculateUserProbability(number_of_times_sent, number_of_success, 0, user_attempts);
-                            }
+                            userProb = calculateUserProbability(number_of_times_sent, number_of_success,user_success, user_attempts);
 
                             //Update user probability of each strategy, user attempts and user success on mongodb
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugProb", userProb));
@@ -142,12 +137,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                             }
 
                             Double userProb = 0.0;
-                            for (int i = 0; i < user_success; i++) {
-                                userProb = calculateUserProbability(number_of_times_sent, number_of_success, 1, user_attempts);
-                            }
-                            for (int i = 0; i < user_attempts - user_success; i++) {
-                                userProb = calculateUserProbability(number_of_times_sent, number_of_success, 0, user_attempts);
-                            }
+                            userProb = calculateUserProbability(number_of_times_sent, number_of_success,user_success, user_attempts);
+
                             //Update user probability of each strategy, user attempts and user success on mongodb
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compProb", userProb));
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", user_attempts));
@@ -179,12 +170,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                                 user_success = userQuery.get().getSelfSuccess();
                             }
                             Double userProb = 0.0;
-                            for (int i = 0; i < user_success; i++) {
-                                userProb = calculateUserProbability(number_of_times_sent, number_of_success, 1, user_attempts);
-                            }
-                            for (int i = 0; i < user_attempts - user_success; i++) {
-                                userProb = calculateUserProbability(number_of_times_sent, number_of_success, 0, user_attempts);
-                            }
+
+                            userProb = calculateUserProbability(number_of_times_sent, number_of_success,user_success, user_attempts);
 
                             //Update user probability of each strategy, user attempts and user success on mongodb
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfProb", userProb));
@@ -218,6 +205,14 @@ public class UpdateStrategiesProbabilities  implements Job{
         }*/
         return (double) p/(n+p);
     }
+    public static double getBinomialDouble(double n, int p) {
+        /*double x = 0.0;
+        for(int i = 0; i < n; i++) {
+            if(Math.random() < p)
+                x++;
+        }*/
+        return (double) p/(n+p);
+    }
     public static  double calculateUserProbability(int total_attempts, int strategy_prob, int attempt, int user_attempts){
         //Get n, p
         //n plh8os prospa9eiwn gia thn sugkekrimenh strathgikh
@@ -226,7 +221,12 @@ public class UpdateStrategiesProbabilities  implements Job{
         //int n=30;
         //double p=0.8;
         double StrategyProbability= getBinomial(total_attempts, strategy_prob);
-        return getBinomial(attempt+user_attempts,total_attempts-attempt+user_attempts*(1-(int)StrategyProbability));
+        System.out.println(StrategyProbability);
+        //return getBinomial(attempt+user_attempts,total_attempts-attempt+user_attempts*(1-(int)StrategyProbability));
+        int s = total_attempts+strategy_prob;
+        double pi=1.0-StrategyProbability;
+
+        return getBinomialDouble(user_attempts-attempt+pi*s,attempt+total_attempts+strategy_prob);
     }
 
 }

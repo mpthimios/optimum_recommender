@@ -3,8 +3,8 @@ import com.mongodb.MongoClientURI;
 import imu.recommender.CalculateMessageUtilities;
 import imu.recommender.helpers.*;
 import imu.recommender.models.user.Personality;
-import imu.recommender.models.user.ModeUsage;
 import imu.recommender.models.user.User;
+import imu.recommender.jobs.UpdateStrategiesProbabilities;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.CoreMatchers.*;
 import org.junit.Assert;
@@ -13,11 +13,6 @@ import org.junit.matchers.JUnitMatchers.*;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import java.util.*;
-import java.io.*;
-
-import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
-import imu.recommender.Recommender;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class CalculateMessageTest{
@@ -243,7 +238,7 @@ public class CalculateMessageTest{
             j++;
         }
         System.out.println(message);
-        Assert.assertThat(message, CoreMatchers.anyOf( CoreMatchers.is("It s not too far. Take your bike instead of car and reach your weekly goal._suggestion"),CoreMatchers.is("You are near to your destination. It s an opportunity to bike._suggestion") ) );
+        Assert.assertThat(message, CoreMatchers.anyOf( CoreMatchers.is("It s not too far. Take your bike instead of car to  reduce your weekly emissions._suggestion"),CoreMatchers.is("You are near to your destination. It s an opportunity to bike._suggestion") ) );
     }
     @Test
     //Test case 6
@@ -335,5 +330,13 @@ public class CalculateMessageTest{
         String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target, mongoDatastore);
         System.out.println(mes);
         Assert.assertThat(mes, CoreMatchers.is("Last week your emissions are increasing. Try more!_self-monitoring"));
+    }
+    @Test
+    //Test case 8
+    public void CalculateMessageTest8() throws Exception{
+        Double userProb = 0.0;
+        userProb = UpdateStrategiesProbabilities.calculateUserProbability(20, 10, 4, 6);
+        Assert.assertThat(userProb, CoreMatchers.is(0.6071428571428571));
+
     }
 }

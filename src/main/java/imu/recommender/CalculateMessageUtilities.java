@@ -18,7 +18,7 @@ public class CalculateMessageUtilities {
     public static String calculateForUser(List<String> contextList, User user, String target, Datastore mongoDatastore) throws Exception {
 
         //Get personality of user
-        String personality = user.getUserPersonalityType(user.getId());
+        String personality = user.getUserPersonalityType(user.getId(), mongoDatastore);
         //Get the most convincing persuasive strategy
         List<String> strategies = user.getBestPersuasiveStrategy(personality);
         String strategy = strategies.get(0);

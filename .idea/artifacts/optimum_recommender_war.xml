@@ -3,6 +3,13 @@
     <output-path>$PROJECT_DIR$/target</output-path>
     <root id="archive" name="recommender.war">
       <element id="artifact" artifact-name="optimum_recommender:war exploded" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="lib">
+          <element id="file-copy" path="$APPLICATION_HOME_DIR$/lib/groovy-all-2.4.6.jar" />
+          <element id="library" level="project" name="Maven: junit:junit:3.8.1" />
+          <element id="library" level="project" name="org.apache.logging.log4j:log4j-api:2.6.2" />
+        </element>
+      </element>
     </root>
   </artifact>
 </component>

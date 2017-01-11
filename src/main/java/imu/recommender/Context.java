@@ -23,15 +23,15 @@ public class Context {
         //String city = trip.getFrom().getAddress().get().getCity().get();
         Integer duration = trip.getRoute().getDurationSeconds();
 
+        //Connect to mongodb
+        Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+
         //Get personality of user
-        String personality = user.getUserPersonalityType(user.getId());
+        String personality = user.getUserPersonalityType(user.getId(), mongoDatastore);
         //Get the most convincing persuasive strategy
         List<String> strategies = user.getBestPersuasiveStrategy(personality);
         String strategy = strategies.get(0);
         System.out.println(strategy);
-
-        //Connect to mongodb
-        Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 
         List<String> targetList = new ArrayList<String>();
         //Select the messages that the target of message is the same with the mode of route
