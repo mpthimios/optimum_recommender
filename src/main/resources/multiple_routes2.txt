@@ -1,0 +1,5007 @@
+{
+  "routeFormatVersion": "0.16-SNAPSHOT",
+  "requestId": "232",
+  "processedTime": "2017-01-11T14:43:39.963+01:00[Europe/Vienna]",
+  "status": "OK",
+  "coordinateReferenceSystem": "EPSG:4326",
+  "request": {
+    "from": {
+      "type": "Location",
+      "coordinate": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.366045475006104,
+            48.20187793582228
+          ]
+        },
+        "properties": {}
+      }
+    },
+    "to": {
+      "type": "Location",
+      "coordinate": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.369307041168213,
+            48.202020952840776
+          ]
+        },
+        "properties": {}
+      }
+    },
+    "modesOfTransport": [
+      {
+        "type": "RequestModeOfTransport",
+        "modeOfTransport": {
+          "generalizedType": "FOOT",
+          "detailedType": "FOOT",
+          "id": "foot"
+        }
+      },
+      {
+        "type": "RequestModeOfTransport",
+        "modeOfTransport": {
+          "generalizedType": "CAR",
+          "detailedType": "CAR",
+          "id": "car"
+        },
+        "locations": [
+          {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.366045475006104,
+                  48.20187793582228
+                ]
+              },
+              "properties": {}
+            }
+          }
+        ]
+      },
+      {
+        "type": "RequestModeOfTransport",
+        "modeOfTransport": {
+          "generalizedType": "CAR",
+          "id": "car2go",
+          "operator": {
+            "name": "CAR2GO_VIENNA"
+          },
+          "sharingType": "FREE_FLOATING_VEHICLE_SHARING"
+        }
+      }
+    ],
+    "optimizedFor": "DISTANCE",
+    "siteId": "vienna",
+    "departureTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+    "language": "en",
+    "serviceId": "vienna"
+  },
+  "routes": [
+    {
+      "from": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.366044,
+              48.2018807
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "to": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.3693026,
+              48.202022
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "distanceMeters": 338,
+      "durationSeconds": 247,
+      "segments": [
+        {
+          "nr": 1,
+          "from": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.366044,
+                  48.2018807
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "to": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3693026,
+                  48.202022
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "distanceMeters": 338,
+          "durationSeconds": 247,
+          "modeOfTransport": {
+            "generalizedType": "FOOT",
+            "detailedType": "FOOT"
+          },
+          "boardingSeconds": 0,
+          "alightingSeconds": 0,
+          "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+          "endTime": "2017-01-11T14:47:44+01:00[Europe/Vienna]",
+          "geometryGeoJson": {
+            "type": "Feature",
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  16.366044,
+                  48.2018807
+                ],
+                [
+                  16.3660469,
+                  48.2018814
+                ],
+                [
+                  16.3661079,
+                  48.2019119
+                ],
+                [
+                  16.3661652,
+                  48.2019501
+                ],
+                [
+                  16.3662853,
+                  48.2019234
+                ],
+                [
+                  16.3664398,
+                  48.2022362
+                ],
+                [
+                  16.3667088,
+                  48.2022018
+                ],
+                [
+                  16.3676434,
+                  48.201992
+                ],
+                [
+                  16.3675709,
+                  48.2018547
+                ],
+                [
+                  16.3676338,
+                  48.2018852
+                ],
+                [
+                  16.3677082,
+                  48.2019806
+                ],
+                [
+                  16.3677444,
+                  48.201973
+                ],
+                [
+                  16.368824,
+                  48.2017365
+                ],
+                [
+                  16.3691311,
+                  48.2016716
+                ],
+                [
+                  16.3691635,
+                  48.2017403
+                ],
+                [
+                  16.3693026,
+                  48.202022
+                ]
+              ]
+            },
+            "properties": {}
+          },
+          "geometryGeoJsonEdges": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366044,
+                      48.2018807
+                    ],
+                    [
+                      16.3660469,
+                      48.2018814
+                    ],
+                    [
+                      16.3661079,
+                      48.2019119
+                    ],
+                    [
+                      16.3661652,
+                      48.2019501
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": ""
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3661652,
+                      48.2019501
+                    ],
+                    [
+                      16.3662853,
+                      48.2019234
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "",
+                  "way": 172464283
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662853,
+                      48.2019234
+                    ],
+                    [
+                      16.3664398,
+                      48.2022362
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Schillerplatz",
+                  "way": 25678124
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3664398,
+                      48.2022362
+                    ],
+                    [
+                      16.3667088,
+                      48.2022018
+                    ],
+                    [
+                      16.3676434,
+                      48.201992
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "ElisabethstraÃŸe",
+                  "way": 5930461
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3676434,
+                      48.201992
+                    ],
+                    [
+                      16.3675709,
+                      48.2018547
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Operngasse",
+                  "way": 231265406
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3675709,
+                      48.2018547
+                    ],
+                    [
+                      16.3676338,
+                      48.2018852
+                    ],
+                    [
+                      16.3677082,
+                      48.2019806
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Operngasse",
+                  "way": 231265407
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3677082,
+                      48.2019806
+                    ],
+                    [
+                      16.3677444,
+                      48.201973
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "ElisabethstraÃŸe",
+                  "way": 5930451
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3677444,
+                      48.201973
+                    ],
+                    [
+                      16.368824,
+                      48.2017365
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "ElisabethstraÃŸe",
+                  "way": 5930451
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368824,
+                      48.2017365
+                    ],
+                    [
+                      16.3691311,
+                      48.2016716
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "ElisabethstraÃŸe",
+                  "way": 5930451
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3691311,
+                      48.2016716
+                    ],
+                    [
+                      16.3691635,
+                      48.2017403
+                    ],
+                    [
+                      16.3693026,
+                      48.202022
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+      "endTime": "2017-01-11T14:47:44+01:00[Europe/Vienna]",
+      "boundingBox": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                16.366044,
+                48.2016716
+              ],
+              [
+                16.366044,
+                48.2022362
+              ],
+              [
+                16.3693026,
+                48.2022362
+              ],
+              [
+                16.3693026,
+                48.2016716
+              ],
+              [
+                16.366044,
+                48.2016716
+              ]
+            ]
+          ]
+        },
+        "properties": {}
+      }
+    },
+    {
+      "from": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.366044,
+              48.2018807
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "to": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.3693026,
+              48.202022
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "distanceMeters": 768,
+      "durationSeconds": 167,
+      "segments": [
+        {
+          "nr": 1,
+          "from": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.366044,
+                  48.2018807
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "to": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3662422,
+                  48.2018352
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "distanceMeters": 32,
+          "durationSeconds": 22,
+          "modeOfTransport": {
+            "generalizedType": "FOOT",
+            "detailedType": "FOOT"
+          },
+          "boardingSeconds": 0,
+          "alightingSeconds": 0,
+          "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+          "endTime": "2017-01-11T14:43:59+01:00[Europe/Vienna]",
+          "geometryGeoJson": {
+            "type": "Feature",
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  16.366044,
+                  48.2018807
+                ],
+                [
+                  16.3660469,
+                  48.2018814
+                ],
+                [
+                  16.3661079,
+                  48.2019119
+                ],
+                [
+                  16.3661652,
+                  48.2019501
+                ],
+                [
+                  16.3662853,
+                  48.2019234
+                ],
+                [
+                  16.3662422,
+                  48.2018352
+                ]
+              ]
+            },
+            "properties": {}
+          },
+          "geometryGeoJsonEdges": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366044,
+                      48.2018807
+                    ],
+                    [
+                      16.3660469,
+                      48.2018814
+                    ],
+                    [
+                      16.3661079,
+                      48.2019119
+                    ],
+                    [
+                      16.3661652,
+                      48.2019501
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": ""
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3661652,
+                      48.2019501
+                    ],
+                    [
+                      16.3662853,
+                      48.2019234
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "",
+                  "way": 172464283
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662853,
+                      48.2019234
+                    ],
+                    [
+                      16.3662422,
+                      48.2018352
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Schillerplatz"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "nr": 2,
+          "from": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3662422,
+                  48.2018352
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "to": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3693026,
+                  48.202022
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "distanceMeters": 736,
+          "durationSeconds": 145,
+          "modeOfTransport": {
+            "generalizedType": "CAR",
+            "detailedType": "CAR"
+          },
+          "boardingSeconds": 60,
+          "alightingSeconds": 0,
+          "startTime": "2017-01-11T14:43:59+01:00[Europe/Vienna]",
+          "endTime": "2017-01-11T14:46:24+01:00[Europe/Vienna]",
+          "geometryGeoJson": {
+            "type": "Feature",
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  16.3662422,
+                  48.2018352
+                ],
+                [
+                  16.3661213,
+                  48.2015877
+                ],
+                [
+                  16.3670686,
+                  48.2013772
+                ],
+                [
+                  16.3671856,
+                  48.2013512
+                ],
+                [
+                  16.3673058,
+                  48.2013321
+                ],
+                [
+                  16.3672237,
+                  48.2012749
+                ],
+                [
+                  16.3670731,
+                  48.2010689
+                ],
+                [
+                  16.3669281,
+                  48.2008629
+                ],
+                [
+                  16.3667049,
+                  48.2007103
+                ],
+                [
+                  16.366497,
+                  48.2005768
+                ],
+                [
+                  16.3660431,
+                  48.2002907
+                ],
+                [
+                  16.3657627,
+                  48.2001152
+                ],
+                [
+                  16.3656464,
+                  48.2000389
+                ],
+                [
+                  16.3657169,
+                  48.1999855
+                ],
+                [
+                  16.365799,
+                  48.1999245
+                ],
+                [
+                  16.3660049,
+                  48.1997948
+                ],
+                [
+                  16.3660603,
+                  48.1997681
+                ],
+                [
+                  16.3661366,
+                  48.1997643
+                ],
+                [
+                  16.3662243,
+                  48.1997719
+                ],
+                [
+                  16.3665447,
+                  48.1999397
+                ],
+                [
+                  16.366724,
+                  48.2000465
+                ],
+                [
+                  16.3668995,
+                  48.2001457
+                ],
+                [
+                  16.366993,
+                  48.2001953
+                ],
+                [
+                  16.3671284,
+                  48.2002678
+                ],
+                [
+                  16.3671722,
+                  48.2002907
+                ],
+                [
+                  16.3673553,
+                  48.2003899
+                ],
+                [
+                  16.3676643,
+                  48.2005463
+                ],
+                [
+                  16.3677921,
+                  48.2006111
+                ],
+                [
+                  16.3680573,
+                  48.200737
+                ],
+                [
+                  16.3683338,
+                  48.2008057
+                ],
+                [
+                  16.3686447,
+                  48.2008553
+                ],
+                [
+                  16.3687286,
+                  48.2008667
+                ],
+                [
+                  16.368906,
+                  48.2009277
+                ],
+                [
+                  16.368948,
+                  48.2010155
+                ],
+                [
+                  16.368906,
+                  48.2010994
+                ],
+                [
+                  16.3689156,
+                  48.2011986
+                ],
+                [
+                  16.3689919,
+                  48.2013741
+                ],
+                [
+                  16.3690243,
+                  48.2014542
+                ],
+                [
+                  16.3690739,
+                  48.2015533
+                ],
+                [
+                  16.3691311,
+                  48.2016716
+                ],
+                [
+                  16.3691635,
+                  48.2017403
+                ],
+                [
+                  16.3693026,
+                  48.202022
+                ]
+              ]
+            },
+            "properties": {}
+          },
+          "geometryGeoJsonEdges": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662422,
+                      48.2018352
+                    ],
+                    [
+                      16.3661213,
+                      48.2015877
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Schillerplatz"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3661213,
+                      48.2015877
+                    ],
+                    [
+                      16.3670686,
+                      48.2013772
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3670686,
+                      48.2013772
+                    ],
+                    [
+                      16.3671856,
+                      48.2013512
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671856,
+                      48.2013512
+                    ],
+                    [
+                      16.3673058,
+                      48.2013321
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse",
+                  "way": 172464282
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3673058,
+                      48.2013321
+                    ],
+                    [
+                      16.3672237,
+                      48.2012749
+                    ],
+                    [
+                      16.3670731,
+                      48.2010689
+                    ],
+                    [
+                      16.3669281,
+                      48.2008629
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 231265404
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3669281,
+                      48.2008629
+                    ],
+                    [
+                      16.3667049,
+                      48.2007103
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 31275224
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3667049,
+                      48.2007103
+                    ],
+                    [
+                      16.366497,
+                      48.2005768
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 31275225
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366497,
+                      48.2005768
+                    ],
+                    [
+                      16.3660431,
+                      48.2002907
+                    ],
+                    [
+                      16.3657627,
+                      48.2001152
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 422392731
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3657627,
+                      48.2001152
+                    ],
+                    [
+                      16.3656464,
+                      48.2000389
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 422392731
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3656464,
+                      48.2000389
+                    ],
+                    [
+                      16.3657169,
+                      48.1999855
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291149
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3657169,
+                      48.1999855
+                    ],
+                    [
+                      16.365799,
+                      48.1999245
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291149
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.365799,
+                      48.1999245
+                    ],
+                    [
+                      16.3660049,
+                      48.1997948
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291150
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3660049,
+                      48.1997948
+                    ],
+                    [
+                      16.3660603,
+                      48.1997681
+                    ],
+                    [
+                      16.3661366,
+                      48.1997643
+                    ],
+                    [
+                      16.3662243,
+                      48.1997719
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291150
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662243,
+                      48.1997719
+                    ],
+                    [
+                      16.3665447,
+                      48.1999397
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 31275222
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3665447,
+                      48.1999397
+                    ],
+                    [
+                      16.366724,
+                      48.2000465
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 432792248
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366724,
+                      48.2000465
+                    ],
+                    [
+                      16.3668995,
+                      48.2001457
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 155291159
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3668995,
+                      48.2001457
+                    ],
+                    [
+                      16.366993,
+                      48.2001953
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366993,
+                      48.2001953
+                    ],
+                    [
+                      16.3671284,
+                      48.2002678
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671284,
+                      48.2002678
+                    ],
+                    [
+                      16.3671722,
+                      48.2002907
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671722,
+                      48.2002907
+                    ],
+                    [
+                      16.3673553,
+                      48.2003899
+                    ],
+                    [
+                      16.3676643,
+                      48.2005463
+                    ],
+                    [
+                      16.3677921,
+                      48.2006111
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3677921,
+                      48.2006111
+                    ],
+                    [
+                      16.3680573,
+                      48.200737
+                    ],
+                    [
+                      16.3683338,
+                      48.2008057
+                    ],
+                    [
+                      16.3686447,
+                      48.2008553
+                    ],
+                    [
+                      16.3687286,
+                      48.2008667
+                    ],
+                    [
+                      16.368906,
+                      48.2009277
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 5891878
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368906,
+                      48.2009277
+                    ],
+                    [
+                      16.368948,
+                      48.2010155
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856397
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368948,
+                      48.2010155
+                    ],
+                    [
+                      16.368906,
+                      48.2010994
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368906,
+                      48.2010994
+                    ],
+                    [
+                      16.3689156,
+                      48.2011986
+                    ],
+                    [
+                      16.3689919,
+                      48.2013741
+                    ],
+                    [
+                      16.3690243,
+                      48.2014542
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3690243,
+                      48.2014542
+                    ],
+                    [
+                      16.3690739,
+                      48.2015533
+                    ],
+                    [
+                      16.3691311,
+                      48.2016716
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3691311,
+                      48.2016716
+                    ],
+                    [
+                      16.3691635,
+                      48.2017403
+                    ],
+                    [
+                      16.3693026,
+                      48.202022
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+      "endTime": "2017-01-11T14:46:24+01:00[Europe/Vienna]",
+      "boundingBox": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                16.3656464,
+                48.1997643
+              ],
+              [
+                16.3656464,
+                48.202022
+              ],
+              [
+                16.3693026,
+                48.202022
+              ],
+              [
+                16.3693026,
+                48.1997643
+              ],
+              [
+                16.3656464,
+                48.1997643
+              ]
+            ]
+          ]
+        },
+        "properties": {}
+      }
+    },
+    {
+      "from": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.366044,
+              48.2018807
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "to": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.3693026,
+              48.202022
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "distanceMeters": 768,
+      "durationSeconds": 225,
+      "segments": [
+        {
+          "nr": 1,
+          "from": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.366044,
+                  48.2018807
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "to": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3670686,
+                  48.2013772
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "distanceMeters": 135,
+          "durationSeconds": 98,
+          "modeOfTransport": {
+            "generalizedType": "FOOT",
+            "detailedType": "FOOT"
+          },
+          "boardingSeconds": 0,
+          "alightingSeconds": 0,
+          "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+          "endTime": "2017-01-11T14:45:15+01:00[Europe/Vienna]",
+          "geometryGeoJson": {
+            "type": "Feature",
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  16.366044,
+                  48.2018807
+                ],
+                [
+                  16.3660469,
+                  48.2018814
+                ],
+                [
+                  16.3661079,
+                  48.2019119
+                ],
+                [
+                  16.3661652,
+                  48.2019501
+                ],
+                [
+                  16.3662853,
+                  48.2019234
+                ],
+                [
+                  16.3662422,
+                  48.2018352
+                ],
+                [
+                  16.3661213,
+                  48.2015877
+                ],
+                [
+                  16.3670686,
+                  48.2013772
+                ]
+              ]
+            },
+            "properties": {}
+          },
+          "geometryGeoJsonEdges": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366044,
+                      48.2018807
+                    ],
+                    [
+                      16.3660469,
+                      48.2018814
+                    ],
+                    [
+                      16.3661079,
+                      48.2019119
+                    ],
+                    [
+                      16.3661652,
+                      48.2019501
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": ""
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3661652,
+                      48.2019501
+                    ],
+                    [
+                      16.3662853,
+                      48.2019234
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "",
+                  "way": 172464283
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662853,
+                      48.2019234
+                    ],
+                    [
+                      16.3662422,
+                      48.2018352
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Schillerplatz"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662422,
+                      48.2018352
+                    ],
+                    [
+                      16.3661213,
+                      48.2015877
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Schillerplatz"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3661213,
+                      48.2015877
+                    ],
+                    [
+                      16.3670686,
+                      48.2013772
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "nr": 2,
+          "from": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3670686,
+                  48.2013772
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "to": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3693026,
+                  48.202022
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "distanceMeters": 633,
+          "durationSeconds": 127,
+          "modeOfTransport": {
+            "generalizedType": "CAR",
+            "operator": {
+              "name": "Car2Go Wien",
+              "website": "https://www.car2go.com/AT/de/"
+            },
+            "sharingType": "FREE_FLOATING_VEHICLE_SHARING",
+            "additionalInfo": {
+              "address": "Operngasse 16, 1010 Wien",
+              "charging": false,
+              "coordinates": {
+                "latitude": 48.2015,
+                "longitude": 16.36713,
+                "altitude": 0
+              },
+              "engineType": "CE",
+              "exteriorState": "GOOD",
+              "fuelPercentage": 70,
+              "id": "WME4513341K831542",
+              "interiorState": "GOOD",
+              "number": "1437",
+              "numberplate": "W-85312C",
+              "smartPhoneRequired": true
+            }
+          },
+          "boardingSeconds": 60,
+          "alightingSeconds": 0,
+          "startTime": "2017-01-11T14:45:15+01:00[Europe/Vienna]",
+          "endTime": "2017-01-11T14:47:22+01:00[Europe/Vienna]",
+          "geometryGeoJson": {
+            "type": "Feature",
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  16.3670686,
+                  48.2013772
+                ],
+                [
+                  16.3671856,
+                  48.2013512
+                ],
+                [
+                  16.3673058,
+                  48.2013321
+                ],
+                [
+                  16.3672237,
+                  48.2012749
+                ],
+                [
+                  16.3670731,
+                  48.2010689
+                ],
+                [
+                  16.3669281,
+                  48.2008629
+                ],
+                [
+                  16.3667049,
+                  48.2007103
+                ],
+                [
+                  16.366497,
+                  48.2005768
+                ],
+                [
+                  16.3660431,
+                  48.2002907
+                ],
+                [
+                  16.3657627,
+                  48.2001152
+                ],
+                [
+                  16.3656464,
+                  48.2000389
+                ],
+                [
+                  16.3657169,
+                  48.1999855
+                ],
+                [
+                  16.365799,
+                  48.1999245
+                ],
+                [
+                  16.3660049,
+                  48.1997948
+                ],
+                [
+                  16.3660603,
+                  48.1997681
+                ],
+                [
+                  16.3661366,
+                  48.1997643
+                ],
+                [
+                  16.3662243,
+                  48.1997719
+                ],
+                [
+                  16.3665447,
+                  48.1999397
+                ],
+                [
+                  16.366724,
+                  48.2000465
+                ],
+                [
+                  16.3668995,
+                  48.2001457
+                ],
+                [
+                  16.366993,
+                  48.2001953
+                ],
+                [
+                  16.3671284,
+                  48.2002678
+                ],
+                [
+                  16.3671722,
+                  48.2002907
+                ],
+                [
+                  16.3673553,
+                  48.2003899
+                ],
+                [
+                  16.3676643,
+                  48.2005463
+                ],
+                [
+                  16.3677921,
+                  48.2006111
+                ],
+                [
+                  16.3680573,
+                  48.200737
+                ],
+                [
+                  16.3683338,
+                  48.2008057
+                ],
+                [
+                  16.3686447,
+                  48.2008553
+                ],
+                [
+                  16.3687286,
+                  48.2008667
+                ],
+                [
+                  16.368906,
+                  48.2009277
+                ],
+                [
+                  16.368948,
+                  48.2010155
+                ],
+                [
+                  16.368906,
+                  48.2010994
+                ],
+                [
+                  16.3689156,
+                  48.2011986
+                ],
+                [
+                  16.3689919,
+                  48.2013741
+                ],
+                [
+                  16.3690243,
+                  48.2014542
+                ],
+                [
+                  16.3690739,
+                  48.2015533
+                ],
+                [
+                  16.3691311,
+                  48.2016716
+                ],
+                [
+                  16.3691635,
+                  48.2017403
+                ],
+                [
+                  16.3693026,
+                  48.202022
+                ]
+              ]
+            },
+            "properties": {}
+          },
+          "geometryGeoJsonEdges": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3670686,
+                      48.2013772
+                    ],
+                    [
+                      16.3671856,
+                      48.2013512
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671856,
+                      48.2013512
+                    ],
+                    [
+                      16.3673058,
+                      48.2013321
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse",
+                  "way": 172464282
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3673058,
+                      48.2013321
+                    ],
+                    [
+                      16.3672237,
+                      48.2012749
+                    ],
+                    [
+                      16.3670731,
+                      48.2010689
+                    ],
+                    [
+                      16.3669281,
+                      48.2008629
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 231265404
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3669281,
+                      48.2008629
+                    ],
+                    [
+                      16.3667049,
+                      48.2007103
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 31275224
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3667049,
+                      48.2007103
+                    ],
+                    [
+                      16.366497,
+                      48.2005768
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 31275225
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366497,
+                      48.2005768
+                    ],
+                    [
+                      16.3660431,
+                      48.2002907
+                    ],
+                    [
+                      16.3657627,
+                      48.2001152
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 422392731
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3657627,
+                      48.2001152
+                    ],
+                    [
+                      16.3656464,
+                      48.2000389
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 422392731
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3656464,
+                      48.2000389
+                    ],
+                    [
+                      16.3657169,
+                      48.1999855
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291149
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3657169,
+                      48.1999855
+                    ],
+                    [
+                      16.365799,
+                      48.1999245
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291149
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.365799,
+                      48.1999245
+                    ],
+                    [
+                      16.3660049,
+                      48.1997948
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291150
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3660049,
+                      48.1997948
+                    ],
+                    [
+                      16.3660603,
+                      48.1997681
+                    ],
+                    [
+                      16.3661366,
+                      48.1997643
+                    ],
+                    [
+                      16.3662243,
+                      48.1997719
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291150
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662243,
+                      48.1997719
+                    ],
+                    [
+                      16.3665447,
+                      48.1999397
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 31275222
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3665447,
+                      48.1999397
+                    ],
+                    [
+                      16.366724,
+                      48.2000465
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 432792248
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366724,
+                      48.2000465
+                    ],
+                    [
+                      16.3668995,
+                      48.2001457
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 155291159
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3668995,
+                      48.2001457
+                    ],
+                    [
+                      16.366993,
+                      48.2001953
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366993,
+                      48.2001953
+                    ],
+                    [
+                      16.3671284,
+                      48.2002678
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671284,
+                      48.2002678
+                    ],
+                    [
+                      16.3671722,
+                      48.2002907
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671722,
+                      48.2002907
+                    ],
+                    [
+                      16.3673553,
+                      48.2003899
+                    ],
+                    [
+                      16.3676643,
+                      48.2005463
+                    ],
+                    [
+                      16.3677921,
+                      48.2006111
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3677921,
+                      48.2006111
+                    ],
+                    [
+                      16.3680573,
+                      48.200737
+                    ],
+                    [
+                      16.3683338,
+                      48.2008057
+                    ],
+                    [
+                      16.3686447,
+                      48.2008553
+                    ],
+                    [
+                      16.3687286,
+                      48.2008667
+                    ],
+                    [
+                      16.368906,
+                      48.2009277
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 5891878
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368906,
+                      48.2009277
+                    ],
+                    [
+                      16.368948,
+                      48.2010155
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856397
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368948,
+                      48.2010155
+                    ],
+                    [
+                      16.368906,
+                      48.2010994
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368906,
+                      48.2010994
+                    ],
+                    [
+                      16.3689156,
+                      48.2011986
+                    ],
+                    [
+                      16.3689919,
+                      48.2013741
+                    ],
+                    [
+                      16.3690243,
+                      48.2014542
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3690243,
+                      48.2014542
+                    ],
+                    [
+                      16.3690739,
+                      48.2015533
+                    ],
+                    [
+                      16.3691311,
+                      48.2016716
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3691311,
+                      48.2016716
+                    ],
+                    [
+                      16.3691635,
+                      48.2017403
+                    ],
+                    [
+                      16.3693026,
+                      48.202022
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+      "endTime": "2017-01-11T14:47:22+01:00[Europe/Vienna]",
+      "boundingBox": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                16.3656464,
+                48.1997643
+              ],
+              [
+                16.3656464,
+                48.202022
+              ],
+              [
+                16.3693026,
+                48.202022
+              ],
+              [
+                16.3693026,
+                48.1997643
+              ],
+              [
+                16.3656464,
+                48.1997643
+              ]
+            ]
+          ]
+        },
+        "properties": {}
+      }
+    },
+    {
+      "from": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.366044,
+              48.2018807
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "to": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.3693026,
+              48.202022
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "distanceMeters": 768,
+      "durationSeconds": 225,
+      "segments": [
+        {
+          "nr": 1,
+          "from": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.366044,
+                  48.2018807
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "to": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3670686,
+                  48.2013772
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "distanceMeters": 135,
+          "durationSeconds": 98,
+          "modeOfTransport": {
+            "generalizedType": "FOOT",
+            "detailedType": "FOOT"
+          },
+          "boardingSeconds": 0,
+          "alightingSeconds": 0,
+          "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+          "endTime": "2017-01-11T14:45:15+01:00[Europe/Vienna]",
+          "geometryGeoJson": {
+            "type": "Feature",
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  16.366044,
+                  48.2018807
+                ],
+                [
+                  16.3660469,
+                  48.2018814
+                ],
+                [
+                  16.3661079,
+                  48.2019119
+                ],
+                [
+                  16.3661652,
+                  48.2019501
+                ],
+                [
+                  16.3662853,
+                  48.2019234
+                ],
+                [
+                  16.3662422,
+                  48.2018352
+                ],
+                [
+                  16.3661213,
+                  48.2015877
+                ],
+                [
+                  16.3670686,
+                  48.2013772
+                ]
+              ]
+            },
+            "properties": {}
+          },
+          "geometryGeoJsonEdges": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366044,
+                      48.2018807
+                    ],
+                    [
+                      16.3660469,
+                      48.2018814
+                    ],
+                    [
+                      16.3661079,
+                      48.2019119
+                    ],
+                    [
+                      16.3661652,
+                      48.2019501
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": ""
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3661652,
+                      48.2019501
+                    ],
+                    [
+                      16.3662853,
+                      48.2019234
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "",
+                  "way": 172464283
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662853,
+                      48.2019234
+                    ],
+                    [
+                      16.3662422,
+                      48.2018352
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Schillerplatz"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662422,
+                      48.2018352
+                    ],
+                    [
+                      16.3661213,
+                      48.2015877
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Schillerplatz"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3661213,
+                      48.2015877
+                    ],
+                    [
+                      16.3670686,
+                      48.2013772
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "nr": 2,
+          "from": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3670686,
+                  48.2013772
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "to": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3693026,
+                  48.202022
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "distanceMeters": 633,
+          "durationSeconds": 127,
+          "modeOfTransport": {
+            "generalizedType": "CAR",
+            "operator": {
+              "name": "Car2Go Wien",
+              "website": "https://www.car2go.com/AT/de/"
+            },
+            "sharingType": "FREE_FLOATING_VEHICLE_SHARING",
+            "additionalInfo": {
+              "address": "Operngasse 16, 1010 Wien",
+              "charging": false,
+              "coordinates": {
+                "latitude": 48.2015,
+                "longitude": 16.36713,
+                "altitude": 0
+              },
+              "engineType": "CE",
+              "exteriorState": "GOOD",
+              "fuelPercentage": 70,
+              "id": "WME4513341K831542",
+              "interiorState": "GOOD",
+              "number": "1437",
+              "numberplate": "W-85312C",
+              "smartPhoneRequired": true
+            }
+          },
+          "boardingSeconds": 60,
+          "alightingSeconds": 0,
+          "startTime": "2017-01-11T14:45:15+01:00[Europe/Vienna]",
+          "endTime": "2017-01-11T14:47:22+01:00[Europe/Vienna]",
+          "geometryGeoJson": {
+            "type": "Feature",
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  16.3670686,
+                  48.2013772
+                ],
+                [
+                  16.3671856,
+                  48.2013512
+                ],
+                [
+                  16.3673058,
+                  48.2013321
+                ],
+                [
+                  16.3672237,
+                  48.2012749
+                ],
+                [
+                  16.3670731,
+                  48.2010689
+                ],
+                [
+                  16.3669281,
+                  48.2008629
+                ],
+                [
+                  16.3667049,
+                  48.2007103
+                ],
+                [
+                  16.366497,
+                  48.2005768
+                ],
+                [
+                  16.3660431,
+                  48.2002907
+                ],
+                [
+                  16.3657627,
+                  48.2001152
+                ],
+                [
+                  16.3656464,
+                  48.2000389
+                ],
+                [
+                  16.3657169,
+                  48.1999855
+                ],
+                [
+                  16.365799,
+                  48.1999245
+                ],
+                [
+                  16.3660049,
+                  48.1997948
+                ],
+                [
+                  16.3660603,
+                  48.1997681
+                ],
+                [
+                  16.3661366,
+                  48.1997643
+                ],
+                [
+                  16.3662243,
+                  48.1997719
+                ],
+                [
+                  16.3665447,
+                  48.1999397
+                ],
+                [
+                  16.366724,
+                  48.2000465
+                ],
+                [
+                  16.3668995,
+                  48.2001457
+                ],
+                [
+                  16.366993,
+                  48.2001953
+                ],
+                [
+                  16.3671284,
+                  48.2002678
+                ],
+                [
+                  16.3671722,
+                  48.2002907
+                ],
+                [
+                  16.3673553,
+                  48.2003899
+                ],
+                [
+                  16.3676643,
+                  48.2005463
+                ],
+                [
+                  16.3677921,
+                  48.2006111
+                ],
+                [
+                  16.3680573,
+                  48.200737
+                ],
+                [
+                  16.3683338,
+                  48.2008057
+                ],
+                [
+                  16.3686447,
+                  48.2008553
+                ],
+                [
+                  16.3687286,
+                  48.2008667
+                ],
+                [
+                  16.368906,
+                  48.2009277
+                ],
+                [
+                  16.368948,
+                  48.2010155
+                ],
+                [
+                  16.368906,
+                  48.2010994
+                ],
+                [
+                  16.3689156,
+                  48.2011986
+                ],
+                [
+                  16.3689919,
+                  48.2013741
+                ],
+                [
+                  16.3690243,
+                  48.2014542
+                ],
+                [
+                  16.3690739,
+                  48.2015533
+                ],
+                [
+                  16.3691311,
+                  48.2016716
+                ],
+                [
+                  16.3691635,
+                  48.2017403
+                ],
+                [
+                  16.3693026,
+                  48.202022
+                ]
+              ]
+            },
+            "properties": {}
+          },
+          "geometryGeoJsonEdges": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3670686,
+                      48.2013772
+                    ],
+                    [
+                      16.3671856,
+                      48.2013512
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671856,
+                      48.2013512
+                    ],
+                    [
+                      16.3673058,
+                      48.2013321
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse",
+                  "way": 172464282
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3673058,
+                      48.2013321
+                    ],
+                    [
+                      16.3672237,
+                      48.2012749
+                    ],
+                    [
+                      16.3670731,
+                      48.2010689
+                    ],
+                    [
+                      16.3669281,
+                      48.2008629
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 231265404
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3669281,
+                      48.2008629
+                    ],
+                    [
+                      16.3667049,
+                      48.2007103
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 31275224
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3667049,
+                      48.2007103
+                    ],
+                    [
+                      16.366497,
+                      48.2005768
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 31275225
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366497,
+                      48.2005768
+                    ],
+                    [
+                      16.3660431,
+                      48.2002907
+                    ],
+                    [
+                      16.3657627,
+                      48.2001152
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 422392731
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3657627,
+                      48.2001152
+                    ],
+                    [
+                      16.3656464,
+                      48.2000389
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 422392731
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3656464,
+                      48.2000389
+                    ],
+                    [
+                      16.3657169,
+                      48.1999855
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291149
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3657169,
+                      48.1999855
+                    ],
+                    [
+                      16.365799,
+                      48.1999245
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291149
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.365799,
+                      48.1999245
+                    ],
+                    [
+                      16.3660049,
+                      48.1997948
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291150
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3660049,
+                      48.1997948
+                    ],
+                    [
+                      16.3660603,
+                      48.1997681
+                    ],
+                    [
+                      16.3661366,
+                      48.1997643
+                    ],
+                    [
+                      16.3662243,
+                      48.1997719
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291150
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662243,
+                      48.1997719
+                    ],
+                    [
+                      16.3665447,
+                      48.1999397
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 31275222
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3665447,
+                      48.1999397
+                    ],
+                    [
+                      16.366724,
+                      48.2000465
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 432792248
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366724,
+                      48.2000465
+                    ],
+                    [
+                      16.3668995,
+                      48.2001457
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 155291159
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3668995,
+                      48.2001457
+                    ],
+                    [
+                      16.366993,
+                      48.2001953
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366993,
+                      48.2001953
+                    ],
+                    [
+                      16.3671284,
+                      48.2002678
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671284,
+                      48.2002678
+                    ],
+                    [
+                      16.3671722,
+                      48.2002907
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671722,
+                      48.2002907
+                    ],
+                    [
+                      16.3673553,
+                      48.2003899
+                    ],
+                    [
+                      16.3676643,
+                      48.2005463
+                    ],
+                    [
+                      16.3677921,
+                      48.2006111
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3677921,
+                      48.2006111
+                    ],
+                    [
+                      16.3680573,
+                      48.200737
+                    ],
+                    [
+                      16.3683338,
+                      48.2008057
+                    ],
+                    [
+                      16.3686447,
+                      48.2008553
+                    ],
+                    [
+                      16.3687286,
+                      48.2008667
+                    ],
+                    [
+                      16.368906,
+                      48.2009277
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 5891878
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368906,
+                      48.2009277
+                    ],
+                    [
+                      16.368948,
+                      48.2010155
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856397
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368948,
+                      48.2010155
+                    ],
+                    [
+                      16.368906,
+                      48.2010994
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368906,
+                      48.2010994
+                    ],
+                    [
+                      16.3689156,
+                      48.2011986
+                    ],
+                    [
+                      16.3689919,
+                      48.2013741
+                    ],
+                    [
+                      16.3690243,
+                      48.2014542
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3690243,
+                      48.2014542
+                    ],
+                    [
+                      16.3690739,
+                      48.2015533
+                    ],
+                    [
+                      16.3691311,
+                      48.2016716
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3691311,
+                      48.2016716
+                    ],
+                    [
+                      16.3691635,
+                      48.2017403
+                    ],
+                    [
+                      16.3693026,
+                      48.202022
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+      "endTime": "2017-01-11T14:47:22+01:00[Europe/Vienna]",
+      "boundingBox": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                16.3656464,
+                48.1997643
+              ],
+              [
+                16.3656464,
+                48.202022
+              ],
+              [
+                16.3693026,
+                48.202022
+              ],
+              [
+                16.3693026,
+                48.1997643
+              ],
+              [
+                16.3656464,
+                48.1997643
+              ]
+            ]
+          ]
+        },
+        "properties": {}
+      }
+    },
+    {
+      "from": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.366044,
+              48.2018807
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "to": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.3693026,
+              48.202022
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "distanceMeters": 768,
+      "durationSeconds": 225,
+      "segments": [
+        {
+          "nr": 1,
+          "from": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.366044,
+                  48.2018807
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "to": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3670686,
+                  48.2013772
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "distanceMeters": 135,
+          "durationSeconds": 98,
+          "modeOfTransport": {
+            "generalizedType": "FOOT",
+            "detailedType": "FOOT"
+          },
+          "boardingSeconds": 0,
+          "alightingSeconds": 0,
+          "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+          "endTime": "2017-01-11T14:45:15+01:00[Europe/Vienna]",
+          "geometryGeoJson": {
+            "type": "Feature",
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  16.366044,
+                  48.2018807
+                ],
+                [
+                  16.3660469,
+                  48.2018814
+                ],
+                [
+                  16.3661079,
+                  48.2019119
+                ],
+                [
+                  16.3661652,
+                  48.2019501
+                ],
+                [
+                  16.3662853,
+                  48.2019234
+                ],
+                [
+                  16.3662422,
+                  48.2018352
+                ],
+                [
+                  16.3661213,
+                  48.2015877
+                ],
+                [
+                  16.3670686,
+                  48.2013772
+                ]
+              ]
+            },
+            "properties": {}
+          },
+          "geometryGeoJsonEdges": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366044,
+                      48.2018807
+                    ],
+                    [
+                      16.3660469,
+                      48.2018814
+                    ],
+                    [
+                      16.3661079,
+                      48.2019119
+                    ],
+                    [
+                      16.3661652,
+                      48.2019501
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": ""
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3661652,
+                      48.2019501
+                    ],
+                    [
+                      16.3662853,
+                      48.2019234
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "",
+                  "way": 172464283
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662853,
+                      48.2019234
+                    ],
+                    [
+                      16.3662422,
+                      48.2018352
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Schillerplatz"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662422,
+                      48.2018352
+                    ],
+                    [
+                      16.3661213,
+                      48.2015877
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Schillerplatz"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3661213,
+                      48.2015877
+                    ],
+                    [
+                      16.3670686,
+                      48.2013772
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "nr": 2,
+          "from": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3670686,
+                  48.2013772
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "to": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3693026,
+                  48.202022
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "distanceMeters": 633,
+          "durationSeconds": 127,
+          "modeOfTransport": {
+            "generalizedType": "CAR",
+            "operator": {
+              "name": "Car2Go Wien",
+              "website": "https://www.car2go.com/AT/de/"
+            },
+            "sharingType": "FREE_FLOATING_VEHICLE_SHARING",
+            "additionalInfo": {
+              "address": "Operngasse 16, 1010 Wien",
+              "charging": false,
+              "coordinates": {
+                "latitude": 48.2015,
+                "longitude": 16.36713,
+                "altitude": 0
+              },
+              "engineType": "CE",
+              "exteriorState": "GOOD",
+              "fuelPercentage": 70,
+              "id": "WME4513341K831542",
+              "interiorState": "GOOD",
+              "number": "1437",
+              "numberplate": "W-85312C",
+              "smartPhoneRequired": true
+            }
+          },
+          "boardingSeconds": 60,
+          "alightingSeconds": 0,
+          "startTime": "2017-01-11T14:45:15+01:00[Europe/Vienna]",
+          "endTime": "2017-01-11T14:47:22+01:00[Europe/Vienna]",
+          "geometryGeoJson": {
+            "type": "Feature",
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  16.3670686,
+                  48.2013772
+                ],
+                [
+                  16.3671856,
+                  48.2013512
+                ],
+                [
+                  16.3673058,
+                  48.2013321
+                ],
+                [
+                  16.3672237,
+                  48.2012749
+                ],
+                [
+                  16.3670731,
+                  48.2010689
+                ],
+                [
+                  16.3669281,
+                  48.2008629
+                ],
+                [
+                  16.3667049,
+                  48.2007103
+                ],
+                [
+                  16.366497,
+                  48.2005768
+                ],
+                [
+                  16.3660431,
+                  48.2002907
+                ],
+                [
+                  16.3657627,
+                  48.2001152
+                ],
+                [
+                  16.3656464,
+                  48.2000389
+                ],
+                [
+                  16.3657169,
+                  48.1999855
+                ],
+                [
+                  16.365799,
+                  48.1999245
+                ],
+                [
+                  16.3660049,
+                  48.1997948
+                ],
+                [
+                  16.3660603,
+                  48.1997681
+                ],
+                [
+                  16.3661366,
+                  48.1997643
+                ],
+                [
+                  16.3662243,
+                  48.1997719
+                ],
+                [
+                  16.3665447,
+                  48.1999397
+                ],
+                [
+                  16.366724,
+                  48.2000465
+                ],
+                [
+                  16.3668995,
+                  48.2001457
+                ],
+                [
+                  16.366993,
+                  48.2001953
+                ],
+                [
+                  16.3671284,
+                  48.2002678
+                ],
+                [
+                  16.3671722,
+                  48.2002907
+                ],
+                [
+                  16.3673553,
+                  48.2003899
+                ],
+                [
+                  16.3676643,
+                  48.2005463
+                ],
+                [
+                  16.3677921,
+                  48.2006111
+                ],
+                [
+                  16.3680573,
+                  48.200737
+                ],
+                [
+                  16.3683338,
+                  48.2008057
+                ],
+                [
+                  16.3686447,
+                  48.2008553
+                ],
+                [
+                  16.3687286,
+                  48.2008667
+                ],
+                [
+                  16.368906,
+                  48.2009277
+                ],
+                [
+                  16.368948,
+                  48.2010155
+                ],
+                [
+                  16.368906,
+                  48.2010994
+                ],
+                [
+                  16.3689156,
+                  48.2011986
+                ],
+                [
+                  16.3689919,
+                  48.2013741
+                ],
+                [
+                  16.3690243,
+                  48.2014542
+                ],
+                [
+                  16.3690739,
+                  48.2015533
+                ],
+                [
+                  16.3691311,
+                  48.2016716
+                ],
+                [
+                  16.3691635,
+                  48.2017403
+                ],
+                [
+                  16.3693026,
+                  48.202022
+                ]
+              ]
+            },
+            "properties": {}
+          },
+          "geometryGeoJsonEdges": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3670686,
+                      48.2013772
+                    ],
+                    [
+                      16.3671856,
+                      48.2013512
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse"
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671856,
+                      48.2013512
+                    ],
+                    [
+                      16.3673058,
+                      48.2013321
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Nibelungengasse",
+                  "way": 172464282
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3673058,
+                      48.2013321
+                    ],
+                    [
+                      16.3672237,
+                      48.2012749
+                    ],
+                    [
+                      16.3670731,
+                      48.2010689
+                    ],
+                    [
+                      16.3669281,
+                      48.2008629
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 231265404
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3669281,
+                      48.2008629
+                    ],
+                    [
+                      16.3667049,
+                      48.2007103
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 31275224
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3667049,
+                      48.2007103
+                    ],
+                    [
+                      16.366497,
+                      48.2005768
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 31275225
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366497,
+                      48.2005768
+                    ],
+                    [
+                      16.3660431,
+                      48.2002907
+                    ],
+                    [
+                      16.3657627,
+                      48.2001152
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 422392731
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3657627,
+                      48.2001152
+                    ],
+                    [
+                      16.3656464,
+                      48.2000389
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "FriedrichstraÃŸe",
+                  "way": 422392731
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3656464,
+                      48.2000389
+                    ],
+                    [
+                      16.3657169,
+                      48.1999855
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291149
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3657169,
+                      48.1999855
+                    ],
+                    [
+                      16.365799,
+                      48.1999245
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291149
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.365799,
+                      48.1999245
+                    ],
+                    [
+                      16.3660049,
+                      48.1997948
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291150
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3660049,
+                      48.1997948
+                    ],
+                    [
+                      16.3660603,
+                      48.1997681
+                    ],
+                    [
+                      16.3661366,
+                      48.1997643
+                    ],
+                    [
+                      16.3662243,
+                      48.1997719
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Getreidemarkt",
+                  "way": 155291150
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662243,
+                      48.1997719
+                    ],
+                    [
+                      16.3665447,
+                      48.1999397
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 31275222
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3665447,
+                      48.1999397
+                    ],
+                    [
+                      16.366724,
+                      48.2000465
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 432792248
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366724,
+                      48.2000465
+                    ],
+                    [
+                      16.3668995,
+                      48.2001457
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 155291159
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3668995,
+                      48.2001457
+                    ],
+                    [
+                      16.366993,
+                      48.2001953
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366993,
+                      48.2001953
+                    ],
+                    [
+                      16.3671284,
+                      48.2002678
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671284,
+                      48.2002678
+                    ],
+                    [
+                      16.3671722,
+                      48.2002907
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3671722,
+                      48.2002907
+                    ],
+                    [
+                      16.3673553,
+                      48.2003899
+                    ],
+                    [
+                      16.3676643,
+                      48.2005463
+                    ],
+                    [
+                      16.3677921,
+                      48.2006111
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 127061653
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3677921,
+                      48.2006111
+                    ],
+                    [
+                      16.3680573,
+                      48.200737
+                    ],
+                    [
+                      16.3683338,
+                      48.2008057
+                    ],
+                    [
+                      16.3686447,
+                      48.2008553
+                    ],
+                    [
+                      16.3687286,
+                      48.2008667
+                    ],
+                    [
+                      16.368906,
+                      48.2009277
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Rechte Wienzeile",
+                  "way": 5891878
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368906,
+                      48.2009277
+                    ],
+                    [
+                      16.368948,
+                      48.2010155
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856397
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368948,
+                      48.2010155
+                    ],
+                    [
+                      16.368906,
+                      48.2010994
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368906,
+                      48.2010994
+                    ],
+                    [
+                      16.3689156,
+                      48.2011986
+                    ],
+                    [
+                      16.3689919,
+                      48.2013741
+                    ],
+                    [
+                      16.3690243,
+                      48.2014542
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3690243,
+                      48.2014542
+                    ],
+                    [
+                      16.3690739,
+                      48.2015533
+                    ],
+                    [
+                      16.3691311,
+                      48.2016716
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe",
+                  "way": 201856399
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3691311,
+                      48.2016716
+                    ],
+                    [
+                      16.3691635,
+                      48.2017403
+                    ],
+                    [
+                      16.3693026,
+                      48.202022
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+      "endTime": "2017-01-11T14:47:22+01:00[Europe/Vienna]",
+      "boundingBox": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                16.3656464,
+                48.1997643
+              ],
+              [
+                16.3656464,
+                48.202022
+              ],
+              [
+                16.3693026,
+                48.202022
+              ],
+              [
+                16.3693026,
+                48.1997643
+              ],
+              [
+                16.3656464,
+                48.1997643
+              ]
+            ]
+          ]
+        },
+        "properties": {}
+      }
+    },
+    {
+      "from": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.366044,
+              48.2018807
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "to": {
+        "type": "Location",
+        "coordinate": {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              16.3693026,
+              48.202022
+            ]
+          },
+          "properties": {}
+        }
+      },
+      "distanceMeters": 338,
+      "durationSeconds": 247,
+      "segments": [
+        {
+          "nr": 1,
+          "from": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.366044,
+                  48.2018807
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "to": {
+            "type": "Location",
+            "coordinate": {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  16.3693026,
+                  48.202022
+                ]
+              },
+              "properties": {}
+            }
+          },
+          "distanceMeters": 338,
+          "durationSeconds": 247,
+          "modeOfTransport": {
+            "generalizedType": "FOOT",
+            "detailedType": "FOOT"
+          },
+          "boardingSeconds": 0,
+          "alightingSeconds": 0,
+          "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+          "endTime": "2017-01-11T14:47:44+01:00[Europe/Vienna]",
+          "geometryGeoJson": {
+            "type": "Feature",
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  16.366044,
+                  48.2018807
+                ],
+                [
+                  16.3660469,
+                  48.2018814
+                ],
+                [
+                  16.3661079,
+                  48.2019119
+                ],
+                [
+                  16.3661652,
+                  48.2019501
+                ],
+                [
+                  16.3662853,
+                  48.2019234
+                ],
+                [
+                  16.3664398,
+                  48.2022362
+                ],
+                [
+                  16.3667088,
+                  48.2022018
+                ],
+                [
+                  16.3676434,
+                  48.201992
+                ],
+                [
+                  16.3675709,
+                  48.2018547
+                ],
+                [
+                  16.3676338,
+                  48.2018852
+                ],
+                [
+                  16.3677082,
+                  48.2019806
+                ],
+                [
+                  16.3677444,
+                  48.201973
+                ],
+                [
+                  16.368824,
+                  48.2017365
+                ],
+                [
+                  16.3691311,
+                  48.2016716
+                ],
+                [
+                  16.3691635,
+                  48.2017403
+                ],
+                [
+                  16.3693026,
+                  48.202022
+                ]
+              ]
+            },
+            "properties": {}
+          },
+          "geometryGeoJsonEdges": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.366044,
+                      48.2018807
+                    ],
+                    [
+                      16.3660469,
+                      48.2018814
+                    ],
+                    [
+                      16.3661079,
+                      48.2019119
+                    ],
+                    [
+                      16.3661652,
+                      48.2019501
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": ""
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3661652,
+                      48.2019501
+                    ],
+                    [
+                      16.3662853,
+                      48.2019234
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "",
+                  "way": 172464283
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3662853,
+                      48.2019234
+                    ],
+                    [
+                      16.3664398,
+                      48.2022362
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Schillerplatz",
+                  "way": 25678124
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3664398,
+                      48.2022362
+                    ],
+                    [
+                      16.3667088,
+                      48.2022018
+                    ],
+                    [
+                      16.3676434,
+                      48.201992
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "ElisabethstraÃŸe",
+                  "way": 5930461
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3676434,
+                      48.201992
+                    ],
+                    [
+                      16.3675709,
+                      48.2018547
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Operngasse",
+                  "way": 231265406
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3675709,
+                      48.2018547
+                    ],
+                    [
+                      16.3676338,
+                      48.2018852
+                    ],
+                    [
+                      16.3677082,
+                      48.2019806
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "Operngasse",
+                  "way": 231265407
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3677082,
+                      48.2019806
+                    ],
+                    [
+                      16.3677444,
+                      48.201973
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "ElisabethstraÃŸe",
+                  "way": 5930451
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3677444,
+                      48.201973
+                    ],
+                    [
+                      16.368824,
+                      48.2017365
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "ElisabethstraÃŸe",
+                  "way": 5930451
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.368824,
+                      48.2017365
+                    ],
+                    [
+                      16.3691311,
+                      48.2016716
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "ElisabethstraÃŸe",
+                  "way": 5930451
+                }
+              },
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "LineString",
+                  "coordinates": [
+                    [
+                      16.3691311,
+                      48.2016716
+                    ],
+                    [
+                      16.3691635,
+                      48.2017403
+                    ],
+                    [
+                      16.3693026,
+                      48.202022
+                    ]
+                  ]
+                },
+                "properties": {
+                  "edgename": "KÃ¤rntner StraÃŸe"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "startTime": "2017-01-11T14:43:37+01:00[Europe/Vienna]",
+      "endTime": "2017-01-11T14:47:44+01:00[Europe/Vienna]",
+      "boundingBox": {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                16.366044,
+                48.2016716
+              ],
+              [
+                16.366044,
+                48.2022362
+              ],
+              [
+                16.3693026,
+                48.2022362
+              ],
+              [
+                16.3693026,
+                48.2016716
+              ],
+              [
+                16.366044,
+                48.2016716
+              ]
+            ]
+          ]
+        },
+        "properties": {}
+      }
+    }
+  ],
+  "additionalInfo": {
+    "computationTimeMs": 2442
+  }
+}

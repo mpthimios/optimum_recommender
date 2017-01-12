@@ -33,7 +33,6 @@ public class WeatherInfo implements ServletContextListener {
         WeatherStatusResponse currentWeather;
 
         String url = "http://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+lon+"&appid="+GetProperties.getweatherId();
-
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 

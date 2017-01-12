@@ -14,7 +14,7 @@ import java.util.List;
  * Created by evangelie on 22/12/2016.
  */
 public class Context {
-    public static List<String> getRelevantContextForUser(Recommender route, RouteModel trip, User user) throws Exception {
+    public static List<String> getRelevantContextForUser(Recommender route, RouteModel trip, User user, Datastore mongoDatastore) throws Exception {
         //Get trip properties
         Integer route_distance = trip.getRoute().getDistanceMeters();
         Float lat = trip.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0).floatValue();
@@ -24,7 +24,7 @@ public class Context {
         Integer duration = trip.getRoute().getDurationSeconds();
 
         //Connect to mongodb
-        Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+        //Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 
         //Get personality of user
         String personality = user.getUserPersonalityType(user.getId(), mongoDatastore);
@@ -66,9 +66,7 @@ public class Context {
                 contextList.add("NiceWeather");
             }
         }*/
-        /*if (emissionsIncreasing("user")){
-            searchQuery.append("context", "emissionsIncreasing");
-        }*/
+
         if (user.tooManyPublicTransportRoutes()) {
             contextList.add("TooManyTransportRoutes");
         }
@@ -88,7 +86,7 @@ public class Context {
         }
 
         if (EmissionComparetoOthers(user)) {
-            contextList.add("EmissionComparetoOthers");
+            contextList.add("emissionsIncreasing");
         }
 
         return contextList;
@@ -97,22 +95,22 @@ public class Context {
     public static Boolean GetRelevantContext(String target, List<String> context){
         Boolean RelevantContext = Boolean.TRUE;
         if (target.equals("walk")){
-            if ( !context.contains("WalkDistance")  && !context.contains("Duration") && !context.contains("TooManyCarRoutes") && !context.contains("EmissionComparetoOthers") && !context.contains("NiceWeather") && context.contains("TooManyTransportRoutes")){
+            if ( !context.contains("WalkDistance")  && !context.contains("Duration") && !context.contains("TooManyCarRoutes") && !context.contains("emissionsIncreasing") && !context.contains("NiceWeather") && context.contains("TooManyTransportRoutes")){
                 RelevantContext = Boolean.FALSE;
             }
         }
         else if(target.equals("bicycle") || target.equals("bikeSharing")){
-            if ( !context.contains("BikeDistance") && !context.contains("Duration") && !context.contains("TooManyCarRoutes") && !context.contains("EmissionComparetoOthers") && !context.contains("NiceWeather") && context.contains("TooManyTransportRoutes")){
+            if ( !context.contains("BikeDistance") && !context.contains("Duration") && !context.contains("TooManyCarRoutes") && !context.contains("emissionsIncreasing") && !context.contains("NiceWeather") && context.contains("TooManyTransportRoutes")){
                 RelevantContext = Boolean.FALSE;
             }
         }
         else if(target.equals("bike&ride")){
-            if ( !context.contains("Duration") && !context.contains("TooManyCarRoutes") && !context.contains("EmissionComparetoOthers") && !context.contains("NiceWeather") && context.contains("TooManyTransportRoutes")){
+            if ( !context.contains("Duration") && !context.contains("TooManyCarRoutes") && !context.contains("emissionsIncreasing") && !context.contains("NiceWeather") && context.contains("TooManyTransportRoutes")){
                 RelevantContext = Boolean.FALSE;
             }
         }
         else if(target.equals("pt") || target.equals("park&ride")){
-            if ( !context.contains("Duration") && !context.contains("TooManyCarRoutes") && !context.contains("EmissionComparetoOthers") && !context.contains("NiceWeather")){
+            if ( !context.contains("Duration") && !context.contains("TooManyCarRoutes") && !context.contains("emissionsIncreasing") && !context.contains("NiceWeather")){
                 RelevantContext = Boolean.FALSE;
             }
         }

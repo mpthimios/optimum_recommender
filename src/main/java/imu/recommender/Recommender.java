@@ -106,7 +106,7 @@ public class Recommender {
 		logger.debug("filtering routes for user - before size: " + routes.size());
 		for (int i = 0; i < routes.size(); i++) {
 			RouteModel recommenderRoute = routes.get(i);			
-			boolean car_owner = false;
+			boolean car_owner = true;
 			boolean bike_owner = true;
 			logger.debug(recommenderRoute.getRoute().getFrom());
 			recommenderRoute.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0);
@@ -155,7 +155,7 @@ public class Recommender {
 		logger.debug("filtering routes for user - after size: " + routes.size());
 	}
 	
-	public void rankRoutesForUser (User user){
+	public void rankRoutesForUser (User user, Datastore mongoDatastore){
 		//function aggregated
 
 		
@@ -178,14 +178,15 @@ public class Recommender {
 		}
 		for (RouteModel route : routes){
 			String routeId = String.valueOf(route.getRouteId());		
-			int routeIndex = Arrays.binarySearch(sortedRoutesId, routeId);
+			//int routeIndex = Arrays.binarySearch(sortedRoutesId, routeId);
+			int routeIndex = Arrays.asList(sortedRoutesId).indexOf(routeId);
 			FinalRankedRoutes.set(routeIndex, route);
 		}		
 		logger.debug(FinalRankedRoutes);
 		
 		routes.clear();
 		routes = FinalRankedRoutes;
-		selectTargetRouteandAddMessageForUser(user);
+		selectTargetRouteandAddMessageForUser(user, mongoDatastore);
 	}
 	
 	private List<RouteModel> rankBasedonBehaviouralModel(User user, List<RouteModel> routes){
@@ -414,7 +415,7 @@ public class Recommender {
 		
 	}
 	
-	private void selectTargetRouteandAddMessageForUser(User user){
+	private void selectTargetRouteandAddMessageForUser(User user, Datastore mongoDatastore){
 		//Select target route and add message and strategy.
 		List<String> targetList = user.getTargetList();
 		logger.debug(targetList);
@@ -430,7 +431,7 @@ public class Recommender {
 				if (route.getRoute().getAdditionalInfo().get("mode") == targetList.get(i)) {
 					target = targetList.get(i);
 					try {
-						contextList = Context.getRelevantContextForUser(this, route, user);
+						contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -448,9 +449,7 @@ public class Recommender {
 			for (RouteModel route : routes) {
 				if (route.getRoute().getAdditionalInfo().get("mode") == target) {
 					try {
-						//Connect to mongodb
-						Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
-						contextList = Context.getRelevantContextForUser(this, route, user);
+						contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore);
 						mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore);
 						message = mes.split("_")[0];
 						strategy = mes.split("_")[1];

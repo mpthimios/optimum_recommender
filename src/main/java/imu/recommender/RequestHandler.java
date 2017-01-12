@@ -121,7 +121,7 @@ public class RequestHandler extends HttpServlet{
 			Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
 			recommenderRoutes.filterDuplicates();
 			recommenderRoutes.filterRoutesForUser(user);		
-			recommenderRoutes.rankRoutesForUser(user);
+			recommenderRoutes.rankRoutesForUser(user,mongoDatastore);
 			String jsonResult = mapper.writeValueAsString(recommenderRoutes.getRankedRoutesResponse());
 			out.println(jsonResult);			
 		}

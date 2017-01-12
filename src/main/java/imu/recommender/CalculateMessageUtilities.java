@@ -2,7 +2,6 @@ package imu.recommender;
 
 import com.mongodb.*;
 import imu.recommender.helpers.GetProperties;
-import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.message.Message;
 import imu.recommender.models.strategy.Strategy;
 import imu.recommender.models.user.User;

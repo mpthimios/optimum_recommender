@@ -9,8 +9,9 @@ import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
 import java.net.UnknownHostException;
-import java.util.Map;
 import java.util.*;
+import java.util.Map;
+
 
 @Entity("OptimumUsers")
 
@@ -83,20 +84,15 @@ public class User {
 		this.id="6EEGP034JBLydaotzqZrCs65jRdpfR4s";
 		this.name = "John";
 		this.access_token = "lukaios";
-		this.bikeUsage = 0.0;
 		this.bikeUsageComparedToOthers = 0.0;
 		this.walkUsageComparedToOthers = 0.0;
 		this.bikeUsageComparedToOthersGW = 0.0;
 		this.walkUsageComparedToOthersGW = 0.0;
-		this.carUsage = 0.0;
 		this.carUsageComparedToOthers = 0.0;		
 		this.extra_data = "";
 		this.mobility_type = "car";
 		this.car_ownership = 0;
-		this.ptUsage = 0.0;
-		this.ptUsage = 0.0;
 		this.ptUsageComparedToOthers = 0.0;
-		this.walkUsage = 0.0;
 		this.demographics = new Demographics();
 		this.personality = new Personality();
 		this.stated_preferences = new StatedPreferences();
@@ -129,21 +125,22 @@ public class User {
 	
 	public boolean emissionsIncreasing() {
         //
-        return true;
+		Double emissions_last_period = this.getEmissionsLastWeek();
+		return emissions_last_period>300.0;
 
     }
 	
 	public boolean tooManyPublicTransportRoutes() {
         //Get percentage_of_public_transport_use_last_period from mongodb
-        Double percentage_of_public_transport_use_last_period = this.getPtUsage();
-        return percentage_of_public_transport_use_last_period>0.6;
+        Double percentage_of_public_transport_use_last_period = this.getMode_usage().getPt_percent();
+        return percentage_of_public_transport_use_last_period>51.0;
 
     }
 	
 	public boolean tooManyCarRoutes() {
         //Get percentage_of_car_use_last_period from mongodb
-        Double percentage_of_car_use_last_period = this.getCarUsage();
-        return percentage_of_car_use_last_period>0.6;
+        Double percentage_of_car_use_last_period = this.getMode_usage().getCar_percent();
+        return percentage_of_car_use_last_period>51.0;
     }
 	
 	public static User findByAccessToken(String accessToken){
@@ -356,38 +353,6 @@ public class User {
 
 	public void setAccess_token(String access_token) {
 		this.access_token = access_token;
-	}
-
-	public double getCarUsage() {
-		return carUsage;
-	}
-
-	public void setCarUsage(double carUsage) {
-		this.carUsage = carUsage;
-	}
-
-	public double getPtUsage() {
-		return ptUsage;
-	}
-
-	public void setPtUsage(double ptUsage) {
-		this.ptUsage = ptUsage;
-	}
-
-	public double getWalkUsage() {
-		return walkUsage;
-	}
-
-	public void setWalkUsage(double walkUsage) {
-		this.walkUsage = walkUsage;
-	}
-
-	public double getBikeUsage() {
-		return bikeUsage;
-	}
-
-	public void setBikeUsage(double bikeUsage) {
-		this.bikeUsage = bikeUsage;
 	}
 
 	public double getEmissionsLastWeek() {
