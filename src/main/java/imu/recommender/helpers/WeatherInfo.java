@@ -1,24 +1,16 @@
 package imu.recommender.helpers;
 
-import jdk.nashorn.internal.objects.annotations.Property;
-import jdk.nashorn.internal.parser.JSONParser;
-import org.apache.http.client.methods.HttpGet;
 import org.bitpipeline.lib.owm.OwmClient;
-import org.bitpipeline.lib.owm.StatusWeatherData;
-import org.bitpipeline.lib.owm.WeatherData;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Locale;
 
 public class WeatherInfo implements ServletContextListener {
 

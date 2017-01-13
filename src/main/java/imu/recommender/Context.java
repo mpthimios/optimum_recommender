@@ -1,7 +1,6 @@
 package imu.recommender;
 
 import imu.recommender.helpers.GetProperties;
-import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.helpers.WeatherInfo;
 import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.User;

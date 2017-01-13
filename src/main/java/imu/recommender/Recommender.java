@@ -1,35 +1,18 @@
 package imu.recommender;
 
-import imu.recommender.helpers.*;
-
-import java.lang.reflect.Array;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-
-import imu.recommender.models.message.Message;
-import imu.recommender.models.strategy.Strategy;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-
+import at.ac.ait.ariadne.routeformat.Route;
+import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
+import imu.recommender.helpers.*;
 import imu.recommender.models.route.RouteModel;
-import at.ac.ait.ariadne.routeformat.Route;
-import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
-import at.ac.ait.ariadne.routeformat.RouteSegment;
 import imu.recommender.models.user.User;
+import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.Query;
-import org.mongodb.morphia.query.UpdateOperations;
+import java.util.*;
+
+import java.io.IOException;
 
 
 public class Recommender {
@@ -444,7 +427,8 @@ public class Recommender {
 		}
 		List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
 		int j=0;
-		while (message.isEmpty() && j<FinaltargetList.size() ) {
+		boolean SetMessage= false;
+		while (message.isEmpty() && j<FinaltargetList.size() && SetMessage==false) {
 			target = FinaltargetList.get(j);
 			for (RouteModel route : routes) {
 				if (route.getRoute().getAdditionalInfo().get("mode") == target) {
@@ -464,7 +448,7 @@ public class Recommender {
 					route.setMessage(message);
 					route.setStrategy(strategy);
 					rankedRoutes2.add(route);
-					break;
+					SetMessage=true;
 				}
 			}
 			j++;

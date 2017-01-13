@@ -16,59 +16,31 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 import at.ac.ait.ariadne.routeformat.*;
-//import at.ac.ait.ariadne.routeformat.Sproute.Status;
-
-import at.ac.ait.ariadne.routeformat.geojson.GeoJSONFeature;
-import at.ac.ait.ariadne.routeformat.geojson.GeoJSONFeatureCollection;
-import at.ac.ait.ariadne.routeformat.geojson.GeoJSONLineString;
-import at.ac.ait.ariadne.routeformat.geojson.GeoJSONPolygon;
+import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import at.ac.ait.ariadne.routeformat.location.Address;
-import imu.recommender.helpers.IgnoreMixIn;
-import imu.recommender.helpers.MongoConnectionHelper;
-import imu.recommender.models.route.RouteModel;
-import imu.recommender.models.user.Demographics;
-import imu.recommender.models.user.OwnedVehicle;
-import imu.recommender.models.user.Personality;
-import imu.recommender.models.user.RoutePreference;
-import imu.recommender.models.user.User;
-
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
-import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
-
-import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
-
-import java.util.Optional;
-
-import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import com.mongodb.util.JSON;
-import javafx.geometry.BoundingBox;
-
+import imu.recommender.helpers.MongoConnectionHelper;
+import imu.recommender.models.user.OwnedVehicle;
+import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
-import org.bitpipeline.lib.owm.WeatherForecastResponse;
-import org.bson.types.ObjectId;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
-import sun.font.TrueTypeFont;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.UnknownHostException;
+import java.util.Optional;
+import java.util.*;
+import java.io.*;
 
-import static imu.recommender.CalculateMessageUtilities.calculateForUser;
-import static java.lang.System.out;
+//import at.ac.ait.ariadne.routeformat.Sproute.Status;
 
 public class RequestHandler extends HttpServlet{
 
