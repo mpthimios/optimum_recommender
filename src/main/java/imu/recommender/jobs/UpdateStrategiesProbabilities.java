@@ -3,6 +3,7 @@ package imu.recommender.jobs;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
+import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.strategy.Strategy;
 import imu.recommender.models.user.User;
@@ -76,11 +77,13 @@ public class UpdateStrategiesProbabilities  implements Job{
 
                     for (Object userid : userIds) {
                         System.out.println(id);
-                        if (id.toString().equals("suggestion ")) {
+                        if (id.toString().equals("suggestion")) {
                             Integer user_attempts;
                             Integer user_success;
                             //Get total attemps
                             Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(userid);
+                            //Get personality of user
+                            String personality = userQuery.get().getPersonality().getTypeStr();
                             //Get total successes
                             //Find all saved trips of current user with persusasive message (suggestion)
                             BasicDBObject searchTripQuery = new BasicDBObject();
@@ -103,8 +106,23 @@ public class UpdateStrategiesProbabilities  implements Job{
                                 user_success = userQuery.get().getSugSuccess();
                             }
                             Double userProb = 0.0;
-                            userProb = calculateUserProbability(number_of_times_sent, number_of_success,user_success, user_attempts);
-
+                            switch (personality) {
+                                case "Extraversion":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugEx());
+                                    break;
+                                case "Agreeableness":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugAg());
+                                    break;
+                                case "Openness":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugOp());
+                                    break;
+                                case "Conscientiousness":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugCons());
+                                    break;
+                                case "Neuroticism":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugN());
+                                    break;
+                            }
                             //Update user probability of each strategy, user attempts and user success on mongodb
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugProb", userProb));
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", user_attempts));
@@ -137,7 +155,24 @@ public class UpdateStrategiesProbabilities  implements Job{
                             }
 
                             Double userProb = 0.0;
-                            userProb = calculateUserProbability(number_of_times_sent, number_of_success,user_success, user_attempts);
+                            String personality = userQuery.get().getPersonality().getTypeStr();
+                            switch (personality) {
+                                case "Extraversion":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompEx());
+                                    break;
+                                case "Agreeableness":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompAg());
+                                    break;
+                                case "Openness":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompOp());
+                                    break;
+                                case "Conscientiousness":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompCons());
+                                    break;
+                                case "Neuroticism":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompN());
+                                    break;
+                            }
 
                             //Update user probability of each strategy, user attempts and user success on mongodb
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compProb", userProb));
@@ -170,8 +205,24 @@ public class UpdateStrategiesProbabilities  implements Job{
                                 user_success = userQuery.get().getSelfSuccess();
                             }
                             Double userProb = 0.0;
-
-                            userProb = calculateUserProbability(number_of_times_sent, number_of_success,user_success, user_attempts);
+                            String personality = userQuery.get().getPersonality().getTypeStr();
+                            switch (personality) {
+                                case "Extraversion":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfEx());
+                                    break;
+                                case "Agreeableness":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfAg());
+                                    break;
+                                case "Openness":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfOp());
+                                    break;
+                                case "Conscientiousness":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfCons());
+                                    break;
+                                case "Neuroticism":
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfN());
+                                    break;
+                            }
 
                             //Update user probability of each strategy, user attempts and user success on mongodb
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfProb", userProb));
@@ -213,14 +264,15 @@ public class UpdateStrategiesProbabilities  implements Job{
         }*/
         return (double) p/(n+p);
     }
-    public static  double calculateUserProbability(int total_attempts, int strategy_prob, int attempt, int user_attempts){
+    public static  double calculateUserProbability(int total_attempts, int strategy_prob, int attempt, int user_attempts, double user_prob){
         //Get n, p
         //n plh8os prospa9eiwn gia thn sugkekrimenh strathgikh
         //p pi8anothta epituxias ths sugkekrimenhs strathgikhs
         //p=epituxia/plh8os
         //int n=30;
         //double p=0.8;
-        double StrategyProbability= getBinomial(total_attempts, strategy_prob);
+        //double StrategyProbability= getBinomial(total_attempts, strategy_prob);
+        double StrategyProbability= user_prob;
         System.out.println(StrategyProbability);
         //return getBinomial(attempt+user_attempts,total_attempts-attempt+user_attempts*(1-(int)StrategyProbability));
         int s = total_attempts+strategy_prob;

@@ -567,9 +567,9 @@ public class User {
 					SelfMonitoring = GetProperties.getSelfEx();
 
 				} else {
-					Suggestion = (UserSug + GetProperties.getSugEx()) / 2.0;
-					Comparison = (UserComp + GetProperties.getCompEx()) / 2.0;
-					SelfMonitoring = (UserSelf + GetProperties.getSelfEx()) / 2.0;
+					Suggestion = UserSug;
+					Comparison = UserComp;
+					SelfMonitoring = UserSelf;
 				}
 				break;
 			case "Agreeableness":
@@ -580,9 +580,9 @@ public class User {
 					SelfMonitoring = GetProperties.getSelfAg();
 
 				} else {
-					Suggestion = (UserSug + GetProperties.getSugAg()) / 2.0;
-					Comparison = (UserComp + GetProperties.getCompAg()) / 2.0;
-					SelfMonitoring = (UserSelf + GetProperties.getSelfAg()) / 2.0;
+					Suggestion = UserSug;
+					Comparison = UserComp;
+					SelfMonitoring = UserSelf;
 				}
 				break;
 			case "Openness":
@@ -593,9 +593,9 @@ public class User {
 					SelfMonitoring = GetProperties.getSelfOp();
 
 				} else {
-					Suggestion = (UserSug + GetProperties.getSugOp()) / 2.0;
-					Comparison = (UserComp + GetProperties.getCompOp()) / 2.0;
-					SelfMonitoring = (UserSelf + GetProperties.getSelfOp()) / 2.0;
+					Suggestion = UserSug;
+					Comparison = UserComp;
+					SelfMonitoring = UserSelf;
 				}
 				break;
 			case "Conscientiousness":
@@ -606,9 +606,9 @@ public class User {
 					SelfMonitoring = GetProperties.getSelfCons();
 
 				} else {
-					Suggestion = (UserSug + GetProperties.getSugCons()) / 2.0;
-					Comparison = (UserComp + GetProperties.getCompCons()) / 2.0;
-					SelfMonitoring = (UserSelf + GetProperties.getSelfCons()) / 2.0;
+					Suggestion = UserSug;
+					Comparison = UserComp;
+					SelfMonitoring = UserSelf;
 				}
 				break;
 			case "Neuroticism":
@@ -619,9 +619,9 @@ public class User {
 					SelfMonitoring = GetProperties.getSelfN();
 
 				} else {
-					Suggestion = (UserSug + GetProperties.getSugN()) / 2.0;
-					Comparison = (UserComp + GetProperties.getCompN()) / 2.0;
-					SelfMonitoring = (UserSelf + GetProperties.getSelfN()) / 2.0;
+					Suggestion = UserSug;
+					Comparison = UserComp;
+					SelfMonitoring = UserSelf;
 				}
 				break;
 		}

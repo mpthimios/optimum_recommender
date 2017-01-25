@@ -1,41 +1,25 @@
+package imu.recommender;
+
 import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import imu.recommender.CalculateMessageUtilities;
-import imu.recommender.Recommender;
-import imu.recommender.helpers.*;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.jobs.UpdateStrategiesProbabilities;
 import imu.recommender.models.user.ModeUsage;
 import imu.recommender.models.user.Personality;
 import imu.recommender.models.user.User;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.CoreMatchers.*;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.matchers.JUnitMatchers.*;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
-import java.util.*;
-import imu.recommender.Recommender;
-import java.io.*;
-import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
-import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
-import imu.recommender.helpers.GetProperties;
-import imu.recommender.models.user.ModeUsage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CalculateMessageTest{
     @Test
@@ -356,9 +340,64 @@ public class CalculateMessageTest{
     @Test
     //Test case 8
     public void CalculateMessageTest8() throws Exception{
-        Double userProb = 0.0;
-        userProb = UpdateStrategiesProbabilities.calculateUserProbability(20, 10, 4, 6);
-        Assert.assertThat(userProb, CoreMatchers.is(0.6071428571428571));
+
+        /*String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
+        //Connect to our test mongo db
+        String connectionStr = "mongodb://OptimumUser1:Optimum123!@83.212.113.64:32085";
+        MongoClient mongoSingleton = new MongoClient(new MongoClientURI(connectionStr) );
+        Morphia morphia = new Morphia();
+        Datastore mongoDatastore = morphia.createDatastore(mongoSingleton, "Optimum");
+        User user = (User) mongoDatastore.find(User.class).field("id").equal(userID).get();
+        //Set strategy comparison
+        user.setSugProb(0.0);
+        user.setSelfProb(0.0);
+        user.setCompProb(0.0);
+        //Set personality Extraversion
+        Personality personality = new Personality();
+        personality.setQ1(1.0);
+        personality.setQ2(5.0);
+        personality.setQ3(5.0);
+        personality.setQ4(5.0);
+        personality.setQ5(5.0);
+        personality.setQ6(5.0);
+        personality.setQ7(1.0);
+        personality.setQ8(1.0);
+        personality.setQ9(1.0);
+        personality.setQ10(1.0);
+        user.setPersonality(personality);
+
+        Double UserSug = UpdateStrategiesProbabilities.calculateUserProbability(10, 5, 1, 3, GetProperties.getSugEx());
+        Double UserComp = UpdateStrategiesProbabilities.calculateUserProbability(10, 4, 5, 5, GetProperties.getCompEx());
+        Double UserSelf = UpdateStrategiesProbabilities.calculateUserProbability(10, 3, 0, 2, GetProperties.getSelfEx());
+        System.out.println("Suggestion");
+        System.out.println(UserSug);
+        System.out.println("Comp");
+        System.out.println(UserComp);
+        System.out.println("Self");
+        System.out.println(UserSelf);
+
+        Double Suggestion = (UserSug + GetProperties.getSugEx()) / 2.0;
+        Double Comparison = (UserComp + GetProperties.getCompEx()) / 2.0;
+        Double SelfMonitoring = (UserSelf + GetProperties.getSelfEx()) / 2.0;
+        System.out.println(Suggestion);
+        System.out.println(Comparison);
+        System.out.println(SelfMonitoring);
+        Double Suggestion1 = 0.8*UserSug + 0.2*GetProperties.getSugEx();
+        Double Comparison1 = 0.8*UserComp + 0.2*GetProperties.getCompEx();
+        Double SelfMonitoring1 = 0.8*UserSelf + 0.2*GetProperties.getSelfEx();
+        System.out.println("Suggestion1");
+        System.out.println(Suggestion1);
+        System.out.println(Comparison1);
+        System.out.println(SelfMonitoring1);
+        Double Suggestion2 = 0.7*UserSug + 0.3*GetProperties.getSugEx();
+        Double Comparison2 = 0.7*UserComp + 0.3*GetProperties.getCompEx();
+        Double SelfMonitoring2 = 0.7*UserSelf + 0.3*GetProperties.getSelfEx();
+        System.out.println("Suggestion2");
+        System.out.println(Suggestion2);
+        System.out.println(Comparison2);
+        System.out.println(SelfMonitoring2);*/
+        Double userProb = UpdateStrategiesProbabilities.calculateUserProbability(20, 10, 4, 6, GetProperties.getSugEx());
+        Assert.assertThat(userProb, CoreMatchers.is(0.5443483829650977));
 
     }
     @Test

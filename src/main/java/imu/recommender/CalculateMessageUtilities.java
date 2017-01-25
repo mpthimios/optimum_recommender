@@ -97,7 +97,7 @@ public class CalculateMessageUtilities {
         List<Message> mes = query.asList();
         logger.debug("found " + mes.size() + " messages that match the search criteria");
         //If no message exists change strategy(select the next more persuasive strategy)
-        int i=1;
+        int i=0;
         while (mes.isEmpty() && i<strategies.size() ){
             strategy = strategies.get(i);
             logger.debug("message list is empty, trying next persuasive strategy: -" + strategy + "-");

@@ -428,8 +428,9 @@ public class Recommender {
 		List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
 		int j=0;
 		boolean SetMessage= false;
-		while (message.isEmpty() && j<FinaltargetList.size() && SetMessage==false) {
+		while (message.isEmpty() && j<FinaltargetList.size() && !SetMessage) {
 			target = FinaltargetList.get(j);
+			rankedRoutes2 = new ArrayList<RouteModel>();
 			for (RouteModel route : routes) {
 				if (route.getRoute().getAdditionalInfo().get("mode") == target) {
 					try {
@@ -447,9 +448,9 @@ public class Recommender {
 				if(!message.isEmpty()) {
 					route.setMessage(message);
 					route.setStrategy(strategy);
-					rankedRoutes2.add(route);
 					SetMessage=true;
 				}
+				rankedRoutes2.add(route);
 			}
 			j++;
 		}

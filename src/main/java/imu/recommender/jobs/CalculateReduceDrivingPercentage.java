@@ -68,7 +68,7 @@ public class CalculateReduceDrivingPercentage implements Job {
                 DBObject user = m.findOne(id);
 
                 try{
-                    URL obj = new URL(activitiesUrl+"?user="+id.toString()+"&from="+previous_week+"&to="+last_week);
+                    URL obj = new URL(activitiesUrl+"?from="+previous_week+"&to="+last_week+"&user="+id.toString());
                     con = (HttpURLConnection) obj.openConnection();
                     con.setRequestMethod("GET");
 
