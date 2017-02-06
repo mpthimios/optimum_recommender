@@ -89,8 +89,16 @@ public class Recommender {
 		logger.debug("filtering routes for user - before size: " + routes.size());
 		for (int i = 0; i < routes.size(); i++) {
 			RouteModel recommenderRoute = routes.get(i);			
-			boolean car_owner = true;
-			boolean bike_owner = true;
+			boolean car_owner = false;
+			boolean bike_owner = false;
+			for (int k=0; k< user.getOwned_vehicles().size(); k++){
+				if (user.getOwned_vehicles().get(k).getType().equals("car") ){
+					car_owner = true;
+				}
+				if (user.getOwned_vehicles().get(k).getType().equals("bicycle") ){
+					bike_owner = true;
+				}
+			}
 			logger.debug(recommenderRoute.getRoute().getFrom());
 			recommenderRoute.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0);
 			//Find the mode of the route searching segments of the route
