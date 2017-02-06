@@ -41,6 +41,17 @@ public class Context {
 
         List<String> contextList = new ArrayList<String>();
 
+        //if user PreferredMode is car, add context
+        if (user.getPreferredMode().equals("car")){
+            contextList.add("TooManyCarRoutes");
+            contextList.add("emissionsIncreasing");
+        }
+
+        //if user PreferredMode is pt, add context
+        if (user.getPreferredMode().equals("pt")){
+            contextList.add("TooManyTransportRoutes");
+        }
+
         //Check if the distance of route is walking
         if (withinWalkingDistance(route_distance)) {
             System.out.println("Walking Distance");

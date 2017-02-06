@@ -89,7 +89,7 @@ public class UpdateStrategiesProbabilities  implements Job{
                             BasicDBObject searchTripQuery = new BasicDBObject();
                             searchTripQuery.put("favourite", true);
                             searchTripQuery.put("userId", userid);
-                            //searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "suggestion ");
+                            searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "suggestion");
                             DBCursor tripIds = trips.find(searchTripQuery);
                             Integer StrategySuccess = tripIds.count();
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", StrategySuccess));
@@ -137,7 +137,7 @@ public class UpdateStrategiesProbabilities  implements Job{
                             BasicDBObject searchTripQuery = new BasicDBObject();
                             searchTripQuery.put("favourite", true);
                             searchTripQuery.put("userId", userid);
-                            //searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "comparison");
+                            searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "comparison");
                             DBCursor tripsIdsComp = trips.find(searchTripQuery);
                             Integer successComp = tripsIdsComp.count();
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", successComp));
@@ -188,7 +188,7 @@ public class UpdateStrategiesProbabilities  implements Job{
                             BasicDBObject searchTripQuery = new BasicDBObject();
                             searchTripQuery.put("favourite", true);
                             searchTripQuery.put("userId", userid);
-                            //searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "self-monitoring");
+                            searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "self-monitoring");
                             DBCursor tripsIdsSelf = trips.find(searchTripQuery);
                             Integer successSelf = tripsIdsSelf.count();
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", successSelf));
