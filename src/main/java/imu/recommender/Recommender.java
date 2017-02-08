@@ -91,12 +91,14 @@ public class Recommender {
 			RouteModel recommenderRoute = routes.get(i);			
 			boolean car_owner = false;
 			boolean bike_owner = false;
-			for (int k=0; k< user.getOwned_vehicles().size(); k++){
-				if (user.getOwned_vehicles().get(k).getType().equals("car") ){
-					car_owner = true;
-				}
-				if (user.getOwned_vehicles().get(k).getType().equals("bicycle") ){
-					bike_owner = true;
+			if (user.getOwned_vehicles() != null ) {
+				for (int k = 0; k < user.getOwned_vehicles().size(); k++) {
+					if (user.getOwned_vehicles().get(k).getType().equals("car")) {
+						car_owner = true;
+					}
+					if (user.getOwned_vehicles().get(k).getType().equals("bicycle")) {
+						bike_owner = true;
+					}
 				}
 			}
 			logger.debug(recommenderRoute.getRoute().getFrom());
@@ -174,7 +176,6 @@ public class Recommender {
 			FinalRankedRoutes.set(routeIndex, route);
 		}		
 		logger.debug(FinalRankedRoutes);
-		logger.debug("---");
 		
 		routes.clear();
 		routes = FinalRankedRoutes;
