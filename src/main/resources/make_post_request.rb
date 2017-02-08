@@ -3,8 +3,10 @@ require 'net/http'
 @host = 'localhost'
 @port = '8080'
 #@host = '83.212.123.149'
-#@port = '8082'
-
+#@host = '83.212.113.64'
+#@port = '8080'
+#@host = 'optimum-recommender.imu-projects.eu'
+#@port = '8080'
 
 @path = "/recommender/route_recommender"
 
@@ -15,7 +17,7 @@ require 'net/http'
 #file = File.new("body_23_06_2014.txt", "r")
 #file = File.new("dublin_route.txt", "r")
 #file = File.new("body_23_06_2014.txt", "r")
-file = File.new("multiple_routes.txt", "r")
+file = File.new("error_request.json", "r")
 while (line = file.gets)
     @body = @body + "#{line}"    
 end

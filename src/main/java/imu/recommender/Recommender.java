@@ -174,6 +174,7 @@ public class Recommender {
 			FinalRankedRoutes.set(routeIndex, route);
 		}		
 		logger.debug(FinalRankedRoutes);
+		logger.debug("---");
 		
 		routes.clear();
 		routes = FinalRankedRoutes;
@@ -418,7 +419,6 @@ public class Recommender {
 		List<String> FinaltargetList = new ArrayList<>();
 		for (int i = 0; i < targetList.size(); i++) {
 			for (RouteModel route : routes) {
-
 				if (route.getRoute().getAdditionalInfo().get("mode") == targetList.get(i)) {
 					target = targetList.get(i);
 					try {
@@ -436,34 +436,36 @@ public class Recommender {
 		List<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
 		int j=0;
 		boolean SetMessage= false;
-		while (message.isEmpty() && j<FinaltargetList.size() && !SetMessage) {
-			target = FinaltargetList.get(j);
-			rankedRoutes2 = new ArrayList<RouteModel>();
-			for (RouteModel route : routes) {
-				if (route.getRoute().getAdditionalInfo().get("mode") == target) {
-					try {
-						contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore);
-						mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore);
-						message = mes.split("_")[0];
-						strategy = mes.split("_")[1];
-					} catch (Exception e) {
-						e.printStackTrace();
+		if (FinaltargetList.size()>0) {
+			while (message.isEmpty() && j < FinaltargetList.size() && !SetMessage) {
+				target = FinaltargetList.get(j);
+				rankedRoutes2 = new ArrayList<RouteModel>();
+				for (RouteModel route : routes) {
+					if (route.getRoute().getAdditionalInfo().get("mode") == target) {
+						try {
+							contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore);
+							mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore);
+							message = mes.split("_")[0];
+							strategy = mes.split("_")[1];
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					} else {
+						message = "";
+						strategy = "";
 					}
-				} else {
-					message = "";
-					strategy = "";
+					if (!message.isEmpty()) {
+						route.setMessage(message);
+						route.setStrategy(strategy);
+						SetMessage = true;
+					}
+					rankedRoutes2.add(route);
 				}
-				if(!message.isEmpty()) {
-					route.setMessage(message);
-					route.setStrategy(strategy);
-					SetMessage=true;
-				}
-				rankedRoutes2.add(route);
+				j++;
 			}
-			j++;
+			routes.clear();
+			routes = rankedRoutes2;
 		}
-		routes.clear();
-		routes=rankedRoutes2;
 
 	}
 	

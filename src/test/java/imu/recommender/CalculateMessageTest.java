@@ -1,28 +1,7 @@
 package imu.recommender;
 
-import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import imu.recommender.helpers.GetProperties;
-import imu.recommender.jobs.UpdateStrategiesProbabilities;
-import imu.recommender.models.user.ModeUsage;
-import imu.recommender.models.user.Personality;
-import imu.recommender.models.user.User;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 public class CalculateMessageTest{
-    @Test
+    /*@Test
     //Test case 1
     public void CalculateMessageTest1() throws Exception{
         String target= "walk";
@@ -339,7 +318,7 @@ public class CalculateMessageTest{
     }
     @Test
     //Test case 8
-    public void CalculateMessageTest8() throws Exception{
+    public void CalculateMessageTest8() throws Exception{ */
 
         /*String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
         //Connect to our test mongo db
@@ -396,7 +375,7 @@ public class CalculateMessageTest{
         System.out.println(Suggestion2);
         System.out.println(Comparison2);
         System.out.println(SelfMonitoring2);*/
-        Double userProb = UpdateStrategiesProbabilities.calculateUserProbability(20, 10, 4, 6, GetProperties.getSugEx());
+        /*Double userProb = UpdateStrategiesProbabilities.calculateUserProbability(20, 10, 4, 6, GetProperties.getSugEx());
         Assert.assertThat(userProb, CoreMatchers.is(0.5443483829650977));
 
     }
@@ -885,7 +864,7 @@ public class CalculateMessageTest{
         String res3 = res2.split(":")[1];
 
         Assert.assertThat(res3, CoreMatchers.is(" \"Last week your emissions are increasing. Try more!\"") );
-    }
+    }*/
 
 
 
