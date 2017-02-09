@@ -4,7 +4,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import imu.recommender.helpers.MongoConnectionHelper;
-import imu.recommender.helpers.WeatherInfo;
 import imu.recommender.models.user.ModeUsage;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
@@ -86,81 +85,83 @@ public class CalculateModeUsePercentages implements Job {
 				JSONObject jsonObj  = new JSONObject(response.toString());
 				logger.debug(jsonObj.getJSONArray("data"));
 				JSONArray arr = jsonObj.getJSONArray("data");
-				Integer n_car=0;
-				Integer n_pt=0;
-				Integer n_bike=0;
-				Integer n_walk=0;
-				Integer n_bike_GW=0;
-				Integer n_walk_GW=0;
+				double car_percent = 0.0;
+				double pt_percent = 0.0;
+				double bike_percent = 0.0;
+				double walk_percent = 0.0;
+				double bike_percent_GW = 0.0;
+				double walk_percent_GW = 0.0;
 
-				for (int i = 0; i < arr.length(); i++) {
-				 	 String mode="";
-					 //String [] all_modes = {"car", "pt", "bike", "walk"};
-	
-					 JSONObject object = arr.getJSONObject(i);
+				if (arr != null && arr.length() > 0 ) {
+					Integer n_car = 0;
+					Integer n_pt = 0;
+					Integer n_bike = 0;
+					Integer n_walk = 0;
+					Integer n_bike_GW = 0;
+					Integer n_walk_GW = 0;
 
-					 Integer sensorActivity = Integer.parseInt(object.get("sensorActivity").toString());
-					 //Get location and date
-					float lat = 12;
-					float longitude = 23;
-					Integer start = 12;
-					Integer end = 13;
+					for (int i = 0; i < arr.length(); i++) {
+						String mode = "";
+						//String [] all_modes = {"car", "pt", "bike", "walk"};
 
-					Boolean NiceWeather = WeatherInfo.isHistoricalWeatherNice(lat, longitude, start, end);
+						JSONObject object = arr.getJSONObject(i);
 
-					 if(sensorActivity ==1){
-						 mode = "bike";
-					 } else if(sensorActivity==7|| sensorActivity==2 || sensorActivity==3 || sensorActivity==4){
-						 mode = "walk";
-					 } else  if(sensorActivity==5){
-						 mode ="tilting";
-					 } else  if(sensorActivity==6){
-						 mode ="question";
-					 } else  if(sensorActivity==8 || sensorActivity==11 || sensorActivity==12 || sensorActivity==0){
-						 mode = "car";
-					 } else  if(sensorActivity==9 || sensorActivity == 10) {
-						 mode = "pt";
-					 }
-					 else{
-						 mode="question";
-					 }
+						Integer sensorActivity = Integer.parseInt(object.get("sensorActivity").toString());
+						//Get location and date
+						float lat = 12;
+						float longitude = 23;
+						Integer start = 12;
+						Integer end = 13;
 
-					 if (mode.equals("car") ){
-						 n_car++;
+						//Boolean NiceWeather = WeatherInfo.isHistoricalWeatherNice(lat, longitude, start, end);
+						Boolean NiceWeather = Boolean.TRUE;
 
-					 }
-					 if (mode.equals("pt") ){
-						 n_pt++;
-					 }
-					 if (mode.equals("bike") ){
-						 n_bike++;
-						 if(NiceWeather){
-						 	n_bike_GW++;
-						 }
-					 }
-					 if (mode.equals("walk") ){
-						 n_walk++;
-						 if(NiceWeather){
-							 n_walk_GW++;
-						 }
-					 }
-				 }
-				 //Calculate percentages
-				 double car_percent = ( (double)(n_car*100)/(double) arr.length());
-				 double pt_percent = ( (double)(n_pt*100)/(double) arr.length());
-				 double bike_percent = ( (double)(n_bike*100)/(double) arr.length());
-				 double walk_percent = ( (double)(n_walk*100)/(double) arr.length());
-				 double bike_percent_GW = ( (double)(n_bike_GW*100)/(double) arr.length());
-				 double walk_percent_GW = ( (double)(n_walk_GW*100)/(double) arr.length());
+						if (sensorActivity == 1) {
+							mode = "bike";
+						} else if (sensorActivity == 7 || sensorActivity == 2 || sensorActivity == 3 || sensorActivity == 4) {
+							mode = "walk";
+						} else if (sensorActivity == 5) {
+							mode = "tilting";
+						} else if (sensorActivity == 6) {
+							mode = "question";
+						} else if (sensorActivity == 8 || sensorActivity == 11 || sensorActivity == 12 || sensorActivity == 0) {
+							mode = "car";
+						} else if (sensorActivity == 9 || sensorActivity == 10) {
+							mode = "pt";
+						} else {
+							mode = "question";
+						}
 
-				//test
-//				 double car_percent = 10.0;
-//				 double pt_percent = 20.0;
-//				 double bike_percent = 30.0;
-//				 double walk_percent = 40.0;
+						if (mode.equals("car")) {
+							n_car++;
+
+						}
+						if (mode.equals("pt")) {
+							n_pt++;
+						}
+						if (mode.equals("bike")) {
+							n_bike++;
+							if (NiceWeather) {
+								n_bike_GW++;
+							}
+						}
+						if (mode.equals("walk")) {
+							n_walk++;
+							if (NiceWeather) {
+								n_walk_GW++;
+							}
+						}
+					}
+					//Calculate percentages
+					car_percent = ((double) (n_car * 100) / (double) arr.length());
+					pt_percent = ((double) (n_pt * 100) / (double) arr.length());
+					bike_percent = ((double) (n_bike * 100) / (double) arr.length());
+					walk_percent = ((double) (n_walk * 100) / (double) arr.length());
+					bike_percent_GW = ((double) (n_bike_GW * 100) / (double) arr.length());
+					walk_percent_GW = ((double) (n_walk_GW * 100) / (double) arr.length());
+				}
 				 
 				 //percentages should be saved to mongo
-				 
 				 Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
 				 ModeUsage modeUsage = new ModeUsage();
 				 modeUsage.setWalk_percent(walk_percent);
@@ -170,12 +171,24 @@ public class CalculateModeUsePercentages implements Job {
 				 modeUsage.setWalk_percentGW(walk_percent_GW);
 				 modeUsage.setBike_percentGW(bike_percent_GW);
 				 UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage", modeUsage);
-				 mongoDatastore.update(query, ops);
+				 mongoDatastore.update(query, ops, true);
 
 
 			} catch (Exception e) {
 				 e.printStackTrace();
-			 }
+				//percentages should be saved to mongo
+				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
+				ModeUsage modeUsage = new ModeUsage();
+				modeUsage.setWalk_percent(0.0);
+				modeUsage.setPt_percent(0.0);
+				modeUsage.setCar_percent(0.0);
+				modeUsage.setBike_percent(0.0);
+				modeUsage.setWalk_percentGW(0.0);
+				modeUsage.setBike_percentGW(0.0);
+				UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage", modeUsage);
+				mongoDatastore.update(query, ops, true);
+
+			}
 
     	}
 		//Calculate Average Mode Use percentages
@@ -219,15 +232,24 @@ public class CalculateModeUsePercentages implements Job {
 				double bikeUsageComparedToOthersGW = total_bike_perc_GW/(double)total_users;
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
 				//Update the AverageEmissions field
-				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthers", ptUsageComparedToOthers));
-				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("carUsageComparedToOthers", carUsageComparedToOthers));
-				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthers", bikeUsageComparedToOthers));
-				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthers", walkUsageComparedToOthers));
-				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthersGW", bikeUsageComparedToOthersGW));
-				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthersGW", walkUsageComparedToOthersGW));
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthers", ptUsageComparedToOthers),true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("carUsageComparedToOthers", carUsageComparedToOthers), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthers", bikeUsageComparedToOthers), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthers", walkUsageComparedToOthers), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthersGW", bikeUsageComparedToOthersGW), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthersGW", walkUsageComparedToOthersGW), true);
 
 			} catch (Exception e) {
 				e.printStackTrace();
+				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
+				//Update the AverageEmissions field
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthers", 0.0),true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("carUsageComparedToOthers", 0.0), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthers", 0.0), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthers", 0.0), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthersGW", 0.0), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthersGW", 0.0), true);
+
 			}
 		}
     }

@@ -240,12 +240,12 @@ public class User {
 
 	public List<String> getTargetList() {
 		List<String> target = new ArrayList<String>();
-		try {			
-			Double max = this.getMode_usage().getPt_percent();
-			String user_mode="pt";
-			if (this.getMode_usage().getCar_percent() > max ){
-				max = this.getMode_usage().getCar_percent();
-				user_mode="car";
+		try {
+			Double max = this.getMode_usage().getCar_percent();
+			String user_mode="car";
+			if (this.getMode_usage().getPt_percent() > max ){
+				max = this.getMode_usage().getPt_percent();
+				user_mode="pt";
 			}
 			if (this.getMode_usage().getWalk_percent() > max ){
 				max = this.getMode_usage().getWalk_percent();

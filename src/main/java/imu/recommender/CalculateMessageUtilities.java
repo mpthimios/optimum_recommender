@@ -1,6 +1,6 @@
 package imu.recommender;
 
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.models.message.Message;
 import imu.recommender.models.strategy.Strategy;
@@ -8,7 +8,10 @@ import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class CalculateMessageUtilities {
 
@@ -32,7 +35,7 @@ public class CalculateMessageUtilities {
         //Get the user percentages that are true
         List<String> PercentageList = new ArrayList<String>();
         double emissions = user.getEmissionsLastWeek();
-        if(emissions>200){
+        if(emissions>0.1){
             PercentageList.add("CO2Em");
         }
         double PCar = user.getCarUsageComparedToOthers();
@@ -46,25 +49,63 @@ public class CalculateMessageUtilities {
         double PWalkSD = user.getWalkUsageComparedToOthers();
         double PBikeSD = user.getBikeUsageComparedToOthers();
 
+        //Initialize all percentage values in order to solve the cold start  problem
+
         if (PCar > GetProperties.getPCar()){
             PercentageList.add("PCar");
         }
         if (PWalkGW > GetProperties.getPWalkGW()){
             PercentageList.add("PWalkGW");
         }
+        else{
+            double random = new Random().nextDouble();
+            double result = -0.5 + (random * (0.5 + 0.5));
+            PWalkGW = 25.0 + result;
+            PercentageList.add("PWalkGW");
+        }
         if (PBikeGW > GetProperties.getPBikeGW()){
+            PercentageList.add("PBikeGW");
+        }
+        else{
+            double random = new Random().nextDouble();
+            double result = -0.5 + (random * (0.5 + 0.5));
+            PBikeGW = 25.0 + result;
             PercentageList.add("PBikeGW");
         }
         if (PPtGW > GetProperties.getPPtGW()){
             PercentageList.add("PPtGW");
         }
+        else{
+            double random = new Random().nextDouble();
+            double result = -0.5 + (random * (0.5 + 0.5));
+            PPtGW = 25.0 + result;
+            PercentageList.add("PPtGW");
+        }
         if (MinWalked > GetProperties.getMinWalked()){
+            PercentageList.add("MinWalked");
+        }
+        else{
+            double random = new Random().nextDouble();
+            double result = -0.2 + (random * (0.2 + 0.2));
+            MinWalked = 1.0 + result;
             PercentageList.add("MinWalked");
         }
         if (MinBiked > GetProperties.getMinBiked()){
             PercentageList.add("MinBiked");
         }
+        else{
+            double random = new Random().nextDouble();
+            double result = -0.5 + (random * (0.5 + 0.5));
+            MinBiked = 5.0 + result;
+            PercentageList.add("MinBiked");
+        }
         if (MinPT > GetProperties.getMinPT()){
+            PercentageList.add("MinPT");
+        }
+        else{
+            double random = new Random().nextDouble();
+            double result = -0.5 + (random * (0.5 + 0.5));
+            MinPT = 5.0 + result;
             PercentageList.add("MinPT");
         }
         /*if (MinBikeSharing > GetProperties.getMinBikeSharing()){
@@ -76,13 +117,25 @@ public class CalculateMessageUtilities {
         if (MinParkRide > GetProperties.getMinParkRide()){
             PercentageList.add("MinParkRide");
         }*/
-        if (PReduceDriving > 55.0){
+        if (PReduceDriving > 5.0){
             PercentageList.add("PReduceDriving");
         }
         if (PWalkSD > GetProperties.getPWalkGW()){
             PercentageList.add("PWalkSD");
         }
+        else{
+            double random = new Random().nextDouble();
+            double result = -0.5 + (random * (0.5 + 0.5));
+            PWalkSD = 50.0 + result;
+            PercentageList.add("PWalkSD");
+        }
         if (PBikeSD > GetProperties.getPBikeGW()){
+            PercentageList.add("PBikeSD");
+        }
+        else{
+            double random = new Random().nextDouble();
+            double result = -0.5 + (random * (0.5 + 0.5));
+            PBikeSD = 50.0 + result;
             PercentageList.add("PBikeSD");
         }
         PercentageList.add("no");
