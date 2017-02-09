@@ -1,7 +1,10 @@
 package imu.recommender;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import imu.recommender.helpers.GetProperties;
+import imu.recommender.jobs.UpdateStrategiesProbabilities;
 import imu.recommender.models.message.Message;
 import imu.recommender.models.strategy.Strategy;
 import imu.recommender.models.user.User;
@@ -254,6 +257,7 @@ public class CalculateMessageUtilities {
 	        //Increase the number of attemps for the current user
 	        Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
 	        Integer user_attempts;
+            DBCollection trips = mongoDatastore.getDB().getCollection("UserTrip");
 	        if (strategy.equals("suggestion") ) {
 	            try {
 	                user_attempts = userQuery.get().getSugAttempts();
@@ -265,7 +269,58 @@ public class CalculateMessageUtilities {
 	            }
 	            user_attempts = user_attempts + 1;
 	            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", user_attempts));
-	        }
+	            //Find all saved trips with persusasive message (suggestion)
+                BasicDBObject TripQuery = new BasicDBObject();
+                TripQuery.put("favourite", true);
+                TripQuery.put("body.additionalInfo.additionalProperties.strategy", strategy);
+                DBCursor tripsIds = trips.find(TripQuery);
+                Integer number_of_success = tripsIds.count();
+                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_successes", number_of_success));
+
+                //Calculate probability
+                Double probability;
+                if (number_of_success.equals(0) | number_of_times_sent.equals(0)) {
+                    probability = 0.0;
+                } else {
+                    probability = (double) number_of_success / (double) number_of_times_sent;
+                }
+                //Update Strategy probability on mongodb
+                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("probability", probability));
+
+                //---------------------------------------------------------------------------
+
+                //Calculate and update Strategy Probability of this user
+                //Find all saved trips of current user with persusasive message (suggestion)
+                BasicDBObject searchTripQuery = new BasicDBObject();
+                searchTripQuery.put("favourite", true);
+                searchTripQuery.put("userId", user.getId());
+                searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "suggestion");
+                DBCursor tripIds = trips.find(searchTripQuery);
+                Integer user_success = tripIds.count();
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", user_success));
+
+                Double userProb = 0.0;
+                switch (personality) {
+                    case "Extraversion":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugEx());
+                        break;
+                    case "Agreeableness":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugAg());
+                        break;
+                    case "Openness":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugOp());
+                        break;
+                    case "Conscientiousness":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugCons());
+                        break;
+                    case "Neuroticism":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugN());
+                        break;
+                }
+                //Update user probability of each strategy, user attempts and user success on mongodb
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugProb", userProb));
+
+            }
 	        else if (strategy.equals("comparison") ) {
 	            try {
 	                user_attempts = userQuery.get().getCompAttempts();
@@ -277,6 +332,56 @@ public class CalculateMessageUtilities {
 	            }
 	            user_attempts = user_attempts + 1;
 	            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", user_attempts));
+                //Find all saved trips with persusasive message (suggestion)
+                BasicDBObject TripQuery = new BasicDBObject();
+                TripQuery.put("favourite", true);
+                TripQuery.put("body.additionalInfo.additionalProperties.strategy", strategy);
+                DBCursor tripsIds = trips.find(TripQuery);
+                Integer number_of_success = tripsIds.count();
+                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_successes", number_of_success));
+
+                //Calculate probability
+                Double probability;
+                if (number_of_success.equals(0) | number_of_times_sent.equals(0)) {
+                    probability = 0.0;
+                } else {
+                    probability = (double) number_of_success / (double) number_of_times_sent;
+                }
+                //Update Strategy probability on mongodb
+                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("probability", probability));
+
+                //---------------------------------------------------------------------------
+
+                //Calculate and update Strategy Probability of this user
+                //Find all saved trips of current user with persusasive message (suggestion)
+                BasicDBObject searchTripQuery = new BasicDBObject();
+                searchTripQuery.put("favourite", true);
+                searchTripQuery.put("userId", user.getId());
+                searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", strategy);
+                DBCursor tripIds = trips.find(searchTripQuery);
+                Integer user_success = tripIds.count();
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", user_success));
+
+                Double userProb = 0.0;
+                switch (personality) {
+                    case "Extraversion":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompEx());
+                        break;
+                    case "Agreeableness":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompAg());
+                        break;
+                    case "Openness":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompOp());
+                        break;
+                    case "Conscientiousness":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompCons());
+                        break;
+                    case "Neuroticism":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompN());
+                        break;
+                }
+                //Update user probability of each strategy, user attempts and user success on mongodb
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compProb", userProb));
 	        }
 	        if (strategy.equals("self-monitoring") ) {
 	            try {
@@ -289,6 +394,56 @@ public class CalculateMessageUtilities {
 	            }
 	            user_attempts = user_attempts + 1;
 	            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", user_attempts));
+                //Find all saved trips with persusasive message (suggestion)
+                BasicDBObject TripQuery = new BasicDBObject();
+                TripQuery.put("favourite", true);
+                TripQuery.put("body.additionalInfo.additionalProperties.strategy", strategy);
+                DBCursor tripsIds = trips.find(TripQuery);
+                Integer number_of_success = tripsIds.count();
+                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_successes", number_of_success));
+
+                //Calculate probability
+                Double probability;
+                if (number_of_success.equals(0) | number_of_times_sent.equals(0)) {
+                    probability = 0.0;
+                } else {
+                    probability = (double) number_of_success / (double) number_of_times_sent;
+                }
+                //Update Strategy probability on mongodb
+                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("probability", probability));
+
+                //---------------------------------------------------------------------------
+
+                //Calculate and update Strategy Probability of this user
+                //Find all saved trips of current user with persusasive message (suggestion)
+                BasicDBObject searchTripQuery = new BasicDBObject();
+                searchTripQuery.put("favourite", true);
+                searchTripQuery.put("userId", user.getId());
+                searchTripQuery.put("body.additionalInfo.additionalProperties.strategy",strategy);
+                DBCursor tripIds = trips.find(searchTripQuery);
+                Integer user_success = tripIds.count();
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", user_success));
+
+                Double userProb = 0.0;
+                switch (personality) {
+                    case "Extraversion":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfEx());
+                        break;
+                    case "Agreeableness":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfAg());
+                        break;
+                    case "Openness":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfOp());
+                        break;
+                    case "Conscientiousness":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfCons());
+                        break;
+                    case "Neuroticism":
+                        userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfN());
+                        break;
+                }
+                //Update user probability of each strategy, user attempts and user success on mongodb
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfProb", userProb));
 	        }
 	        selected_message_text = selected_message_text + "_" +strategy;
 	        return selected_message_text;
