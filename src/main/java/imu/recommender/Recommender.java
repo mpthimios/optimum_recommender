@@ -101,7 +101,6 @@ public class Recommender {
 					}
 				}
 			}
-			logger.debug(recommenderRoute.getRoute().getFrom());
 			recommenderRoute.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0);
 			//Find the mode of the route searching segments of the route
 			int mode = recommenderRoute.getMode();

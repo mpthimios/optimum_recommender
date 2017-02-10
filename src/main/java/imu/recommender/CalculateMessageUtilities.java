@@ -63,7 +63,7 @@ public class CalculateMessageUtilities {
         else{
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
-            PWalkGW = 25.0 + result;
+            PWalkGW = 25.0 + (int)Math.round(result * 100)/(double)100;;
             PercentageList.add("PWalkGW");
         }
         if (PBikeGW > GetProperties.getPBikeGW()){
@@ -72,7 +72,7 @@ public class CalculateMessageUtilities {
         else{
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
-            PBikeGW = 25.0 + result;
+            PBikeGW = 25.0 + (int)Math.round(result * 100)/(double)100;;
             PercentageList.add("PBikeGW");
         }
         if (PPtGW > GetProperties.getPPtGW()){
@@ -81,7 +81,7 @@ public class CalculateMessageUtilities {
         else{
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
-            PPtGW = 25.0 + result;
+            PPtGW = 25.0 + (int)Math.round(result * 100)/(double)100;;
             PercentageList.add("PPtGW");
         }
         if (MinWalked > GetProperties.getMinWalked()){
@@ -111,7 +111,7 @@ public class CalculateMessageUtilities {
         else{
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
-            PWalkSD = 50.0 + result;
+            PWalkSD = 50.0 + (int)Math.round(result * 100)/(double)100;
             PercentageList.add("PWalkSD");
         }
         if (PBikeSD > GetProperties.getPBikeGW()){
@@ -120,7 +120,7 @@ public class CalculateMessageUtilities {
         else{
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
-            PBikeSD = 50.0 + result;
+            PBikeSD = 50.0 + (int)Math.round(result * 100)/(double)100;;
             PercentageList.add("PBikeSD");
         }
         PercentageList.add("no");
@@ -190,7 +190,7 @@ public class CalculateMessageUtilities {
                 selected_message_text = selected_message_text.replace("X", Double.toString(user.getCarUsageComparedToOthers()));
             }
             if (selected_message_params.equals("PWalkGW")){
-                if(PWalkGW > GetProperties.getPWalkGW()){
+                if(user.getWalkUsageComparedToOthersGW() > GetProperties.getPWalkGW()){
                     selected_message_text = selected_message_text.replace("X", Double.toString(user.getWalkUsageComparedToOthersGW()));
                 }
                 else {
@@ -198,7 +198,7 @@ public class CalculateMessageUtilities {
                 }
             }
             if (selected_message_params.equals("PBikeGW")){
-                if(PBikeGW > GetProperties.getPBikeGW()) {
+                if(user.getBikeUsageComparedToOthersGW() > GetProperties.getPBikeGW()) {
                     selected_message_text = selected_message_text.replace("X", Double.toString(user.getBikeUsageComparedToOthersGW()));
                 }
                 else {
@@ -206,7 +206,7 @@ public class CalculateMessageUtilities {
                 }
             }
             if (selected_message_params.equals("PPtGW")){
-                if(PPtGW > GetProperties.getPPtGW()) {
+                if(user.getPtUsageComparedToOthers() > GetProperties.getPPtGW()) {
                     selected_message_text = selected_message_text.replace("X", Double.toString(user.getPtUsageComparedToOthers()));
                 }
                 else {
@@ -226,7 +226,7 @@ public class CalculateMessageUtilities {
                 selected_message_text = selected_message_text.replace("X", Double.toString(user.getPercentageReduceDriving()));
             }
             if (selected_message_params.equals("PWalkSD")){
-                if(PWalkSD > GetProperties.getPWalkGW()) {
+                if(user.getWalkUsageComparedToOthers() > GetProperties.getPWalkGW()) {
                     selected_message_text = selected_message_text.replace("X", Double.toString(user.getWalkUsageComparedToOthers()));
                 }
                 else {
@@ -234,7 +234,7 @@ public class CalculateMessageUtilities {
                 }
             }
             if (selected_message_params.equals("PBikeSD")){
-                if(PBikeSD > GetProperties.getPBikeGW()) {
+                if(user.getBikeUsageComparedToOthers() > GetProperties.getPBikeGW()) {
                     selected_message_text = selected_message_text.replace("X", Double.toString(user.getBikeUsageComparedToOthers()));
                 }
                 else{

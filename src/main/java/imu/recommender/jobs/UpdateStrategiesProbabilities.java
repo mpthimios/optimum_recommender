@@ -206,21 +206,27 @@ public class UpdateStrategiesProbabilities  implements Job{
                             }
                             Double userProb = 0.0;
                             String personality = userQuery.get().getPersonality().getTypeStr();
+                            double sum_prob;
                             switch (personality) {
                                 case "Extraversion":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfEx());
+                                    sum_prob = GetProperties.getCompEx() + GetProperties.getSelfEx() + GetProperties.getSugEx();
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfEx()/sum_prob);
                                     break;
                                 case "Agreeableness":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfAg());
+                                    sum_prob = GetProperties.getCompAg() + GetProperties.getSelfAg() + GetProperties.getSugAg();
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfAg()/sum_prob);
                                     break;
                                 case "Openness":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfOp());
+                                    sum_prob = GetProperties.getCompOp() + GetProperties.getSelfOp() + GetProperties.getSugOp();
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfOp()/sum_prob);
                                     break;
                                 case "Conscientiousness":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfCons());
+                                    sum_prob = GetProperties.getCompCons() + GetProperties.getSelfCons() + GetProperties.getSugCons();
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfCons()/sum_prob);
                                     break;
                                 case "Neuroticism":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfN());
+                                    sum_prob = GetProperties.getCompN() + GetProperties.getSelfN() + GetProperties.getSugN();
+                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfN()/sum_prob);
                                     break;
                             }
 
