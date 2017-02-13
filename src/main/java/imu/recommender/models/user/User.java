@@ -52,9 +52,9 @@ public class User {
 	private double MinBiked;
 	private double MinPT;
 	private double MinDrived;
-	private String PreferredMode;
+	/*private String PreferredMode;
 	private Integer MaxPreferredBikeDistance;
-	private Integer MaxPreferredWalkDistance;
+	private Integer MaxPreferredWalkDistance;*/
 	private double CarPercentagePreviousWeek;
 	private double PercentageReduceDriving;
 
@@ -115,9 +115,9 @@ public class User {
 		this.MinPT = 0.0;
 		this.MinDrived = 0.0;
 		this.MinBiked = 0.0;
-		this.PreferredMode = "";
-		this.MaxPreferredBikeDistance = 3;
-		this.MaxPreferredWalkDistance = 3;
+		//this.PreferredMode = "";
+		//this.MaxPreferredBikeDistance = 3;
+		//this.MaxPreferredWalkDistance = 3;
 		this.CarPercentagePreviousWeek = 0;
 		this.PercentageReduceDriving = 80.0;
 
@@ -230,6 +230,9 @@ public class User {
 			personality.setNeuroticism(this.personality.getNeuroticism());
 			personality.setExtraversion(this.personality.getExtraversion());
 			personality.setScores_calculated(true);
+			personality.setPreferredMode(this.personality.getPreferredMode());
+			personality.setMaxPreferredBikeDistance(this.personality.getMaxPreferredBikeDistance());
+			personality.setMaxPreferredWalkDistance(this.personality.getMaxPreferredWalkDistance());
 
 			UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("personality",personality);
 			mongoDatastore.update(query, ops);
@@ -695,7 +698,7 @@ public class User {
 		MinDrived = minDrived;
 	}
 
-	public String getPreferredMode() {
+	/*public String getPreferredMode() {
 		return PreferredMode;
 	}
 
@@ -717,7 +720,7 @@ public class User {
 
 	public void setMaxPreferredWalkDistance(Integer maxPreferredWalkDistance) {
 		MaxPreferredWalkDistance = maxPreferredWalkDistance;
-	}
+	}*/
 	public double getCarPercentagePreviousWeek() {
 		return CarPercentagePreviousWeek;
 	}

@@ -21,6 +21,9 @@ public class Personality {
 	private double Consientiousness;
 	//per personality type scores
 	private boolean scores_calculated = false;
+	private String PreferredMode;
+	private Integer MaxPreferredBikeDistance;
+	private Integer MaxPreferredWalkDistance;
 
 	public Personality() {
 		Q1 = 1.0;
@@ -40,6 +43,9 @@ public class Personality {
 		Neuroticism = 0.0;
 		Agreeableness = 0.0;
 		Consientiousness = 0.0;
+		this.PreferredMode= "car";
+		this.MaxPreferredBikeDistance = 0;
+		this.MaxPreferredWalkDistance = 0;
 
 	}
 
@@ -177,6 +183,29 @@ public class Personality {
 	}
 	public void setConsientiousness(double consientiousness){
 		Consientiousness = consientiousness;
+	}
+	public String getPreferredMode() {
+		return PreferredMode;
+	}
+
+	public void setPreferredMode(String preferredMode) {
+		PreferredMode = preferredMode;
+	}
+
+	public Integer getMaxPreferredBikeDistance() {
+		return MaxPreferredBikeDistance;
+	}
+
+	public void setMaxPreferredBikeDistance(Integer maxPreferredBikeDistance) {
+		MaxPreferredBikeDistance = maxPreferredBikeDistance;
+	}
+
+	public Integer getMaxPreferredWalkDistance() {
+		return MaxPreferredWalkDistance;
+	}
+
+	public void setMaxPreferredWalkDistance(Integer maxPreferredWalkDistance) {
+		MaxPreferredWalkDistance = maxPreferredWalkDistance;
 	}
 
 }
