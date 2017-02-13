@@ -2,7 +2,6 @@ package imu.recommender.jobs;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.strategy.Strategy;
@@ -46,10 +45,10 @@ public class UpdateStrategiesProbabilities  implements Job{
                 //Update the number of success
                 //Find all saved trips with persusasive message (suggestion)
                 BasicDBObject TripQuery = new BasicDBObject();
-                TripQuery.put("favourite", true);
+                TripQuery.put("viewed", true);
                 TripQuery.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
-                DBCursor tripsIds = trips.find(TripQuery);
-                Integer success = tripsIds.count();
+                List tripsIds = trips.distinct("requestId",TripQuery);
+                Integer success = tripsIds.size();
                 mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_successes", success));
                 try {
 
@@ -87,11 +86,11 @@ public class UpdateStrategiesProbabilities  implements Job{
                             //Get total successes
                             //Find all saved trips of current user with persusasive message (suggestion)
                             BasicDBObject searchTripQuery = new BasicDBObject();
-                            searchTripQuery.put("favourite", true);
+                            searchTripQuery.put("viewed", true);
                             searchTripQuery.put("userId", userid);
                             searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "suggestion");
-                            DBCursor tripIds = trips.find(searchTripQuery);
-                            Integer StrategySuccess = tripIds.count();
+                            List tripIds = trips.distinct("requestId",searchTripQuery);
+                            Integer StrategySuccess = tripIds.size();
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", StrategySuccess));
                             try {
                                 //Get total attemps and successes
@@ -106,21 +105,53 @@ public class UpdateStrategiesProbabilities  implements Job{
                                 user_success = userQuery.get().getSugSuccess();
                             }
                             Double userProb = 0.0;
+                            double sum_prob;
                             switch (personality) {
                                 case "Extraversion":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugEx());
+                                    sum_prob = GetProperties.getCompEx() + GetProperties.getSelfEx() + GetProperties.getSugEx();
+                                    if (sum_prob!= 0.0) {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugEx() / sum_prob);
+                                    }
+                                    else{
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugEx());
+                                    }
                                     break;
                                 case "Agreeableness":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugAg());
+                                    sum_prob = GetProperties.getCompAg() + GetProperties.getSelfAg() + GetProperties.getSugAg();
+                                    if (sum_prob != 0.0){
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugAg()/sum_prob);
+                                    }
+                                    else {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugAg());
+                                    }
                                     break;
                                 case "Openness":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugOp());
+                                    sum_prob = GetProperties.getCompOp() + GetProperties.getSelfOp() + GetProperties.getSugOp();
+                                    if (sum_prob !=0){
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugOp()/sum_prob);
+                                    }
+                                    else {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugOp());
+                                    }
                                     break;
                                 case "Conscientiousness":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugCons());
+                                    sum_prob = GetProperties.getCompCons() + GetProperties.getSelfCons() + GetProperties.getSugCons();
+                                    if (sum_prob !=0.0){
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugCons()/sum_prob);
+
+                                    }
+                                    else {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugCons());
+                                    }
                                     break;
                                 case "Neuroticism":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugN());
+                                    sum_prob = GetProperties.getCompN() + GetProperties.getSelfN() + GetProperties.getSugN();
+                                    if(sum_prob!=0.0) {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugN() / sum_prob);
+                                    }
+                                    else{
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugN());
+                                    }
                                     break;
                             }
                             //Update user probability of each strategy, user attempts and user success on mongodb
@@ -135,11 +166,11 @@ public class UpdateStrategiesProbabilities  implements Job{
                             //Get total successes
                             //Find all saved trips of current user with persusasive message (suggestion)
                             BasicDBObject searchTripQuery = new BasicDBObject();
-                            searchTripQuery.put("favourite", true);
+                            searchTripQuery.put("viewed", true);
                             searchTripQuery.put("userId", userid);
                             searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "comparison");
-                            DBCursor tripsIdsComp = trips.find(searchTripQuery);
-                            Integer successComp = tripsIdsComp.count();
+                            List tripsIdsComp = trips.distinct("requestId",searchTripQuery);
+                            Integer successComp = tripsIdsComp.size();
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", successComp));
                             try {
                                 //Get total attemps and successes
@@ -156,24 +187,55 @@ public class UpdateStrategiesProbabilities  implements Job{
 
                             Double userProb = 0.0;
                             String personality = userQuery.get().getPersonality().getTypeStr();
+                            double sum_prob;
                             switch (personality) {
                                 case "Extraversion":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompEx());
+                                    sum_prob = GetProperties.getCompEx() + GetProperties.getSelfEx() + GetProperties.getSugEx();
+                                    if (sum_prob!= 0.0) {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompEx() / sum_prob);
+                                    }
+                                    else{
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompEx());
+                                    }
                                     break;
                                 case "Agreeableness":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompAg());
+                                    sum_prob = GetProperties.getCompAg() + GetProperties.getSelfAg() + GetProperties.getSugAg();
+                                    if (sum_prob != 0.0){
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompAg()/sum_prob);
+                                    }
+                                    else {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompAg());
+                                    }
                                     break;
                                 case "Openness":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompOp());
+                                    sum_prob = GetProperties.getCompOp() + GetProperties.getSelfOp() + GetProperties.getSugOp();
+                                    if (sum_prob !=0){
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompOp()/sum_prob);
+                                    }
+                                    else {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompOp());
+                                    }
                                     break;
                                 case "Conscientiousness":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompCons());
+                                    sum_prob = GetProperties.getCompCons() + GetProperties.getSelfCons() + GetProperties.getSugCons();
+                                    if (sum_prob !=0.0){
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompCons()/sum_prob);
+
+                                    }
+                                    else {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompCons());
+                                    }
                                     break;
                                 case "Neuroticism":
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompN());
+                                    sum_prob = GetProperties.getCompN() + GetProperties.getSelfN() + GetProperties.getSugN();
+                                    if(sum_prob!=0.0) {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompN() / sum_prob);
+                                    }
+                                    else{
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompN());
+                                    }
                                     break;
                             }
-
                             //Update user probability of each strategy, user attempts and user success on mongodb
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compProb", userProb));
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", user_attempts));
@@ -186,11 +248,12 @@ public class UpdateStrategiesProbabilities  implements Job{
                             //Get total successes
                             //Find all saved trips of current user with persusasive message (suggestion)
                             BasicDBObject searchTripQuery = new BasicDBObject();
-                            searchTripQuery.put("favourite", true);
+                            searchTripQuery.put("viewed", true);
                             searchTripQuery.put("userId", userid);
                             searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "self-monitoring");
-                            DBCursor tripsIdsSelf = trips.find(searchTripQuery);
-                            Integer successSelf = tripsIdsSelf.count();
+                            List tripsIdsSelf = trips.distinct("requestId",searchTripQuery);
+                            //DBCursor tripsIdsSelf = trips.find(searchTripQuery);
+                            Integer successSelf = tripsIdsSelf.size();
                             mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", successSelf));
                             try {
                                 //Get total attemps and successes
@@ -210,23 +273,49 @@ public class UpdateStrategiesProbabilities  implements Job{
                             switch (personality) {
                                 case "Extraversion":
                                     sum_prob = GetProperties.getCompEx() + GetProperties.getSelfEx() + GetProperties.getSugEx();
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfEx()/sum_prob);
+                                    if (sum_prob!= 0.0) {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfEx() / sum_prob);
+                                    }
+                                    else{
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfEx());
+                                    }
                                     break;
                                 case "Agreeableness":
                                     sum_prob = GetProperties.getCompAg() + GetProperties.getSelfAg() + GetProperties.getSugAg();
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfAg()/sum_prob);
+                                    if (sum_prob != 0.0){
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfAg()/sum_prob);
+                                    }
+                                    else {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfAg());
+                                    }
                                     break;
                                 case "Openness":
                                     sum_prob = GetProperties.getCompOp() + GetProperties.getSelfOp() + GetProperties.getSugOp();
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfOp()/sum_prob);
+                                    if (sum_prob !=0){
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfOp()/sum_prob);
+                                    }
+                                    else {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfOp());
+                                    }
                                     break;
                                 case "Conscientiousness":
                                     sum_prob = GetProperties.getCompCons() + GetProperties.getSelfCons() + GetProperties.getSugCons();
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfCons()/sum_prob);
+                                    if (sum_prob !=0.0){
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfCons()/sum_prob);
+
+                                    }
+                                    else {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfCons());
+                                    }
                                     break;
                                 case "Neuroticism":
                                     sum_prob = GetProperties.getCompN() + GetProperties.getSelfN() + GetProperties.getSugN();
-                                    userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfN()/sum_prob);
+                                    if(sum_prob!=0.0) {
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfN() / sum_prob);
+                                    }
+                                    else{
+                                        userProb = calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfN());
+                                    }
                                     break;
                             }
 
