@@ -1,54 +1,68 @@
 package imu.recommender;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-
+import at.ac.ait.ariadne.routeformat.RouteSegment;
+import imu.recommender.models.route.RouteModel;
+import imu.recommender.models.user.User;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import imu.recommender.helpers.RecommenderModes;
-import imu.recommender.models.route.RouteModel;
-import imu.recommender.models.user.User;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class BehaviouralModel {
 	
 	private static Logger logger = Logger.getLogger(BehaviouralModel.class);
 	
 	public static double calculateBhaviouralModelUtility (RouteModel route, User user){
+		double final_utility = 0.0;
 		double utility = 0.0;
 		String[] location = {
 				route.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0).toString(),
 				route.getRoute().getFrom().getCoordinate().geometry.coordinates.get(1).toString()	
 		};
-		double time = (double)route.getRoute().getDurationSeconds();
-		switch (route.getMode()){
-			case RecommenderModes.WALK:
-				utility = U2(0, time, user, location);
-				break;
-			case RecommenderModes.BICYCLE:
-				utility = U1(0, time, user, location);
-				break;
-			case RecommenderModes.BIKE_AND_RIDE:
-				utility = U1(0, time, user, location);
-				break;
-			case RecommenderModes.PUBLIC_TRANSPORT:
-				utility = U3(0, time, user, location);
-				break;
-			case RecommenderModes.PARK_AND_RIDE_WITH_BIKE:
-				utility = U4(0, time, user, location);
-				break;
-			case RecommenderModes.PARK_AND_RIDE:
-				utility = U4(0, time, user, location);
-				break;
-			case RecommenderModes.CAR:
-				utility = U4(0, time, user, location);
-				break;
-			default:
-					break;
+		for (int j = 0; j < route.getRoute().getSegments().size(); j++) {
+			RouteSegment segment = route.getRoute().getSegments().get(j);
+			String mode = segment.getModeOfTransport().getGeneralizedType().toString();
+			double time = (double) segment.getDurationSeconds();
+			try {
+				double cost = (double)segment.getAdditionalInfo().get("estimatedCost");
+				logger.debug("Estimated Cost : "+cost);
+				switch (mode){
+					case "WALK":
+						utility = U2(cost, time, user, location);
+						break;
+					case "BICYCLE":
+						utility = U1(cost, time, user, location);
+						break;
+					case "BIKE_AND_RIDE":
+						utility = U1(cost, time, user, location);
+						break;
+					case "PUBLIC_TRANSPORT":
+						utility = U3(cost, time, user, location);
+						break;
+					case "PARK_AND_RIDE_WITH_BIKE":
+						utility = U4(cost, time, user, location);
+						break;
+					case "PARK_AND_RIDE":
+						utility = U4(cost, time, user, location);
+						break;
+					case "CAR":
+						utility = U4(cost, time, user, location);
+						break;
+					default:
+						break;
+				}
+			}
+			catch (Exception e){
+				utility = 0.0;
+			}
+
+			final_utility = final_utility + utility;
 		}
-		logger.debug("behavioural model utility: " + utility);
-		return utility;
+
+		logger.debug("behavioural model utility: " + final_utility);
+		return final_utility;
 	}
 	
 	public static double U1(double cost, double time, User user, String[] location){

@@ -1,16 +1,13 @@
 package imu.recommender.models.route;
 
-import java.io.IOException;
+import at.ac.ait.ariadne.routeformat.Route;
+import at.ac.ait.ariadne.routeformat.RouteSegment;
+import imu.recommender.helpers.RecommenderModes;
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-
-import at.ac.ait.ariadne.routeformat.Route;
-import at.ac.ait.ariadne.routeformat.RouteSegment;
-import imu.recommender.RequestHandler;
-import imu.recommender.helpers.RecommenderModes;
 
 public class RouteModel {
 
@@ -27,6 +24,7 @@ public class RouteModel {
 	private double CO2EmissionsRank = 0.0;
 	private String message = "";
 	private String strategy = "";
+	private boolean popup = false;
 
 
 	
@@ -252,5 +250,13 @@ public class RouteModel {
 	public void setCO2EmissionsRank(double cO2EmissionsRank) {
 		CO2EmissionsRank = cO2EmissionsRank;
 	}
-		
+
+	public void setPopup(Boolean popup){
+		Map<String, Object> additionalInfoRouteRequest = route.getAdditionalInfo();
+		additionalInfoRouteRequest.put("display_popup", popup);
+		route.setAdditionalInfo(additionalInfoRouteRequest);
+	}
+	public boolean getPopup() { return this.popup;}
+
+
 }

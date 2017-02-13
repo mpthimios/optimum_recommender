@@ -457,6 +457,8 @@ public class Recommender {
 					if (!message.isEmpty()) {
 						route.setMessage(message);
 						route.setStrategy(strategy);
+						//set popup_display false
+						route.setPopup(false);
 						SetMessage = true;
 					}
 					rankedRoutes2.add(route);
