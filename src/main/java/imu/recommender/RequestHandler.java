@@ -24,8 +24,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.util.JSON;
+
 import imu.recommender.helpers.MongoConnectionHelper;
+import imu.recommender.logs.UserRouteLog;
 import imu.recommender.models.user.OwnedVehicle;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
@@ -89,13 +93,21 @@ public class RequestHandler extends HttpServlet{
 //				UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("route_preferences", user.getRoutePreferences());
 //				mongoDatastore.update(query, ops);
 //			}
-			
-			Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
+			RouteFormatRoot originalRoutes = mapper.readValue(requestBody, RouteFormatRoot.class);
+			Recommender recommenderRoutes= new Recommender(originalRoutes, user);
 			recommenderRoutes.filterDuplicates();
 			recommenderRoutes.filterRoutesForUser(user);		
 			recommenderRoutes.rankRoutesForUser(user,mongoDatastore);
-			String jsonResult = mapper.writeValueAsString(recommenderRoutes.getRankedRoutesResponse());
-			out.println(jsonResult);			
+			RouteFormatRoot recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+			String recommendedRoutesStr = mapper.writeValueAsString(recommendedRoutes);
+			
+			UserRouteLog routeLog = new UserRouteLog();
+			routeLog.setOriginalResults((DBObject)JSON.parse(requestBody));
+			routeLog.setRecommendedResults((DBObject)JSON.parse(recommendedRoutesStr));
+			routeLog.setCreatedDate(new Date());
+			mongoDatastore.save(routeLog);
+						
+			out.println(recommendedRoutesStr);			
 		}
 		catch (Exception e){
 			e.printStackTrace();
