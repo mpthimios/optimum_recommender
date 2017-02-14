@@ -43,9 +43,9 @@ public class Personality {
 		Neuroticism = 0.0;
 		Agreeableness = 0.0;
 		Consientiousness = 0.0;
-		this.PreferredMode= "car";
-		this.MaxPreferredBikeDistance = 0;
-		this.MaxPreferredWalkDistance = 0;
+		PreferredMode= "car";
+		MaxPreferredBikeDistance = 0;
+		MaxPreferredWalkDistance = 0;
 
 	}
 
@@ -207,5 +207,55 @@ public class Personality {
 	public void setMaxPreferredWalkDistance(Integer maxPreferredWalkDistance) {
 		MaxPreferredWalkDistance = maxPreferredWalkDistance;
 	}
+	public double convertMaxWalkDistance(){
+		Double distance = 0.5;
+		switch (MaxPreferredBikeDistance){
+			case 0:
+				distance = 0.5;
+				break;
+			case 1:
+				distance = 1.0;
+				break;
+			case 2:
+				distance = 2.0;
+				break;
+			case 3:
+				distance = 3.0;
+				break;
+			case 4:
+				distance = 5.0;
+				break;
+			case 5:
+				distance = 10.0;
+				break;
+		}
+		return distance;
+	}
+
+	public double convertMaxBikeDistance(){
+		Double distance = 0.5;
+		switch (MaxPreferredBikeDistance){
+			case 0:
+				distance = 0.5;
+				break;
+			case 1:
+				distance = 1.0;
+				break;
+			case 2:
+				distance = 2.0;
+				break;
+			case 3:
+				distance = 3.0;
+				break;
+			case 4:
+				distance = 5.0;
+				break;
+			case 5:
+				distance = 10.0;
+				break;
+		}
+		return distance;
+	}
+
 
 }

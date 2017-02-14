@@ -183,6 +183,7 @@ public class User {
 
 		//Datastore mongoDatastore;
 		//mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+		String pref_mode= this.personality.getPreferredMode();
 
 		if (!this.personality.isScores_calculated()){
 			//calculate scores
@@ -230,7 +231,7 @@ public class User {
 			personality.setNeuroticism(this.personality.getNeuroticism());
 			personality.setExtraversion(this.personality.getExtraversion());
 			personality.setScores_calculated(true);
-			personality.setPreferredMode(this.personality.getPreferredMode());
+			personality.setPreferredMode(pref_mode);
 			personality.setMaxPreferredBikeDistance(this.personality.getMaxPreferredBikeDistance());
 			personality.setMaxPreferredWalkDistance(this.personality.getMaxPreferredWalkDistance());
 
