@@ -12,7 +12,8 @@ import com.mongodb.DBObject;
 
 public class UserRouteLog {
 	@Id
-    private ObjectId id;	
+    private ObjectId id;
+	private String userId;
 	private DBObject originalResults;
 	private DBObject recommendedResults;
 	private Date createdDate;
@@ -23,6 +24,12 @@ public class UserRouteLog {
 	public void setId(ObjectId id) {
 		this.id = id;
 	}	
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 	public DBObject getOriginalResults() {
 		return originalResults;
 	}
