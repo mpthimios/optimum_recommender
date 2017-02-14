@@ -27,7 +27,8 @@ public class BehaviouralModel {
 			double time = (double) segment.getDurationSeconds();
 			try {
 				double cost = (double)segment.getAdditionalInfo().get("estimatedCost");
-				logger.debug("Estimated Cost : "+cost);
+				logger.debug("Mode "+j+" : "+mode);
+				logger.debug("Estimated Cost"+j+" : "+cost);
 				switch (mode){
 					case "WALK":
 						utility = U2(cost, time, user, location);
@@ -57,7 +58,7 @@ public class BehaviouralModel {
 			catch (Exception e){
 				utility = 0.0;
 			}
-
+			logger.debug("Utility "+j+" : "+utility);
 			final_utility = final_utility + utility;
 		}
 
