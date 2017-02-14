@@ -102,6 +102,7 @@ public class RequestHandler extends HttpServlet{
 			String recommendedRoutesStr = mapper.writeValueAsString(recommendedRoutes);
 			
 			UserRouteLog routeLog = new UserRouteLog();
+			routeLog.setUserId(userID);
 			routeLog.setOriginalResults((DBObject)JSON.parse(requestBody));
 			routeLog.setRecommendedResults((DBObject)JSON.parse(recommendedRoutesStr));
 			routeLog.setCreatedDate(new Date());
