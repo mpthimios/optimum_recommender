@@ -1,6 +1,7 @@
 package imu.recommender;
 
 import at.ac.ait.ariadne.routeformat.RouteSegment;
+import imu.recommender.helpers.RecommenderModes;
 import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.User;
 import org.apache.commons.io.IOUtils;
@@ -17,53 +18,57 @@ public class BehaviouralModel {
 	public static double calculateBhaviouralModelUtility (RouteModel route, User user){
 		double final_utility = 0.0;
 		double utility = 0.0;
+		logger.debug(route.getRoute().getFrom().getCoordinate().toString());
 		String[] location = {
-				route.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0).toString(),
-				route.getRoute().getFrom().getCoordinate().geometry.coordinates.get(1).toString()	
+				route.getRoute().getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(0).toString(),
+				route.getRoute().getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(1).toString()
 		};
+
+		double cost = 0.0;
+		double segment_cost = 0.0;
+		double time = (double) route.getRoute().getDurationSeconds()/60;
+		logger.debug("Mode : "+route.getRoute().getAdditionalInfo().get("mode"));
+		logger.debug("Time: "+time);
 		for (int j = 0; j < route.getRoute().getSegments().size(); j++) {
 			RouteSegment segment = route.getRoute().getSegments().get(j);
-			String mode = segment.getModeOfTransport().getGeneralizedType().toString();
-			double time = (double) segment.getDurationSeconds();
 			try {
-				double cost = (double)segment.getAdditionalInfo().get("estimatedCost");
-				logger.debug("Mode "+j+" : "+mode);
-				logger.debug("Estimated Cost"+j+" : "+cost);
-				switch (mode){
-					case "WALK":
-						utility = U2(cost, time, user, location);
-						break;
-					case "BICYCLE":
-						utility = U1(cost, time, user, location);
-						break;
-					case "BIKE_AND_RIDE":
-						utility = U1(cost, time, user, location);
-						break;
-					case "PUBLIC_TRANSPORT":
-						utility = U3(cost, time, user, location);
-						break;
-					case "PARK_AND_RIDE_WITH_BIKE":
-						utility = U4(cost, time, user, location);
-						break;
-					case "PARK_AND_RIDE":
-						utility = U4(cost, time, user, location);
-						break;
-					case "CAR":
-						utility = U4(cost, time, user, location);
-						break;
-					default:
-						break;
-				}
+				segment_cost = (double)segment.getAdditionalInfo().get("estimatedCost");
+
 			}
 			catch (Exception e){
-				utility = 0.0;
+				segment_cost = 0.0;
 			}
-			logger.debug("Utility "+j+" : "+utility);
-			final_utility = final_utility + utility;
+			cost = segment_cost + cost;
+		}
+		logger.debug("Estimated Cost : "+cost);
+		switch (route.getMode()){
+			case RecommenderModes.WALK:
+				utility = U2(cost, time, user, location);
+				break;
+			case RecommenderModes.BICYCLE:
+				utility = U1(cost, time, user, location);
+				break;
+			case RecommenderModes.BIKE_AND_RIDE:
+				utility = U1(cost, time, user, location);
+				break;
+			case RecommenderModes.PUBLIC_TRANSPORT:
+				utility = U3(cost, time, user, location);
+				break;
+			case RecommenderModes.PARK_AND_RIDE_WITH_BIKE:
+				utility = U4(cost, time, user, location);
+				break;
+			case RecommenderModes.PARK_AND_RIDE:
+				utility = U4(cost, time, user, location);
+				break;
+			case RecommenderModes.CAR:
+				utility = U4(cost, time, user, location);
+				break;
+			default:
+				break;
 		}
 
-		logger.debug("behavioural model utility: " + final_utility);
-		return final_utility;
+		logger.debug("behavioural model utility: " + utility);
+		return utility;
 	}
 	
 	public static double U1(double cost, double time, User user, String[] location){
@@ -123,24 +128,15 @@ public class BehaviouralModel {
 		
 		double result = g0 + 
 				g1*(double)user.getDemographics().getAge() +
-				g2*1 +educationValue(user.getDemographics().getEducation()) +
+				g2*educationValue(user.getDemographics().getEducation()) +
 				g3*genderValue(user.getDemographics().getGender()) +
 				g4*getLocationValue(location[0], location[1]);				
 		return 0.0;
 	}
 	
 	private static double educationValue(String education){
-		if (education.matches("Primary education or less")){
+		if (education.matches("Graduate or post-graduate degree")){
 			return 1.0;
-		}
-		else if (education.matches("Secondary education")){
-			return 2.0;
-		}
-		else if (education.matches("Undergraduate degree")){
-			return 3.0;
-		}
-		else if (education.matches("Graduate or post-graduate degree")){
-			return 4.0;
 		}
 		else return 0.0;
 	}
@@ -159,18 +155,10 @@ public class BehaviouralModel {
 			URL url = new URL(urlString);
 			URLConnection conn = url.openConnection();
 			InputStream is = conn.getInputStream();
-			String location = IOUtils.toString(is, "UTF-8").trim().replaceAll("\n ", "");			
-			if (location.matches("SI")){
-				logger.debug("request from Slovenia");
-				return 1.0;
-			}
-			else if (location.matches("AT")){
-				logger.debug("request from Austria");
-				return 2.0;
-			}
-			else if (location.matches("GB")){
+			String location = IOUtils.toString(is, "UTF-8").trim().replaceAll("\n ", "");
+			if (location.matches("GB")){
 				logger.debug("request from UK");
-				return 3.0;
+				return 1.0;
 			}
 			else return 0.0;
 		}

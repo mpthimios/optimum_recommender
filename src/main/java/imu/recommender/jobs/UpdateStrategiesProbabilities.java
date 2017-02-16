@@ -35,6 +35,7 @@ public class UpdateStrategiesProbabilities  implements Job{
 
         DBCollection m = mongoDatastore.getCollection( Strategy.class );
         DBCollection trips = mongoDatastore.getDB().getCollection("UserTrip");
+        DBCollection routes = mongoDatastore.getDB().getCollection("UserRoute");
         //Update the probabilities of each strategy based on all users.
         List strategies = m.distinct( "persuasive_strategy", new BasicDBObject());
 
@@ -50,6 +51,13 @@ public class UpdateStrategiesProbabilities  implements Job{
                 List tripsIds = trips.distinct("requestId",TripQuery);
                 Integer success = tripsIds.size();
                 mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_successes", success));
+                //Get total popupdisplays and total helpful
+                /*BasicDBObject RouteQuery = new BasicDBObject();
+                RouteQuery.put("viewed", true);
+                RouteQuery.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
+                List requestIds = routes.distinct("requestId",TripQuery);
+                Integer success = tripsIds.size();
+                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_successes", success));*/
                 try {
 
                     //Get total attemps and successes

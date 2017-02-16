@@ -21,9 +21,9 @@ public class Personality {
 	private double Consientiousness;
 	//per personality type scores
 	private boolean scores_calculated = false;
-	private String PreferredMode;
-	private Integer MaxPreferredBikeDistance;
-	private Integer MaxPreferredWalkDistance;
+	private String preferredMode;
+	private Integer maxPreferredBikeDistance;
+	private Integer maxPreferredWalkDistance;
 
 	public Personality() {
 		Q1 = 1.0;
@@ -43,9 +43,9 @@ public class Personality {
 		Neuroticism = 0.0;
 		Agreeableness = 0.0;
 		Consientiousness = 0.0;
-		PreferredMode= "car";
-		MaxPreferredBikeDistance = 0;
-		MaxPreferredWalkDistance = 0;
+		preferredMode= "car";
+		maxPreferredBikeDistance = 0;
+		maxPreferredWalkDistance = 0;
 
 	}
 
@@ -185,73 +185,70 @@ public class Personality {
 		Consientiousness = consientiousness;
 	}
 	public String getPreferredMode() {
-		return PreferredMode;
+		return preferredMode;
 	}
 
-	public void setPreferredMode(String preferredMode) {
-		PreferredMode = preferredMode;
+	public void setPreferredMode(String PreferredMode) {
+		preferredMode = PreferredMode;
 	}
 
 	public Integer getMaxPreferredBikeDistance() {
-		return MaxPreferredBikeDistance;
+		return maxPreferredBikeDistance;
 	}
 
-	public void setMaxPreferredBikeDistance(Integer maxPreferredBikeDistance) {
-		MaxPreferredBikeDistance = maxPreferredBikeDistance;
+	public void setMaxPreferredBikeDistance(Integer MaxPreferredBikeDistance) {
+		maxPreferredBikeDistance = MaxPreferredBikeDistance;
 	}
 
 	public Integer getMaxPreferredWalkDistance() {
-		return MaxPreferredWalkDistance;
+		return maxPreferredWalkDistance;
 	}
 
-	public void setMaxPreferredWalkDistance(Integer maxPreferredWalkDistance) {
-		MaxPreferredWalkDistance = maxPreferredWalkDistance;
+	public void setMaxPreferredWalkDistance(Integer MaxPreferredWalkDistance) {
+		maxPreferredWalkDistance = MaxPreferredWalkDistance;
 	}
-	public double convertMaxWalkDistance(){
-		Double distance = 0.5;
-		switch (MaxPreferredBikeDistance){
+	public int convertMaxWalkDistance(){
+		int distance = 500;
+		switch (maxPreferredBikeDistance){
 			case 0:
-				distance = 0.5;
+				distance = 500;
 				break;
 			case 1:
-				distance = 1.0;
+				distance = 1000;
 				break;
 			case 2:
-				distance = 2.0;
+				distance = 2000;
 				break;
 			case 3:
-				distance = 3.0;
+				distance = 3000;
 				break;
 			case 4:
-				distance = 5.0;
+				distance = 5000;
 				break;
 			case 5:
-				distance = 10.0;
+				distance = 10000;
 				break;
 		}
 		return distance;
 	}
 
-	public double convertMaxBikeDistance(){
-		Double distance = 0.5;
-		switch (MaxPreferredBikeDistance){
+	public int convertMaxBikeDistance(){
+		int distance = 0;
+		switch (maxPreferredBikeDistance){
 			case 0:
-				distance = 0.5;
+				distance = 0;
 				break;
 			case 1:
-				distance = 1.0;
+				distance = 2000;
 				break;
 			case 2:
-				distance = 2.0;
+				distance = 5000;
 				break;
 			case 3:
-				distance = 3.0;
+				distance = 10000;
 				break;
 			case 4:
-				distance = 5.0;
-				break;
-			case 5:
-				distance = 10.0;
+				distance = 20000;
 				break;
 		}
 		return distance;

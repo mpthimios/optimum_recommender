@@ -91,6 +91,7 @@ public class Recommender {
 			RouteModel recommenderRoute = routes.get(i);			
 			boolean car_owner = false;
 			boolean bike_owner = false;
+			//Get vehicles of user from mongodb
 			if (user.getOwned_vehicles() != null ) {
 				for (int k = 0; k < user.getOwned_vehicles().size(); k++) {
 					if (user.getOwned_vehicles().get(k).getType().equals("car")) {
@@ -101,7 +102,18 @@ public class Recommender {
 					}
 				}
 			}
-			recommenderRoute.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0);
+			//recommenderRoute.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0);
+			//Find the total walk and bike distance of route.
+			int total_walk_distance = 0;
+			int total_bike_distance = 0;
+			for (int l=0;l<recommenderRoute.getRoute().getSegments().size(); l++){
+				if (recommenderRoute.getRoute().getSegments().get(l).getModeOfTransport().getGeneralizedType().toString().equals("FOOT") ){
+					total_walk_distance = total_walk_distance + recommenderRoute.getRoute().getSegments().get(l).getDistanceMeters();
+				}
+				if (recommenderRoute.getRoute().getSegments().get(l).getModeOfTransport().getGeneralizedType().toString().equals("BICYCLE") ){
+					total_bike_distance = total_bike_distance + recommenderRoute.getRoute().getSegments().get(l).getDistanceMeters();
+				}
+			}
 			//Find the mode of the route searching segments of the route
 			int mode = recommenderRoute.getMode();
 			//Filter out routes
@@ -118,22 +130,24 @@ public class Recommender {
 			}
 //					//Filter out bike modes for users that don’t own a bike and for routes containing biking more than 3 Km
 			else if (mode == RecommenderModes.BICYCLE){
-				if((bike_owner) && (recommenderRoute.getRoute().getDistanceMeters()<GetProperties.getMaxBikeDistance())){
+				double maxBikeDistance = user.getPersonality().convertMaxBikeDistance()+ 0.3*user.getPersonality().convertMaxBikeDistance();
+				if((bike_owner) && (recommenderRoute.getRoute().getDistanceMeters()<maxBikeDistance)){
 					filteredRoutes.add(recommenderRoute);
 				}
 				else{
 					logger.debug("filtered bicycle route - bike owner: " + bike_owner + " route distance: " 
-							+ recommenderRoute.getRoute().getDistanceMeters() + " max bike distance: " + GetProperties.getMaxBikeDistance());
+							+ recommenderRoute.getRoute().getDistanceMeters() + " max bike distance: " + maxBikeDistance);
 				}
 			}
 			//Filter out walk modes for routes containing walking more than 1 Km
 			else if(mode == RecommenderModes.WALK){
-				if(recommenderRoute.getRoute().getDistanceMeters()<GetProperties.getMaxWalkingDistance()){
+				double maxDistance = user.getPersonality().convertMaxWalkDistance()+ 0.3*user.getPersonality().convertMaxWalkDistance();
+				if(recommenderRoute.getRoute().getDistanceMeters()<maxDistance){
 					filteredRoutes.add(recommenderRoute);
 				}
 				else{
 					logger.debug("filtered walk route - distance: " 
-							+ recommenderRoute.getRoute().getDistanceMeters() + " max walk distance: " + GetProperties.getMaxWalkingDistance());
+							+ recommenderRoute.getRoute().getDistanceMeters() + " max walk distance: " + maxDistance);
 				}
 			}
 			else {

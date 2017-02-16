@@ -16,8 +16,11 @@ public class Context {
     public static List<String> getRelevantContextForUser(Recommender route, RouteModel trip, User user, Datastore mongoDatastore) throws Exception {
         //Get trip properties
         Integer route_distance = trip.getRoute().getDistanceMeters();
-        Float lat = trip.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0).floatValue();
-        Float lon = trip.getRoute().getFrom().getCoordinate().geometry.coordinates.get(1).floatValue();
+        //Float lat = trip.getRoute().getFrom().getCoordinate().geometry.coordinates.get(0).floatValue();
+        //Float lon = trip.getRoute().getFrom().getCoordinate().geometry.coordinates.get(1).floatValue();
+        //System.out.print(trip.getRoute().getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(0).floatValue();
+        Float lat = trip.getRoute().getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(0).floatValue();
+        Float lon = trip.getRoute().getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(1).floatValue();
         String city = "Vienna";
         //String city = trip.getFrom().getAddress().get().getCity().get();
         Integer duration = trip.getRoute().getDurationSeconds();
