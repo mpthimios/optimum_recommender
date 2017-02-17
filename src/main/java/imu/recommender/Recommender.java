@@ -5,14 +5,17 @@ import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import imu.recommender.helpers.*;
+import imu.recommender.helpers.Ballot;
+import imu.recommender.helpers.Borda;
+import imu.recommender.helpers.RecommenderModes;
+import imu.recommender.helpers.VotingSystem;
 import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
-import java.util.*;
 
 import java.io.IOException;
+import java.util.*;
 
 
 public class Recommender {
@@ -85,7 +88,7 @@ public class Recommender {
 	}
 	
 	//filterRoutes for User function
-	public void filterRoutesForUser(User user){
+	public Boolean filterRoutesForUser(User user){
 		logger.debug("filtering routes for user - before size: " + routes.size());
 		for (int i = 0; i < routes.size(); i++) {
 			RouteModel recommenderRoute = routes.get(i);			
@@ -114,14 +117,19 @@ public class Recommender {
 					total_bike_distance = total_bike_distance + recommenderRoute.getRoute().getSegments().get(l).getDistanceMeters();
 				}
 			}
+			//Filter out routes based on walking and bike distance preference.
+			double maxBikeDistance = user.getPersonality().convertMaxBikeDistance()+ 0.3*user.getPersonality().convertMaxBikeDistance();
+			double maxWalkDistance = user.getPersonality().convertMaxWalkDistance()+ 0.3*user.getPersonality().convertMaxWalkDistance();
+
 			//Find the mode of the route searching segments of the route
 			int mode = recommenderRoute.getMode();
 			//Filter out routes
 			//Filter out car and park and ride modes for users that don’t own a car.
 			logger.debug("MODE: " + mode);
 			if ((mode == RecommenderModes.CAR) || (mode == RecommenderModes.PARK_AND_RIDE)) {
-				if(!car_owner) {
-					logger.debug("filtered car route for non car owner");
+				if(!car_owner && total_bike_distance < maxBikeDistance && total_walk_distance<maxWalkDistance) {
+					logger.debug("filtered car route for non car owner - route walk distance: "+total_walk_distance+"max walk distance: "
+							+ maxWalkDistance+" route bike distance:"+total_bike_distance+" max bike distance:"+maxBikeDistance);
 					continue;
 				}
 				else {
@@ -130,8 +138,7 @@ public class Recommender {
 			}
 //					//Filter out bike modes for users that don’t own a bike and for routes containing biking more than 3 Km
 			else if (mode == RecommenderModes.BICYCLE){
-				double maxBikeDistance = user.getPersonality().convertMaxBikeDistance()+ 0.3*user.getPersonality().convertMaxBikeDistance();
-				if((bike_owner) && (recommenderRoute.getRoute().getDistanceMeters()<maxBikeDistance)){
+				if((bike_owner) && (total_bike_distance < maxBikeDistance) && (total_walk_distance<maxWalkDistance)){
 					filteredRoutes.add(recommenderRoute);
 				}
 				else{
@@ -141,24 +148,39 @@ public class Recommender {
 			}
 			//Filter out walk modes for routes containing walking more than 1 Km
 			else if(mode == RecommenderModes.WALK){
-				double maxDistance = user.getPersonality().convertMaxWalkDistance()+ 0.3*user.getPersonality().convertMaxWalkDistance();
-				if(recommenderRoute.getRoute().getDistanceMeters()<maxDistance){
+				if( total_bike_distance < maxBikeDistance && total_walk_distance<maxWalkDistance){
 					filteredRoutes.add(recommenderRoute);
 				}
 				else{
 					logger.debug("filtered walk route - distance: " 
-							+ recommenderRoute.getRoute().getDistanceMeters() + " max walk distance: " + maxDistance);
+							+ total_walk_distance + " max walk distance: "
+							+ maxWalkDistance +" route bike distance:"+total_bike_distance+" max bike distance:"+maxBikeDistance);
 				}
 			}
 			else {
-				filteredRoutes.add(recommenderRoute);
+				if( total_bike_distance < maxBikeDistance && total_walk_distance<maxWalkDistance){
+					filteredRoutes.add(recommenderRoute);
+				}
+				else{
+					logger.debug("filtered based user preference - walk distance: "
+							+ total_walk_distance + " max walk distance: "
+							+ maxWalkDistance +" route bike distance:"+total_bike_distance+" max bike distance:"+maxBikeDistance);
+				}
 			}
 		}
-		routes.clear();
-		for (RouteModel entry : filteredRoutes){
-			routes.add(entry);				
+		//Filter routes based user preferrence
+		if (filteredRoutes.size()>=1){
+			routes.clear();
+			for (RouteModel entry : filteredRoutes){
+				routes.add(entry);
+			}
+			logger.debug("filtering routes for user - after size: " + routes.size());
+			return Boolean.TRUE;
+
 		}
-		logger.debug("filtering routes for user - after size: " + routes.size());
+		else {
+			return Boolean.FALSE;
+		}
 	}
 	
 	public void rankRoutesForUser (User user, Datastore mongoDatastore){
@@ -192,6 +214,9 @@ public class Recommender {
 		
 		routes.clear();
 		routes = FinalRankedRoutes;
+	}
+
+	public void addMessage(User user, Datastore mongoDatastore){
 		selectTargetRouteandAddMessageForUser(user, mongoDatastore);
 	}
 	

@@ -23,6 +23,8 @@ public class Message {
     private Integer number_of_successes;
     private Double utility;
     private String parameters;
+    private String message_text_german;
+    private String message_text_slo;
 
     public Message(){
 
@@ -34,7 +36,8 @@ public class Message {
         this.target = "bike";
         this.number_of_successes = 0;
         this.parameters = "no";
-        //this.className = "imu.recommender.models.message.Message";
+        this.message_text_german = "";
+        this.message_text_slo = "";
     }
 
     public ObjectId getId() {
@@ -94,5 +97,21 @@ public class Message {
 
     public void setParameters(String parameters) {
         this.parameters = parameters;
+    }
+
+    public String getMessage_text_german() {
+        return message_text_german;
+    }
+
+    public String getMessage_text_slo() {
+        return message_text_slo;
+    }
+
+    public void setMessage_text_german(String message_text_german) {
+        this.message_text_german = message_text_german;
+    }
+
+    public void setMessage_text_slo(String message_text_slo) {
+        this.message_text_slo = message_text_slo;
     }
 }
