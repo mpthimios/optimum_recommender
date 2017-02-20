@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
   <artifact type="war" name="optimum_recommender:war">
     <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="recommender.war">
+    <root id="archive" name="optimum_recommender_war.war">
       <element id="artifact" artifact-name="optimum_recommender:war exploded" />
     </root>
   </artifact>

@@ -246,7 +246,7 @@ public class Personality {
 				distance = 5000;
 				break;
 			case 5:
-				distance = 10000;
+				distance = 100000;
 				break;
 		}
 		return distance;
