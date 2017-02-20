@@ -118,8 +118,8 @@ public class Recommender {
 				}
 			}
 			//Filter out routes based on walking and bike distance preference.
-			double maxBikeDistance = user.getPersonality().convertMaxBikeDistance()+ 0.3*user.getPersonality().convertMaxBikeDistance();
-			double maxWalkDistance = user.getPersonality().convertMaxWalkDistance()+ 0.3*user.getPersonality().convertMaxWalkDistance();
+			double maxBikeDistance = user.getPersonality().convertMaxBikeDistance()+ 0.2*user.getPersonality().convertMaxBikeDistance();
+			double maxWalkDistance = user.getPersonality().convertMaxWalkDistance()+ 0.2*user.getPersonality().convertMaxWalkDistance();
 
 			//Find the mode of the route searching segments of the route
 			int mode = recommenderRoute.getMode();

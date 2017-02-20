@@ -22,8 +22,8 @@ public class Personality {
 	//per personality type scores
 	private boolean scores_calculated = false;
 	private String preferredMode;
-	private Integer maxPreferredBikeDistance;
-	private Integer maxPreferredWalkDistance;
+	private String maxPreferredBikeDistance;
+	private String maxPreferredWalkDistance;
 
 	public Personality() {
 		Q1 = 1.0;
@@ -43,9 +43,9 @@ public class Personality {
 		Neuroticism = 0.0;
 		Agreeableness = 0.0;
 		Consientiousness = 0.0;
-		preferredMode= "car";
-		maxPreferredBikeDistance = 0;
-		maxPreferredWalkDistance = 0;
+		preferredMode= "0";
+		maxPreferredBikeDistance = "0";
+		maxPreferredWalkDistance = "0";
 
 	}
 
@@ -192,24 +192,43 @@ public class Personality {
 		preferredMode = PreferredMode;
 	}
 
-	public Integer getMaxPreferredBikeDistance() {
+	public String getMaxPreferredBikeDistance() {
 		return maxPreferredBikeDistance;
 	}
 
-	public void setMaxPreferredBikeDistance(Integer MaxPreferredBikeDistance) {
+	public void setMaxPreferredBikeDistance(String MaxPreferredBikeDistance) {
 		maxPreferredBikeDistance = MaxPreferredBikeDistance;
 	}
 
-	public Integer getMaxPreferredWalkDistance() {
+	public String getMaxPreferredWalkDistance() {
 		return maxPreferredWalkDistance;
 	}
 
-	public void setMaxPreferredWalkDistance(Integer MaxPreferredWalkDistance) {
+	public void setMaxPreferredWalkDistance(String MaxPreferredWalkDistance) {
 		maxPreferredWalkDistance = MaxPreferredWalkDistance;
+	}
+
+	public String convertPreferredMode(){
+		String mode = "car";
+		switch (Integer.parseInt(getPreferredMode())){
+			case 0:
+				mode = "car";
+				break;
+			case 1:
+				mode = "pt";
+				break;
+			case 2:
+				mode = "bicycle";
+				break;
+			case 3:
+				mode = "walk";
+				break;
+		}
+		return mode;
 	}
 	public int convertMaxWalkDistance(){
 		int distance = 1000;
-		switch (getMaxPreferredWalkDistance()){
+		switch (Integer.parseInt(getMaxPreferredWalkDistance())){
 			case 0:
 				distance = 500;
 				break;
@@ -234,7 +253,7 @@ public class Personality {
 
 	public int convertMaxBikeDistance(){
 		int distance = 5000;
-		switch (getMaxPreferredBikeDistance()){
+		switch (Integer.parseInt(getMaxPreferredBikeDistance())){
 			case 0:
 				distance = 0;
 				break;

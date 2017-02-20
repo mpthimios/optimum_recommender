@@ -47,11 +47,11 @@ public class Context {
         //If too many pt and car routes contexts are false then add the context based on response of user
         if (!user.tooManyPublicTransportRoutes() && !user.tooManyCarRoutes() ) {
             //if user PreferredMode is car, add context
-            if (user.getPersonality().getPreferredMode().equals("car")) {
+            if (user.getPersonality().convertPreferredMode().equals("car")) {
                 contextList.add("TooManyCarRoutes");
             }
             //if user PreferredMode is pt, add context
-            if (user.getPersonality().getPreferredMode().equals("pt")) {
+            if (user.getPersonality().convertPreferredMode().equals("pt")) {
                 contextList.add("TooManyTransportRoutes");
             }
         }
