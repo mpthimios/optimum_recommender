@@ -8,48 +8,48 @@
 
     <schedule>
         <job>
-            <name>TestJob</name>
+            <name>CalculateModeUsePercentages</name>
             <job-class>imu.recommender.jobs.CalculateModeUsePercentages</job-class>
         </job>
         <trigger>
             <cron>
-                <name>TestJob</name>
-                <job-name>TestJob</job-name>
+                <name>CalculateModeUsePercentages</name>
+                <job-name>CalculateModeUsePercentages</job-name>
                 <cron-expression>0 0 12 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
         <job>
-            <name>TestJob2</name>
+            <name>CalculateEmissions</name>
             <job-class>imu.recommender.jobs.CalculateEmissions</job-class>
         </job>
         <trigger>
             <cron>
-                <name>TestJob2</name>
-                <job-name>TestJob2</job-name>
+                <name>CalculateEmissions</name>
+                <job-name>CalculateEmissions</job-name>
                 <cron-expression>0 0 12 1/1 * ? *</cron-expression>
             </cron>
         </trigger>
         <job>
-            <name>TestJob3</name>
+            <name>UpdateStrategiesProbabilities</name>
             <job-class>imu.recommender.jobs.UpdateStrategiesProbabilities</job-class>
         </job>
         <trigger>
             <cron>
-                <name>TestJob3</name>
-                <job-name>TestJob3</job-name>
+                <name>UpdateStrategiesProbabilities</name>
+                <job-name>UpdateStrategiesProbabilities</job-name>
                 <cron-expression>0 0 12 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
         <job>
-            <name>TestJob4</name>
+            <name>CalculateReduceDrivingPercentage</name>
             <job-class>imu.recommender.jobs.CalculateReduceDrivingPercentage</job-class>
         </job>
         <trigger>
             <cron>
-                <name>TestJob4</name>
-                <job-name>TestJob4</job-name>
+                <name>CalculateReduceDrivingPercentage</name>
+                <job-name>CalculateReduceDrivingPercentage</job-name>
                 <cron-expression>0 0 12 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>

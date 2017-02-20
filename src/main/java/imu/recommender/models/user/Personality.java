@@ -192,9 +192,11 @@ public class Personality {
 		preferredMode = PreferredMode;
 	}
 
+	
 	public Integer getMaxPreferredBikeDistance() {
 		return maxPreferredBikeDistance;
 	}
+
 
 	public void setMaxPreferredBikeDistance(Integer MaxPreferredBikeDistance) {
 		maxPreferredBikeDistance = MaxPreferredBikeDistance;
