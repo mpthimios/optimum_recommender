@@ -25,11 +25,14 @@ public class RouteModel {
 	private String message = "";
 	private String strategy = "";
 	private boolean popup = false;
-
+	private int walkingDistance = 0;
+	private int bikeDistance = 0;
 
 	
 	public RouteModel (Route route){
 		this.route = route;
+		calculateWalkingDistance();
+		calculateBikeDistance();
 	}
 	
 	public void setMode(){
@@ -93,6 +96,26 @@ public class RouteModel {
 		Map<String, Object> additionalInfoRouteRequest = route.getAdditionalInfo();
 		additionalInfoRouteRequest.put("mode", mode);
 		route.setAdditionalInfo(additionalInfoRouteRequest);
+	}
+	
+	public void calculateWalkingDistance(){
+		int total_walk_distance = 0;
+		for (RouteSegment segment :  this.route.getSegments()){
+			if (segment.getModeOfTransport().getGeneralizedType().toString().equals("FOOT") ){
+				total_walk_distance = total_walk_distance + segment.getDistanceMeters();
+			}
+		}
+		this.walkingDistance = total_walk_distance;
+	}
+	
+	public void calculateBikeDistance(){
+		int total_bile_distance = 0;
+		for (RouteSegment segment :  this.route.getSegments()){
+			if (segment.getModeOfTransport().getGeneralizedType().toString().equals("FOOT") ){
+				total_bile_distance = total_bile_distance + segment.getDistanceMeters();
+			}
+		}
+		this.bikeDistance = total_bile_distance;
 	}
 	
 	public void calculateEmissions(){
@@ -256,7 +279,23 @@ public class RouteModel {
 		additionalInfoRouteRequest.put("display_popup", popup);
 		route.setAdditionalInfo(additionalInfoRouteRequest);
 	}
+	
 	public boolean getPopup() { return this.popup;}
 
+	public int getWalkingDistance() {
+		return walkingDistance;
+	}
 
+	public void setWalkingDistance(int walkingDistance) {
+		this.walkingDistance = walkingDistance;
+	}
+
+	public int getBikeDistance() {
+		return bikeDistance;
+	}
+
+	public void setBikeDistance(int bikeDistance) {
+		this.bikeDistance = bikeDistance;
+	}
+	
 }

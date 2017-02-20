@@ -65,7 +65,7 @@ public class RequestHandler extends HttpServlet{
 			RouteFormatRoot originalRoutes = mapper.readValue(requestBody, RouteFormatRoot.class);
 			Recommender recommenderRoutes= new Recommender(originalRoutes, user);
 			recommenderRoutes.filterDuplicates();
-			Boolean filtered = recommenderRoutes.filterRoutesForUser(user);
+			boolean filtered = recommenderRoutes.filterRoutesForUser(user);
 			recommenderRoutes.rankRoutesForUser(user,mongoDatastore);
 			RouteFormatRoot recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 			if (filtered){
