@@ -1,33 +1,13 @@
 package imu.recommender;
 
-import java.io.*;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import javax.swing.text.Segment;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
-import at.ac.ait.ariadne.routeformat.*;
+import at.ac.ait.ariadne.routeformat.Route;
 import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import at.ac.ait.ariadne.routeformat.location.Address;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import com.mongodb.util.JSON;
-
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.logs.UserRouteLog;
 import imu.recommender.models.user.OwnedVehicle;
@@ -37,12 +17,13 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.UnknownHostException;
-import java.util.Optional;
-import java.util.*;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.UnknownHostException;
+import java.util.*;
 
 //import at.ac.ait.ariadne.routeformat.Sproute.Status;
 
@@ -80,25 +61,16 @@ public class RequestHandler extends HttpServlet{
 			logger.debug("X-USER-ID");
 			logger.debug(userID);
 			user = User.findById(userID);
-			
-//			if (user.getRoutePreferences().size() == 0){
-//				RoutePreference routePreference = new RoutePreference();
-//				routePreference.setLabel("car_preference");
-//				routePreference.setBikeSharingPref(0.1);
-//				routePreference.setPtPref(0.6);
-//				routePreference.setCarPref(1.0);
-//				routePreference.setWalkPref(10000.0);
-//				user.getRoutePreferences().add(routePreference);
-//				Query query = mongoDatastore.createQuery(User.class).field("id").equal(userID);
-//				UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("route_preferences", user.getRoutePreferences());
-//				mongoDatastore.update(query, ops);
-//			}
+
 			RouteFormatRoot originalRoutes = mapper.readValue(requestBody, RouteFormatRoot.class);
 			Recommender recommenderRoutes= new Recommender(originalRoutes, user);
 			recommenderRoutes.filterDuplicates();
-			recommenderRoutes.filterRoutesForUser(user);		
+			Boolean filtered = recommenderRoutes.filterRoutesForUser(user);
 			recommenderRoutes.rankRoutesForUser(user,mongoDatastore);
 			RouteFormatRoot recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+			if (filtered){
+				recommenderRoutes.addMessage(user, mongoDatastore);
+			}
 			String recommendedRoutesStr = mapper.writeValueAsString(recommendedRoutes);
 			
 			UserRouteLog routeLog = new UserRouteLog();

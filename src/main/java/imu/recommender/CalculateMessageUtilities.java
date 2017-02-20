@@ -27,6 +27,8 @@ public class CalculateMessageUtilities {
         //Get the most convincing persuasive strategy
         List<String> strategies = user.getBestPersuasiveStrategy(personality);
         String strategy = strategies.get(0);
+        //Get user language
+        String lang = user.getLanguage();
 
         //Connect to mongodb
         //Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
@@ -176,7 +178,15 @@ public class CalculateMessageUtilities {
             m.setUtility(messageUtility);
             if (messageUtility > max_message_utility2) {
                 max_message_utility2 = messageUtility;
-                selected_message_text = m.getMessage_text();
+                if (lang.equals("de")) {
+                    selected_message_text = m.getMessage_text_german();
+                }
+                else if(lang.equals("sl")){
+                    selected_message_text = m.getMessage_text_slo();
+                }
+                else {
+                    selected_message_text = m.getMessage_text();
+                }
                 selected_message_params = m.getParameters();
             }
         }

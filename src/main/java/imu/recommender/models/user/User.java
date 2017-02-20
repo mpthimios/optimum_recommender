@@ -52,11 +52,9 @@ public class User {
 	private double MinBiked;
 	private double MinPT;
 	private double MinDrived;
-	/*private String PreferredMode;
-	private Integer MaxPreferredBikeDistance;
-	private Integer MaxPreferredWalkDistance;*/
 	private double CarPercentagePreviousWeek;
 	private double PercentageReduceDriving;
+	private String language;
 
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
@@ -120,6 +118,7 @@ public class User {
 		//this.MaxPreferredWalkDistance = 3;
 		this.CarPercentagePreviousWeek = 0;
 		this.PercentageReduceDriving = 80.0;
+		this.language = "en";
 
 	}
 	
@@ -752,5 +751,13 @@ public class User {
 			sortedEntries.put(entry.getKey(), entry.getValue());
 		}
 		return sortedEntries;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 }

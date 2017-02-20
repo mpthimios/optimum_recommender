@@ -210,8 +210,8 @@ public class Personality {
 		maxPreferredWalkDistance = MaxPreferredWalkDistance;
 	}
 	public int convertMaxWalkDistance(){
-		int distance = 500;
-		switch (maxPreferredBikeDistance){
+		int distance = 1000;
+		switch (getMaxPreferredWalkDistance()){
 			case 0:
 				distance = 500;
 				break;
@@ -235,8 +235,8 @@ public class Personality {
 	}
 
 	public int convertMaxBikeDistance(){
-		int distance = 0;
-		switch (maxPreferredBikeDistance){
+		int distance = 5000;
+		switch (getMaxPreferredBikeDistance()){
 			case 0:
 				distance = 0;
 				break;
