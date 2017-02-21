@@ -115,11 +115,12 @@ public class CalculateModeUsePercentages implements Job {
 
 						//Boolean NiceWeather = WeatherInfo.isHistoricalWeatherNice(lat, longitude, start, end);
 						Boolean NiceWeather = Boolean.TRUE;
-
 						if (sensorActivity == 1) {
 							mode = "bike";
-						} else if (sensorActivity == 7 || sensorActivity == 2 || sensorActivity == 3 || sensorActivity == 4) {
+						} else if (sensorActivity == 7 || sensorActivity == 2 || sensorActivity == 3 ) {
 							mode = "walk";
+						} else if (sensorActivity == 4) {
+							mode = "sitting";
 						} else if (sensorActivity == 5) {
 							mode = "tilting";
 						} else if (sensorActivity == 6) {
@@ -152,13 +153,17 @@ public class CalculateModeUsePercentages implements Job {
 							}
 						}
 					}
+					//Calculate total activities
+					Integer total = n_bike+n_car+n_pt+n_walk;
 					//Calculate percentages
-					car_percent = ((double) (n_car * 100) / (double) arr.length());
-					pt_percent = ((double) (n_pt * 100) / (double) arr.length());
-					bike_percent = ((double) (n_bike * 100) / (double) arr.length());
-					walk_percent = ((double) (n_walk * 100) / (double) arr.length());
-					bike_percent_GW = ((double) (n_bike_GW * 100) / (double) arr.length());
-					walk_percent_GW = ((double) (n_walk_GW * 100) / (double) arr.length());
+					if(total!=0) {
+						car_percent = ((double) (n_car * 100) / (double) total);
+						pt_percent = ((double) (n_pt * 100) / (double) total);
+						bike_percent = ((double) (n_bike * 100) / (double) total);
+						walk_percent = ((double) (n_walk * 100) / (double) total);
+						bike_percent_GW = ((double) (n_bike_GW * 100) / (double) total);
+						walk_percent_GW = ((double) (n_walk_GW * 100) / (double) total);
+					}
 				}
 				 
 				 //percentages should be saved to mongo
@@ -216,7 +221,8 @@ public class CalculateModeUsePercentages implements Job {
 								total_users++;
 							}
 							catch (Exception e){
-								total_users++;
+								//total_users++;
+								e.printStackTrace();
 							}
 						}
 					} catch (Exception e) {

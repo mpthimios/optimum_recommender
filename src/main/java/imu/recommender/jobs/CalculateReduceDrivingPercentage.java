@@ -119,7 +119,7 @@ public class CalculateReduceDrivingPercentage implements Job {
                         mode = "bike";
                     } else  if(sensorActivity==9 || sensorActivity == 10) {
                         mode = "pt";
-                    } else if(sensorActivity==7|| sensorActivity==2 || sensorActivity==3 || sensorActivity==4){
+                    } else if(sensorActivity==7|| sensorActivity==2 || sensorActivity==3 ){
                         mode = "walk";
                     } else  if(sensorActivity==8 || sensorActivity==11 || sensorActivity==12 || sensorActivity==0){
                         mode = "car";
