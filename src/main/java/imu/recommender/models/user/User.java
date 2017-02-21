@@ -55,6 +55,7 @@ public class User {
 	private double CarPercentagePreviousWeek;
 	private double PercentageReduceDriving;
 	private String language;
+	private Date fistLogin;
 
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
@@ -759,5 +760,13 @@ public class User {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public Date getFistLogin() {
+		return fistLogin;
+	}
+
+	public void setFistLogin(Date fistLogin) {
+		this.fistLogin = fistLogin;
 	}
 }

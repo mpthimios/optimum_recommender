@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -190,6 +191,36 @@ public class CalculateMessageUtilities {
                 selected_message_params = m.getParameters();
             }
         }
+
+        //Calculate the number of days since user login
+        Timestamp endDate = new Timestamp(System.currentTimeMillis());
+        Timestamp startDate;
+        try {
+            startDate = new Timestamp(user.getFistLogin().getTime());
+        }
+        catch (Exception e){
+            startDate = Timestamp.valueOf("2017-02-21 10:51:55.415");
+        }
+        long days_long = Math.abs( (endDate.getTime()-startDate.getTime())/86400000);
+        Integer days = Math.round(days_long);
+
+        if (selected_message_text.contains("last week")){
+            if(days.equals(1) || days.equals(0)){
+                selected_message_text = selected_message_text.replace("last week", "last day");
+            }
+            if(days>=2 && days<=6){
+                selected_message_text = selected_message_text.replace("last week", "last "+days+"days");
+            }
+        }
+        if (selected_message_text.contains("Last week")){
+            if(days.equals(1) || days.equals(0)){
+                selected_message_text = selected_message_text.replace("Last week", "Last day");
+            }
+            if(days>=2 && days<=6){
+                selected_message_text = selected_message_text.replace("Last week", "Last "+days+"days");
+            }
+        }
+
 
 
         if ( !selected_message_params.equals("no") ){
