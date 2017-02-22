@@ -56,6 +56,7 @@ public class User {
 	private double PercentageReduceDriving;
 	private String language;
 	private Date fistLogin;
+	private Integer total_activities;
 
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
@@ -120,6 +121,7 @@ public class User {
 		this.CarPercentagePreviousWeek = 0;
 		this.PercentageReduceDriving = 80.0;
 		this.language = "en";
+		this.total_activities = 0;
 
 	}
 	
@@ -245,19 +247,24 @@ public class User {
 	public List<String> getTargetList() {
 		List<String> target = new ArrayList<String>();
 		try {
-			Double max = this.getMode_usage().getCar_percent();
 			String user_mode="car";
-			if (this.getMode_usage().getPt_percent() > max ){
-				max = this.getMode_usage().getPt_percent();
-				user_mode="pt";
+			if(this.getTotal_activities()<=10 || (this.getMode_usage().getPt_percent()==0.0 && this.getMode_usage().getCar_percent()==0.0 && this.getMode_usage().getWalk_percent()==0.0 && this.getMode_usage().getBike_percent()==0.0 )){
+				user_mode = this.personality.convertPreferredMode();
 			}
-			if (this.getMode_usage().getWalk_percent() > max ){
-				max = this.getMode_usage().getWalk_percent();
-				user_mode = "walk";
-			}
-			if (this.getMode_usage().getBike_percent() > max ){
-				max = this.getMode_usage().getBike_percent();
-				user_mode = "bicycle";
+			else {
+				Double max = this.getMode_usage().getCar_percent();
+				if (this.getMode_usage().getPt_percent() > max) {
+					max = this.getMode_usage().getPt_percent();
+					user_mode = "pt";
+				}
+				if (this.getMode_usage().getWalk_percent() > max) {
+					max = this.getMode_usage().getWalk_percent();
+					user_mode = "walk";
+				}
+				if (this.getMode_usage().getBike_percent() > max) {
+					max = this.getMode_usage().getBike_percent();
+					user_mode = "bicycle";
+				}
 			}
 			if (user_mode.equals("pt")){
 				target.add("bike&ride");
@@ -768,5 +775,13 @@ public class User {
 
 	public void setFistLogin(Date fistLogin) {
 		this.fistLogin = fistLogin;
+	}
+
+	public Integer getTotal_activities() {
+		return total_activities;
+	}
+
+	public void setTotal_activities(Integer total_activities) {
+		this.total_activities = total_activities;
 	}
 }

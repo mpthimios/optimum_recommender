@@ -51,9 +51,11 @@ public class CalculateModeUsePercentages implements Job {
 
     	for (Object id : userIds ){
 			try{
-				URL obj = new URL(activitiesUrl+"?user="+id.toString());
+				//URL obj = new URL(activitiesUrl+"?user="+id.toString());
+				URL obj = new URL(activitiesUrl);
 				con = (HttpURLConnection) obj.openConnection();
 				con.setRequestMethod("GET");
+				con.setRequestProperty("token",id.toString());
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -91,6 +93,7 @@ public class CalculateModeUsePercentages implements Job {
 				double walk_percent = 0.0;
 				double bike_percent_GW = 0.0;
 				double walk_percent_GW = 0.0;
+				Integer total = 0;
 
 				if (arr != null && arr.length() > 0 ) {
 					Integer n_car = 0;
@@ -154,7 +157,7 @@ public class CalculateModeUsePercentages implements Job {
 						}
 					}
 					//Calculate total activities
-					Integer total = n_bike+n_car+n_pt+n_walk;
+					total = n_bike+n_car+n_pt+n_walk;
 					//Calculate percentages
 					if(total!=0) {
 						car_percent = ((double) (n_car * 100) / (double) total);
@@ -168,6 +171,7 @@ public class CalculateModeUsePercentages implements Job {
 				 
 				 //percentages should be saved to mongo
 				 Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
+				 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("total_activities", total),true);
 				 ModeUsage modeUsage = new ModeUsage();
 				 modeUsage.setWalk_percent(walk_percent);
 				 modeUsage.setPt_percent(pt_percent);
@@ -183,6 +187,7 @@ public class CalculateModeUsePercentages implements Job {
 				 e.printStackTrace();
 				//percentages should be saved to mongo
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("total_activities", 0),true);
 				ModeUsage modeUsage = new ModeUsage();
 				modeUsage.setWalk_percent(0.0);
 				modeUsage.setPt_percent(0.0);
