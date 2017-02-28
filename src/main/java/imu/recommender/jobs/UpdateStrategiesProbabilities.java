@@ -44,27 +44,25 @@ public class UpdateStrategiesProbabilities  implements Job{
         //Get total popupdisplays and total helpful
         BasicDBObject RouteQuery = new BasicDBObject();
         RouteQuery.put("route_feedback.helpful", true);
-        //RouteQuery.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
-        //List requestIdsSuccess = routes.distinct("requestId",RouteQuery);
+
         BasicDBObject fields = new BasicDBObject();
         fields.put("_id", 1);
-        //fields.put("title", 0);
         DBCursor requestIdsSuccess = routes.find(RouteQuery, fields );
         List<String> requestId = new ArrayList<String>();
         while (requestIdsSuccess.hasNext() ) {
             requestId.add(requestIdsSuccess.next().get("_id").toString());
         }
         Integer total_affect_success = requestId.size();
-        System.out.println(total_affect_success);
 
 
         BasicDBObject RouteQuery1 = new BasicDBObject();
         RouteQuery1.put("route_feedback.helpful", false);
         DBCursor RequsetIdsFailed = routes.find(RouteQuery1);
-        List requsetIdsFailed = RequsetIdsFailed.toArray();
-        System.out.println(RequsetIdsFailed.size());
-        System.out.println(requsetIdsFailed);
-        //List requsetIdsFailed = routes.distinct("requestId",RouteQuery1);
+        List<String> requestIdsFailed = new ArrayList<String>();
+        while (RequsetIdsFailed.hasNext() ) {
+            requestIdsFailed.add(RequsetIdsFailed.next().get("_id").toString());
+        }
+        Integer total_affect_fail = RequsetIdsFailed.size();
 
         for (Object id : strategies ) {
             try {
@@ -83,14 +81,12 @@ public class UpdateStrategiesProbabilities  implements Job{
                 BasicDBObject TripQuery2 = new BasicDBObject();
                 TripQuery2.put("requestId", new BasicDBObject("$in", requestId));
                 TripQuery2.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
-                List StrategySucess = trips.find(TripQuery2).toArray();
-                System.out.println(StrategySucess.size());
-                //List StrategySucess = trips.distinct("requestId",TripQuery2);
+                List StrategySucess = trips.distinct("requestId",TripQuery2);
                 Integer strategysucess = StrategySucess.size();
 
                 //Get total strategy fail
                 BasicDBObject TripQuery3 = new BasicDBObject();
-                TripQuery3.put("requestId", new BasicDBObject("$in", requsetIdsFailed));
+                TripQuery3.put("requestId", new BasicDBObject("$in", requestIdsFailed));
                 TripQuery3.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
                 List StrategyFail = trips.distinct("requestId",TripQuery3);
                 Integer strategyfail = StrategyFail.size();
@@ -129,27 +125,24 @@ public class UpdateStrategiesProbabilities  implements Job{
                     //Update the probabilities of each strategy based on all users.
 
                     for (Object userid : userIds) {
-                        System.out.println(id);
 
                         Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(userid);
 
                         //Get success and feedback attempts
                         BasicDBObject TripQuery4 = new BasicDBObject();
-                        TripQuery4.put("requestId", new BasicDBObject("$in", requestIdsSuccess));
+                        TripQuery4.put("requestId", new BasicDBObject("$in", requestId));
                         TripQuery4.put("userId",userid);
                         TripQuery4.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
-                        DBCursor UserFeedbackSucess = trips.find(TripQuery4);
-                        Integer userFeedbackSucess = UserFeedbackSucess.count();
+                        List UserFeedbackSucess = trips.distinct("requestId",TripQuery4);
+                        Integer userFeedbackSucess = UserFeedbackSucess.size();
 
                         //Get total strategy fail
                         BasicDBObject TripQuery5 = new BasicDBObject();
-                        TripQuery5.put("requestId", new BasicDBObject("$in", requsetIdsFailed));
+                        TripQuery5.put("requestId", new BasicDBObject("$in", requestIdsFailed));
                         TripQuery5.put("userId", userid);
                         TripQuery5.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
-                        //List UserFeedbackFail = trips.distinct("requestId",TripQuery5);
-                        //Integer userFeedbackFail = UserFeedbackFail.size();
-                        DBCursor UserFeedbackFail = trips.find(TripQuery5);
-                        Integer userFeedbackFail = UserFeedbackFail.count();
+                        List UserFeedbackFail = trips.distinct("requestId", TripQuery5);
+                        Integer userFeedbackFail = UserFeedbackFail.size();
                         Integer total_user_feedback = userFeedbackFail +userFeedbackSucess;
 
                         if (id.toString().equals("suggestion")) {

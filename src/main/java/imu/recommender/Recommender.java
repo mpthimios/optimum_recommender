@@ -116,7 +116,7 @@ public class Recommender {
 			//Filter out car and park and ride modes for users that don’t own a car.
 			logger.debug("MODE: " + mode);
 			if ((mode == RecommenderModes.CAR) || (mode == RecommenderModes.PARK_AND_RIDE)) {
-				if(!car_owner || recommenderRoute.getBikeDistance() > maxBikeDistance || recommenderRoute.getWalkingDistance() > maxWalkDistance) {
+				if(!car_owner || recommenderRoute.getBikeDistance() > (int) maxBikeDistance || recommenderRoute.getWalkingDistance() > (int) maxWalkDistance) {
 					logger.debug("filtered car route for non car owner - route walk distance: "+recommenderRoute.getWalkingDistance()+"max walk distance: "
 							+ maxWalkDistance+" route bike distance:"+recommenderRoute.getBikeDistance()+" max bike distance:"+maxBikeDistance);					
 				}
@@ -146,7 +146,7 @@ public class Recommender {
 				}
 			}
 			else{
-				if( recommenderRoute.getBikeDistance() < maxBikeDistance && recommenderRoute.getWalkingDistance()<maxWalkDistance){
+				if( recommenderRoute.getBikeDistance() < (int) maxBikeDistance && recommenderRoute.getWalkingDistance()<(int) maxWalkDistance){
 					filteredRoutes.add(recommenderRoute);
 				}
 				else{
@@ -485,7 +485,8 @@ public class Recommender {
 						route.setMessage(message);
 						route.setStrategy(strategy);
 						//set popup_display false
-						route.setPopup(false);
+						route.setPopup(user.getFeedback(user.getId(),mongoDatastore));
+						logger.debug("-------Feedback----"+user.getFeedback(user.getId(),mongoDatastore));
 						SetMessage = true;
 					}
 					rankedRoutes2.add(route);

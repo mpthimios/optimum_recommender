@@ -63,14 +63,25 @@ public class RequestHandler extends HttpServlet{
 			user = User.findById(userID);
 
 			RouteFormatRoot originalRoutes = mapper.readValue(requestBody, RouteFormatRoot.class);
+			RouteFormatRoot recommendedRoutes;
 			Recommender recommenderRoutes= new Recommender(originalRoutes, user);
 			recommenderRoutes.filterDuplicates();
-			boolean filtered = recommenderRoutes.filterRoutesForUser(user);
-			recommenderRoutes.rankRoutesForUser(user,mongoDatastore);
-			RouteFormatRoot recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
-			if (filtered){
-				recommenderRoutes.addMessage(user, mongoDatastore);
+			//Create 2 groups of users. If user belongs to group A add rank routes and add message
+			user.classify(user, mongoDatastore);
+			System.out.println(user.getPersuasion());
+			if (user.getPersuasion().equals("A")){
+                boolean filtered = recommenderRoutes.filterRoutesForUser(user);
+                recommenderRoutes.rankRoutesForUser(user,mongoDatastore);
+				recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+                if (filtered){
+                    recommenderRoutes.addMessage(user, mongoDatastore);
+                }
+            }
+            else {
+				recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+
 			}
+
 			String recommendedRoutesStr = mapper.writeValueAsString(recommendedRoutes);
 			
 			UserRouteLog routeLog = new UserRouteLog();
