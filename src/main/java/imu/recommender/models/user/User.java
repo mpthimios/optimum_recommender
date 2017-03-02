@@ -45,6 +45,8 @@ public class User {
 	private double walkUsageComparedToOthers;
 	private double bikeUsageComparedToOthersGW;
 	private double walkUsageComparedToOthersGW;
+	private double parkrideUsageComparedToOthers;
+	private double bikerideUsageComparedToOthers;
 	private double emissionsLastWeek;
 	private  double AverageEmissions;
 	private  double sugProb;
@@ -97,7 +99,9 @@ public class User {
 		this.walkUsageComparedToOthers = 0.0;
 		this.bikeUsageComparedToOthersGW = 0.0;
 		this.walkUsageComparedToOthersGW = 0.0;
-		this.carUsageComparedToOthers = 0.0;		
+		this.carUsageComparedToOthers = 0.0;
+		this.parkrideUsageComparedToOthers = 0.0;
+		this.bikerideUsageComparedToOthers = 0.0;
 		this.extra_data = "";
 		this.mobility_type = "car";
 		this.car_ownership = 0;
@@ -880,5 +884,21 @@ public class User {
 			return Boolean.FALSE;
 		}
 
+	}
+
+	public double getParkrideUsageComparedToOthers() {
+		return parkrideUsageComparedToOthers;
+	}
+
+	public void setParkrideUsageComparedToOthers(double parkrideUsageComparedToOthers) {
+		this.parkrideUsageComparedToOthers = parkrideUsageComparedToOthers;
+	}
+
+	public double getBikerideUsageComparedToOthers() {
+		return bikerideUsageComparedToOthers;
+	}
+
+	public void setBikerideUsageComparedToOthers(double bikerideUsageComparedToOthers) {
+		this.bikerideUsageComparedToOthers = bikerideUsageComparedToOthers;
 	}
 }
