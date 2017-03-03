@@ -91,6 +91,8 @@ public class CalculateModeUsePercentages implements Job {
 				double pt_percent = 0.0;
 				double bike_percent = 0.0;
 				double walk_percent = 0.0;
+				double parkride_percent = 0.0;
+				double bikeride_percent = 0.0;
 				double bike_percent_GW = 0.0;
 				double walk_percent_GW = 0.0;
 				Integer total = 0;
@@ -102,6 +104,8 @@ public class CalculateModeUsePercentages implements Job {
 					Integer n_walk = 0;
 					Integer n_bike_GW = 0;
 					Integer n_walk_GW = 0;
+					Integer n_parkride=0;
+					Integer n_bikeride=0;
 
 					for (int i = 0; i < arr.length(); i++) {
 						String mode = "";
@@ -128,7 +132,7 @@ public class CalculateModeUsePercentages implements Job {
 							mode = "tilting";
 						} else if (sensorActivity == 6) {
 							mode = "question";
-						} else if (sensorActivity == 8 || sensorActivity == 11 || sensorActivity == 12 || sensorActivity == 0) {
+						} else if (sensorActivity == 8 || sensorActivity == 11 || sensorActivity == 12 ) {
 							mode = "car";
 						} else if (sensorActivity == 9 || sensorActivity == 10) {
 							mode = "pt";
@@ -137,17 +141,81 @@ public class CalculateModeUsePercentages implements Job {
 						}
 
 						if (mode.equals("car")) {
-							n_car++;
+							//Check if the next mode is sitting or pt
+							try {
+								JSONObject object1 = arr.getJSONObject(i+1);
+								Integer sensorActivity1 = Integer.parseInt(object1.get("sensorActivity").toString());
+								Integer endTime = Integer.parseInt(object.get("end_time").toString());
+								Integer startTime = Integer.parseInt(object1.get("start_time").toString());
+								if( (sensorActivity1 == 9 || sensorActivity1 == 10) && (startTime-endTime>300)){
+									n_parkride++;
+									i++;
+								}
+								else if(sensorActivity1 == 4) {
+									JSONObject object2 = arr.getJSONObject(i + 2);
+									Integer sensorActivity2 = Integer.parseInt(object2.get("sensorActivity").toString());
+									Integer endTime1 = Integer.parseInt(object1.get("end_time").toString());
+									Integer startTime1 = Integer.parseInt(object2.get("start_time").toString());
+									if ( (sensorActivity2 == 9 || sensorActivity2 == 10) && (startTime1-endTime1)>300) {
+										n_parkride++;
+										i = i + 2;
+									} else {
+										n_car++;
+										i++;
+									}
+								}
+								else {
+									n_car++;
+								}
+							}
+							catch(Exception e){
+									n_car++;
+								}
 
 						}
 						if (mode.equals("pt")) {
 							n_pt++;
 						}
 						if (mode.equals("bike")) {
-							n_bike++;
-							if (NiceWeather) {
-								n_bike_GW++;
+							try {
+								JSONObject object1 = arr.getJSONObject(i + 1);
+								Integer sensorActivity1 = Integer.parseInt(object1.get("sensorActivity").toString());
+								Integer endTime = Integer.parseInt(object.get("end_time").toString());
+								Integer startTime = Integer.parseInt(object1.get("start_time").toString());
+								if( (sensorActivity1 == 9 || sensorActivity1 == 10) && (startTime-endTime>300)){
+									n_bikeride++;
+									i++;
+								}
+								else if(sensorActivity1 == 4) {
+									JSONObject object2 = arr.getJSONObject(i + 2);
+									Integer sensorActivity2 = Integer.parseInt(object2.get("sensorActivity").toString());
+									Integer endTime1 = Integer.parseInt(object1.get("end_time").toString());
+									Integer startTime1 = Integer.parseInt(object2.get("start_time").toString());
+									if ( ( sensorActivity2 == 9 || sensorActivity2 == 10) && (startTime1-endTime1>300)) {
+										n_bikeride++;
+										i = i + 2;
+									} else {
+										n_bike++;
+										i++;
+										if (NiceWeather) {
+											n_bike_GW++;
+										}
+									}
+								}
+								else {
+									n_bike++;
+									if (NiceWeather) {
+										n_bike_GW++;
+									}
+								}
 							}
+							catch (Exception e){
+								n_bike++;
+								if (NiceWeather) {
+									n_bike_GW++;
+								}
+							}
+
 						}
 						if (mode.equals("walk")) {
 							n_walk++;
@@ -157,13 +225,15 @@ public class CalculateModeUsePercentages implements Job {
 						}
 					}
 					//Calculate total activities
-					total = n_bike+n_car+n_pt+n_walk;
+					total = n_bike+n_car+n_pt+n_walk+n_parkride+n_bikeride;
 					//Calculate percentages
 					if(total!=0) {
 						car_percent = ((double) (n_car * 100) / (double) total);
 						pt_percent = ((double) (n_pt * 100) / (double) total);
 						bike_percent = ((double) (n_bike * 100) / (double) total);
 						walk_percent = ((double) (n_walk * 100) / (double) total);
+						parkride_percent = ((double) (n_parkride * 100) / (double) total);
+						bikeride_percent = ((double) (n_bikeride * 100) / (double) total);
 						bike_percent_GW = ((double) (n_bike_GW * 100) / (double) total);
 						walk_percent_GW = ((double) (n_walk_GW * 100) / (double) total);
 					}
@@ -177,10 +247,14 @@ public class CalculateModeUsePercentages implements Job {
 				 modeUsage.setPt_percent(pt_percent);
 				 modeUsage.setCar_percent(car_percent);
 				 modeUsage.setBike_percent(bike_percent);
+				 modeUsage.setBikeride_percent(bikeride_percent);
+				 modeUsage.setParkride_percent(parkride_percent);
 				 modeUsage.setWalk_percentGW(walk_percent_GW);
 				 modeUsage.setBike_percentGW(bike_percent_GW);
 				 UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage", modeUsage);
 				 mongoDatastore.update(query, ops, true);
+				 logger.debug(parkride_percent);
+				 logger.debug(bikeride_percent);
 
 
 			} catch (Exception e) {
@@ -193,6 +267,8 @@ public class CalculateModeUsePercentages implements Job {
 				modeUsage.setPt_percent(0.0);
 				modeUsage.setCar_percent(0.0);
 				modeUsage.setBike_percent(0.0);
+				modeUsage.setBikeride_percent(0.0);
+				modeUsage.setParkride_percent(0.0);
 				modeUsage.setWalk_percentGW(0.0);
 				modeUsage.setBike_percentGW(0.0);
 				UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage", modeUsage);
@@ -209,6 +285,8 @@ public class CalculateModeUsePercentages implements Job {
 				double total_pt_perc=0.0;
 				double total_bike_perc=0.0;
 				double total_walk_perc=0.0;
+				double total_parkride_perc = 0.0;
+				double total_bikeride_perc = 0.0;
 				double total_bike_perc_GW=0.0;
 				double total_walk_perc_GW=0.0;
 				Integer total_users = 0;
@@ -221,6 +299,8 @@ public class CalculateModeUsePercentages implements Job {
 								total_bike_perc = total_bike_perc + user.get().getMode_usage().getBike_percent();
 								total_pt_perc =total_pt_perc + user.get().getMode_usage().getPt_percent();
 								total_walk_perc = total_walk_perc + user.get().getMode_usage().getWalk_percent();
+								total_parkride_perc = total_parkride_perc + user.get().getMode_usage().getParkride_percent();
+								total_bikeride_perc = total_bikeride_perc + user.get().getMode_usage().getBikeride_percent();
 								total_walk_perc_GW = total_walk_perc_GW + user.get().getMode_usage().getWalk_percentGW();
 								total_bike_perc_GW = total_bike_perc_GW + user.get().getMode_usage().getBike_percentGW();
 								total_users++;
@@ -241,6 +321,8 @@ public class CalculateModeUsePercentages implements Job {
 				double carUsageComparedToOthers = total_car_perc/(double)total_users;
 				double walkUsageComparedToOthersGW = total_walk_perc_GW/(double)total_users;
 				double bikeUsageComparedToOthersGW = total_bike_perc_GW/(double)total_users;
+				double parkrideUsageComparedToOthers = total_parkride_perc/(double)total_users;
+				double bikerideUsageComparedToOthers = total_bikeride_perc/(double)total_users;
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
 				//Update the AverageEmissions field
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthers", ptUsageComparedToOthers),true);
@@ -249,6 +331,9 @@ public class CalculateModeUsePercentages implements Job {
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthers", walkUsageComparedToOthers), true);
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthersGW", bikeUsageComparedToOthersGW), true);
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthersGW", walkUsageComparedToOthersGW), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("parkrideUsageComparedToOthers", parkrideUsageComparedToOthers), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikerideUsageComparedToOthers", bikerideUsageComparedToOthers), true);
+
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -260,6 +345,9 @@ public class CalculateModeUsePercentages implements Job {
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthers", 0.0), true);
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikeUsageComparedToOthersGW", 0.0), true);
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthersGW", 0.0), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("parkrideUsageComparedToOthers", 0.0), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikerideUsageComparedToOthers", 0.0), true);
+
 
 			}
 		}

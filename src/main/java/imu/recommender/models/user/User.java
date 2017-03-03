@@ -1,15 +1,23 @@
 package imu.recommender.models.user;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.annotations.*;
+import org.mongodb.morphia.annotations.Embedded;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
 import java.net.UnknownHostException;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -37,6 +45,8 @@ public class User {
 	private double walkUsageComparedToOthers;
 	private double bikeUsageComparedToOthersGW;
 	private double walkUsageComparedToOthersGW;
+	private double parkrideUsageComparedToOthers;
+	private double bikerideUsageComparedToOthers;
 	private double emissionsLastWeek;
 	private  double AverageEmissions;
 	private  double sugProb;
@@ -57,6 +67,7 @@ public class User {
 	private String language;
 	private Date fistLogin;
 	private Integer total_activities;
+	private String persuasion;
 
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
@@ -88,7 +99,9 @@ public class User {
 		this.walkUsageComparedToOthers = 0.0;
 		this.bikeUsageComparedToOthersGW = 0.0;
 		this.walkUsageComparedToOthersGW = 0.0;
-		this.carUsageComparedToOthers = 0.0;		
+		this.carUsageComparedToOthers = 0.0;
+		this.parkrideUsageComparedToOthers = 0.0;
+		this.bikerideUsageComparedToOthers = 0.0;
 		this.extra_data = "";
 		this.mobility_type = "car";
 		this.car_ownership = 0;
@@ -122,6 +135,7 @@ public class User {
 		this.PercentageReduceDriving = 80.0;
 		this.language = "en";
 		this.total_activities = 0;
+		this.persuasion = "";
 
 	}
 	
@@ -783,5 +797,108 @@ public class User {
 
 	public void setTotal_activities(Integer total_activities) {
 		this.total_activities = total_activities;
+	}
+
+	public String getPersuasion() {
+		return persuasion;
+	}
+
+	public void setPersuasion(String persuasion) {
+		this.persuasion = persuasion;
+	}
+	public void classify (User user, Datastore mongoDatastore){
+		Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal( user.getId());
+		if (query.field("persuasion").exists().asList().isEmpty()) {  // .asList().isEmpty()
+			String personality = this.getPersonality().getTypeStr();
+			query = mongoDatastore.createQuery(User.class).field("id").equal( user.getId());
+			if (personality.equals("Openess") || personality.equals("Extraversion")) {
+				this.setPersuasion("A");
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("persuasion", "A"),true);
+
+			} else {
+				Random rn = new Random();
+				int number = rn.nextInt(100);
+				System.out.println(number);
+				if (number>50) {
+					this.setPersuasion("B");
+					mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("persuasion", "B"),true);
+				}
+				else {
+					this.setPersuasion("A");
+					mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("persuasion", "A"),true);
+				}
+			}
+		}
+		else {
+			System.out.print("Classified");
+		}
+	}
+
+	public Boolean getFeedback(String userId , Datastore mongoDatastore) {
+		DBCollection trips = mongoDatastore.getDB().getCollection("UserTrip");
+		DBCollection routes = mongoDatastore.getDB().getCollection("UserRoute");
+		Integer days;
+
+		try {
+			BasicDBObject RouteQuery1 = new BasicDBObject();
+			RouteQuery1.put("route_feedback.helpful", false);
+			RouteQuery1.put("route_feedback.helpful", true);
+			RouteQuery1.put("userId",userId);
+			DBCursor RequsetIds = routes.find(RouteQuery1);
+			List<Integer> requestIds = new ArrayList<Integer>();
+			while (RequsetIds.hasNext() ) {
+				requestIds.add(Integer.parseInt(RequsetIds.next().get("_id").toString()));
+			}
+			//sort request Ids and get the last one
+			Collections.sort(requestIds, Collections.reverseOrder());
+
+			BasicDBObject TripQuery = new BasicDBObject();
+			TripQuery.put("requestId", requestIds.get(0).toString());
+			DBCursor tripsIds = trips.find(TripQuery);
+			String feedback_date = "";
+			if (tripsIds.hasNext() ) {
+				feedback_date = tripsIds.next().get("createdat").toString();
+			}
+			//Calculate the number of days since last feedback
+			Timestamp endDate = new Timestamp(System.currentTimeMillis());
+			DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
+			Date startDate = null;
+			try {
+				startDate = df.parse(feedback_date);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			//Timestamp startDate =  Timestamp.valueOf(feedback_date);
+			long days_long = Math.abs( (endDate.getTime()-startDate.getTime())/86400000);
+			days = Math.round(days_long);
+		}
+		catch (Exception e){
+			days = 4;
+		}
+
+
+		if (days>=3){
+			return Boolean.TRUE;
+		}
+		else {
+			return Boolean.FALSE;
+		}
+
+	}
+
+	public double getParkrideUsageComparedToOthers() {
+		return parkrideUsageComparedToOthers;
+	}
+
+	public void setParkrideUsageComparedToOthers(double parkrideUsageComparedToOthers) {
+		this.parkrideUsageComparedToOthers = parkrideUsageComparedToOthers;
+	}
+
+	public double getBikerideUsageComparedToOthers() {
+		return bikerideUsageComparedToOthers;
+	}
+
+	public void setBikerideUsageComparedToOthers(double bikerideUsageComparedToOthers) {
+		this.bikerideUsageComparedToOthers = bikerideUsageComparedToOthers;
 	}
 }
