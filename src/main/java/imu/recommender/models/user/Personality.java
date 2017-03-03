@@ -212,16 +212,16 @@ public class Personality {
 	public String convertPreferredMode(){
 		String mode = "car";
 		switch (Integer.parseInt(getPreferredMode())){
-			case 0:
+			case 1:
 				mode = "car";
 				break;
-			case 1:
+			case 2:
 				mode = "pt";
 				break;
-			case 2:
+			case 3:
 				mode = "bicycle";
 				break;
-			case 3:
+			case 4:
 				mode = "walk";
 				break;
 		}
@@ -230,23 +230,23 @@ public class Personality {
 	public int convertMaxWalkDistance(){
 		int distance = 1000;
 		switch (Integer.parseInt(getMaxPreferredWalkDistance())){
-			case 0:
+			case 1:
 				distance = 500;
 				break;
-			case 1:
+			case 2:
 				distance = 1000;
 				break;
-			case 2:
+			case 3:
 				distance = 2000;
 				break;
-			case 3:
+			case 4:
 				distance = 3000;
 				break;
-			case 4:
+			case 5:
 				distance = 5000;
 				break;
-			case 5:
-				distance = 100000;
+			case 6:
+				distance = 10000;
 				break;
 		}
 		return distance;
@@ -255,19 +255,19 @@ public class Personality {
 	public int convertMaxBikeDistance(){
 		int distance = 5000;
 		switch (Integer.parseInt(getMaxPreferredBikeDistance())){
-			case 0:
+			case 1:
 				distance = 0;
 				break;
-			case 1:
+			case 2:
 				distance = 2000;
 				break;
-			case 2:
+			case 3:
 				distance = 5000;
 				break;
-			case 3:
+			case 4:
 				distance = 10000;
 				break;
-			case 4:
+			case 5:
 				distance = 20000;
 				break;
 		}
