@@ -466,10 +466,10 @@ public class UpdateStrategiesProbabilities  implements Job{
         double StrategyProbability= user_prob;
         System.out.println(StrategyProbability);
         //return getBinomial(attempt+user_attempts,total_attempts-attempt+user_attempts*(1-(int)StrategyProbability));
-        int s = total_attempts+strategy_prob;
+        //int s = total_attempts+strategy_prob;
         double pi=1.0-StrategyProbability;
 
-        return getBinomialDouble(user_attempts-attempt+pi*s,attempt+total_attempts+strategy_prob);
+        return getBinomialDouble(user_attempts-attempt+pi*total_attempts,attempt+total_attempts+strategy_prob);
     }
 
 }

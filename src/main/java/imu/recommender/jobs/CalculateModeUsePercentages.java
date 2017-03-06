@@ -55,6 +55,7 @@ public class CalculateModeUsePercentages implements Job {
 				URL obj = new URL(activitiesUrl);
 				con = (HttpURLConnection) obj.openConnection();
 				con.setRequestMethod("GET");
+				//con.setRequestProperty("token","lukaios");
 				con.setRequestProperty("token",id.toString());
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
