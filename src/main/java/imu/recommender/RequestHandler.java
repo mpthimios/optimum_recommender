@@ -48,6 +48,8 @@ public class RequestHandler extends HttpServlet{
 
 		String userID = "";
 		User user = null;
+		Boolean Baseline = Boolean.TRUE;
+		Boolean Classification = Boolean.FALSE;
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.findAndRegisterModules();
@@ -66,20 +68,35 @@ public class RequestHandler extends HttpServlet{
 			RouteFormatRoot recommendedRoutes;
 			Recommender recommenderRoutes= new Recommender(originalRoutes, user);
 			recommenderRoutes.filterDuplicates();
-			//Create 2 groups of users. If user belongs to group A add rank routes and add message
-			user.classify(user, mongoDatastore);
-			System.out.println(user.getPersuasion());
-			if (user.getPersuasion().equals("A")){
-                boolean filtered = recommenderRoutes.filterRoutesForUser(user);
-                recommenderRoutes.rankRoutesForUser(user,mongoDatastore);
-				recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
-                if (filtered){
-                    recommenderRoutes.addMessage(user, mongoDatastore);
-                }
-            }
-            else {
-				recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+			if (Baseline == Boolean.FALSE) {
+				if (Classification == Boolean.TRUE) {
+					//Create 2 groups of users. If user belongs to group A rank routes and add message
+					user.classify(user, mongoDatastore);
+					System.out.println(user.getPersuasion());
+					if (user.getPersuasion().equals("A")) {
+						boolean filtered = recommenderRoutes.filterRoutesForUser(user);
+						recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
+						recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+						if (filtered) {
+							recommenderRoutes.addMessage(user, mongoDatastore);
+						}
+					} else {
+						recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 
+					}
+				}else {
+					//Rank routes and add persuasive message
+					//recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+					boolean filtered = recommenderRoutes.filterRoutesForUser(user);
+					recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
+					recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+					if (filtered) {
+						recommenderRoutes.addMessage(user, mongoDatastore);
+					}
+				}
+			}
+			else {
+				recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 			}
 
 			String recommendedRoutesStr = mapper.writeValueAsString(recommendedRoutes);

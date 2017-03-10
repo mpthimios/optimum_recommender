@@ -28,7 +28,7 @@ import java.util.List;
 public class CalculateModeUsePercentages implements Job {
 	
 	private Logger logger = Logger.getLogger(CalculateModeUsePercentages.class);
-	private final String activitiesUrl = "http://traffic.ijs.si/NextPin/getActivities";
+	private final String activitiesUrl = "http://traffic.ijs.si/NextPinDev/getActivities";
 	
     @Override
     public void execute(final JobExecutionContext ctx)

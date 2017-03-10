@@ -345,9 +345,9 @@ public class CalculateMessageTest{
         personality.setQ10(1.0);
         //user.setPersonality(personality);
 
-        Double UserSug = UpdateStrategiesProbabilities.calculateUserProbability(1000, 500, 10, 5, GetProperties.getSugEx());
-        Double UserComp = UpdateStrategiesProbabilities.calculateUserProbability(1000, 400, 200, 100, GetProperties.getCompEx());
-        Double UserSelf = UpdateStrategiesProbabilities.calculateUserProbability(1000, 300, 100, 10, GetProperties.getSelfEx());
+        Double UserSug = UpdateStrategiesProbabilities.calculateUserProbability(1000, 500, 0, 0, GetProperties.getSugEx()/0.475);
+        Double UserComp = UpdateStrategiesProbabilities.calculateUserProbability(1000, 400, 0, 0, GetProperties.getCompEx()/0.475);
+        Double UserSelf = UpdateStrategiesProbabilities.calculateUserProbability(1000, 300, 0, 0, GetProperties.getSelfEx()/0.475);
         System.out.println("Suggestion");
         System.out.println(UserSug);
         System.out.println("Comp");
