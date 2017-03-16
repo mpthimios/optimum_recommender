@@ -437,39 +437,22 @@ public class UpdateStrategiesProbabilities  implements Job{
 
     //Calculate the probability of a single user selecting the recommended route
     //based Kaptein Approach (Binomial random variable)
-    //n denotes the number of tries to persuade the user using the specific strategy and
-    //p denotes the probability of success i.e. the probability of taking the recommended route.
-    public static double getBinomial(int n, int p) {
-        /*double x = 0.0;
-        for(int i = 0; i < n; i++) {
-            if(Math.random() < p)
-                x++;
-        }*/
-        return (double) p/(n+p);
-    }
-    public static double getBinomialDouble(double n, int p) {
-        /*double x = 0.0;
-        for(int i = 0; i < n; i++) {
-            if(Math.random() < p)
-                x++;
-        }*/
-        return (double) p/(n+p);
-    }
-    public static  double calculateUserProbability(int total_attempts, int strategy_prob, int attempt, int user_attempts, double user_prob){
-        //Get n, p
-        //n plh8os prospa9eiwn gia thn sugkekrimenh strathgikh
-        //p pi8anothta epituxias ths sugkekrimenhs strathgikhs
-        //p=epituxia/plh8os
-        //int n=30;
-        //double p=0.8;
-        //double StrategyProbability= getBinomial(total_attempts, strategy_prob);
-        double StrategyProbability= user_prob;
-        System.out.println(StrategyProbability);
-        //return getBinomial(attempt+user_attempts,total_attempts-attempt+user_attempts*(1-(int)StrategyProbability));
-        //int s = total_attempts+strategy_prob;
-        double pi=1.0-StrategyProbability;
 
-        return getBinomialDouble(user_attempts-attempt+pi*total_attempts,attempt+total_attempts+strategy_prob);
+    //Likelihood
+    //n denotes the number of tries to persuade the user using the specific strategy and
+    //k denotes the number of success of the specific strategy
+
+    //Prior
+    //m denotes the prior probability of success (StrategyProbabilitySuccess based on model )
+    //M denotes the number of attempts of prior.
+
+    public static  double calculateUserProbability(int total_attempts, int total_successes, int k, int n, double m){
+
+        //Set M to 10
+        int M = 10;
+        System.out.println((k+M*m)/(n+M));
+
+        return (k+M*m)/(n+M);
     }
 
 }
