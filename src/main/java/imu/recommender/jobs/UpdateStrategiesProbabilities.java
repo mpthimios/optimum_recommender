@@ -6,15 +6,18 @@ import com.mongodb.DBCursor;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.strategy.Strategy;
+import imu.recommender.models.user.Personality;
 import imu.recommender.models.user.User;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -274,7 +277,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                             }
 
                             Double userProb = 0.0;
-                            String personality = userQuery.get().getPersonality().getTypeStr();
+                            //String personality = userQuery.get().getPersonality().getTypeStr();
+                            String personality  = getPersonalityType(userid.toString(), mongoDatastore);
                             double sum_prob;
                             switch (personality) {
                                 case "Extraversion":
@@ -455,7 +459,90 @@ public class UpdateStrategiesProbabilities  implements Job{
         return (k+M*m)/(n+M);
     }
 
+    public String getPersonalityType(String id, Datastore mongoDatastore) throws UnknownHostException {
+
+        //Datastore mongoDatastore;
+        //mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+        Personality pers = mongoDatastore.createQuery(User.class).field("id").equal(id).get().getPersonality();
+
+        String pref_mode= pers.getPreferredMode();
+
+        if (!pers.isScores_calculated()){
+            //calculate scores
+            double extraversion_score = ( reverse(pers.getQ1()) + pers.getQ6() )/2.0;
+            double agreeableness_score = ( pers.getQ2() + reverse(pers.getQ7() ) )/2.0;
+            double conscientiousness_score = ( reverse(pers.getQ3() ) + pers.getQ8() )/2.0;
+            double neuroticism_score = ( reverse(pers.getQ4()) + pers.getQ9() )/2.0;
+            double openness_score = (reverse(pers.getQ5()) + pers.getQ10() )/2.0;
+            pers.setExtraversion(extraversion_score);
+            pers.setAgreeableness(agreeableness_score);
+            pers.setConsientiousness(conscientiousness_score);
+            pers.setNeuroticism(neuroticism_score);
+            pers.setOpenness(openness_score);
+            pers.setScores_calculated(true);
+            //Find max score
+            List<String> personalities =  Arrays.asList("Extraversion", "Agreeableness", "Conscientiousness", "Neuroticism", "Openness");
+            List<Double> scores = Arrays.asList( pers.getExtraversion(), pers.getAgreeableness(), pers.getConsientiousness(), pers.getNeuroticism(), pers.getOpenness() );
+            double max = 0.0;
+            for(int i=0; i<personalities.size(); i++){
+                if (scores.get(i) > max) {
+                    max= scores.get(i);
+                    pers.setTypeStr(personalities.get(i));
+                    pers.setType(max);
+                }
+            }
+
+            Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal(id);
+            //Update the personality of user.
+            Personality personality = new Personality();
+            personality.setTypeStr(pers.getTypeStr());
+            personality.setType(pers.getType());
+            personality.setQ1(pers.getQ1());
+            personality.setQ2(pers.getQ2());
+            personality.setQ3(pers.getQ3());
+            personality.setQ4(pers.getQ4());
+            personality.setQ5(pers.getQ5());
+            personality.setQ6(pers.getQ6());
+            personality.setQ7(pers.getQ7());
+            personality.setQ8(pers.getQ8());
+            personality.setQ9(pers.getQ9());
+            personality.setQ10(pers.getQ10());
+            personality.setConsientiousness(pers.getConsientiousness());
+            personality.setAgreeableness(pers.getAgreeableness());
+            personality.setOpenness(pers.getOpenness());
+            personality.setNeuroticism(pers.getNeuroticism());
+            personality.setExtraversion(pers.getExtraversion());
+            personality.setScores_calculated(true);
+            personality.setPreferredMode(pref_mode);
+            personality.setMaxPreferredBikeDistance(pers.getMaxPreferredBikeDistance());
+            personality.setMaxPreferredWalkDistance(pers.getMaxPreferredWalkDistance());
+
+            UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("personality",personality);
+            mongoDatastore.update(query, ops);
+        }
+
+        return pers.getTypeStr();
+    }
+
+    private Double reverse(Double score){
+        Double reversed = 0.0;
+        if (score == 1.0){
+            reversed = 5.0;
+        }
+        else if (score == 2.0){
+            reversed = 4.0;
+        }
+        else if (score == 4.0){
+            reversed = 2.0;
+        }
+        else if (score == 5.0){
+            reversed = 1.0;
+        }
+        else{
+            reversed = 3.0;
+        }
+        return reversed;
+    }
+
 }
-
-
 
