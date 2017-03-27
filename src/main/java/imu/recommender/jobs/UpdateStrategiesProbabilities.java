@@ -8,6 +8,7 @@ import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.strategy.Strategy;
 import imu.recommender.models.user.Personality;
 import imu.recommender.models.user.User;
+import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
@@ -24,6 +25,7 @@ import java.util.List;
  * Created by evangelie on 12/12/2016.
  */
 public class UpdateStrategiesProbabilities  implements Job{
+    private Logger logger = Logger.getLogger(UpdateStrategiesProbabilities.class);
     @Override
     public void execute(final JobExecutionContext ctx)
             throws JobExecutionException {
@@ -464,7 +466,6 @@ public class UpdateStrategiesProbabilities  implements Job{
         //Datastore mongoDatastore;
         //mongoDatastore = MongoConnectionHelper.getMongoDatastore();
         Personality pers = mongoDatastore.createQuery(User.class).field("id").equal(id).get().getPersonality();
-
         String pref_mode= pers.getPreferredMode();
 
         if (!pers.isScores_calculated()){

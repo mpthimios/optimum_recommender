@@ -8,6 +8,7 @@ import imu.recommender.models.user.ModeUsage;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
@@ -49,13 +50,13 @@ public class CalculateModeUsePercentages implements Job {
     	//List userTokens = m.distinct( "access_token", new BasicDBObject());
 		List userIds = m.distinct( "id", new BasicDBObject());
 
-    	for (Object id : userIds ){
+		for (Object id : userIds ){
 			try{
 				//URL obj = new URL(activitiesUrl+"?user="+id.toString());
 				URL obj = new URL(activitiesUrl);
 				con = (HttpURLConnection) obj.openConnection();
 				con.setRequestMethod("GET");
-				//con.setRequestProperty("token","lukaios");
+				//con.setRequestProperty("token","319aBnZbjGpzLgQQWBZs5G6AO9ynurcA");
 				con.setRequestProperty("token",id.toString());
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
@@ -114,7 +115,11 @@ public class CalculateModeUsePercentages implements Job {
 
 						JSONObject object = arr.getJSONObject(i);
 
-						Integer sensorActivity = Integer.parseInt(object.get("sensorActivity").toString());
+						//Integer sensorActivity = Integer.parseInt(object.get("sensor_activity_all").toString());
+						mode = getMode(object);
+
+						System.out.println(mode);
+
 						//Get location and date
 						float lat = 12;
 						float longitude = 23;
@@ -123,41 +128,24 @@ public class CalculateModeUsePercentages implements Job {
 
 						//Boolean NiceWeather = WeatherInfo.isHistoricalWeatherNice(lat, longitude, start, end);
 						Boolean NiceWeather = Boolean.TRUE;
-						if (sensorActivity == 1) {
-							mode = "bike";
-						} else if (sensorActivity == 7 || sensorActivity == 2 || sensorActivity == 3 ) {
-							mode = "walk";
-						} else if (sensorActivity == 4) {
-							mode = "sitting";
-						} else if (sensorActivity == 5) {
-							mode = "tilting";
-						} else if (sensorActivity == 6) {
-							mode = "question";
-						} else if (sensorActivity == 8 || sensorActivity == 11 || sensorActivity == 12 ) {
-							mode = "car";
-						} else if (sensorActivity == 9 || sensorActivity == 10) {
-							mode = "pt";
-						} else {
-							mode = "question";
-						}
 
-						if (mode.equals("car")) {
+						if (mode.equals("IN_CAR")) {
 							//Check if the next mode is sitting or pt
 							try {
 								JSONObject object1 = arr.getJSONObject(i+1);
-								Integer sensorActivity1 = Integer.parseInt(object1.get("sensorActivity").toString());
+								String mode1 = getMode(object1);
 								Integer endTime = Integer.parseInt(object.get("end_time").toString());
 								Integer startTime = Integer.parseInt(object1.get("start_time").toString());
-								if( (sensorActivity1 == 9 || sensorActivity1 == 10) && (startTime-endTime>300)){
+								if( ( mode1.equals("ON_TRAIN") || mode1.equals("IN_BUS") ) && (startTime-endTime>300)){
 									n_parkride++;
 									i++;
 								}
-								else if(sensorActivity1 == 4) {
+								else if(mode1.equals("STILL") ) {
 									JSONObject object2 = arr.getJSONObject(i + 2);
-									Integer sensorActivity2 = Integer.parseInt(object2.get("sensorActivity").toString());
+									String mode2 = getMode(object2);
 									Integer endTime1 = Integer.parseInt(object1.get("end_time").toString());
 									Integer startTime1 = Integer.parseInt(object2.get("start_time").toString());
-									if ( (sensorActivity2 == 9 || sensorActivity2 == 10) && (startTime1-endTime1)>300) {
+									if ( (mode2.equals("ON_TRAIN") || mode2.equals("IN_BUS")) && (startTime1-endTime1)>300) {
 										n_parkride++;
 										i = i + 2;
 									} else {
@@ -174,28 +162,28 @@ public class CalculateModeUsePercentages implements Job {
 								}
 
 						}
-						if (mode.equals("pt")) {
+						if (mode.equals("ON_TRAIN") || mode.equals("IN_BUS")) {
 							n_pt++;
 						}
-						if (mode.equals("bike")) {
+						if (mode.equals("ON_BICYCLE")) {
 							try {
 								JSONObject object1 = arr.getJSONObject(i + 1);
-								Integer sensorActivity1 = Integer.parseInt(object1.get("sensorActivity").toString());
+								String mode1 = getMode(object1);
 								Integer endTime = Integer.parseInt(object.get("end_time").toString());
 								Integer startTime = Integer.parseInt(object1.get("start_time").toString());
-								if( (sensorActivity1 == 9 || sensorActivity1 == 10) && (startTime-endTime>300)){
+								if( (mode1.equals("ON_TRAIN") || mode1.equals("IN_BUS")) && (startTime-endTime>300)){
 									n_bikeride++;
 									i++;
 								}
-								else if(sensorActivity1 == 4) {
+								else if(mode1.equals("STILL") ) {
 									JSONObject object2 = arr.getJSONObject(i + 2);
-									Integer sensorActivity2 = Integer.parseInt(object2.get("sensorActivity").toString());
+									String mode2 = getMode(object2);
 									Integer endTime1 = Integer.parseInt(object1.get("end_time").toString());
 									Integer startTime1 = Integer.parseInt(object2.get("start_time").toString());
-									if ( ( sensorActivity2 == 9 || sensorActivity2 == 10) && (startTime1-endTime1>300)) {
+									if ( (mode2.equals("ON_TRAIN") || mode2.equals("IN_BUS") ) && (startTime1-endTime1>300)) {
 										n_bikeride++;
 										i = i + 2;
-									} else {
+									}else {
 										n_bike++;
 										i++;
 										if (NiceWeather) {
@@ -218,7 +206,7 @@ public class CalculateModeUsePercentages implements Job {
 							}
 
 						}
-						if (mode.equals("walk")) {
+						if (mode.equals("ON_FOOT") || mode.equals("WALKING")) {
 							n_walk++;
 							if (NiceWeather) {
 								n_walk_GW++;
@@ -353,4 +341,26 @@ public class CalculateModeUsePercentages implements Job {
 			}
 		}
     }
+
+    public String getMode(JSONObject object) throws JSONException {
+    	String mode = "";
+    	try {
+			JSONObject sensor = object.getJSONObject("sensor_activity_all");
+			Double max = 0.0;
+			for (int j = 0; j < sensor.length(); j++)
+			{
+				String key = sensor.names().getString(j);
+				Double value = Double.parseDouble(sensor.get(key).toString());
+				if (value> max){
+					max = value;
+					mode = key;
+				}
+			}
+		}
+		catch (Exception e){
+    		return "UNKNOWN";
+		}
+
+		return mode;
+	}
 }
