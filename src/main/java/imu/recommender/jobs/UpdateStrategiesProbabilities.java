@@ -6,21 +6,26 @@ import com.mongodb.DBCursor;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.strategy.Strategy;
+import imu.recommender.models.user.Personality;
 import imu.recommender.models.user.User;
+import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by evangelie on 12/12/2016.
  */
 public class UpdateStrategiesProbabilities  implements Job{
+    private Logger logger = Logger.getLogger(UpdateStrategiesProbabilities.class);
     @Override
     public void execute(final JobExecutionContext ctx)
             throws JobExecutionException {
@@ -274,7 +279,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                             }
 
                             Double userProb = 0.0;
-                            String personality = userQuery.get().getPersonality().getTypeStr();
+                            //String personality = userQuery.get().getPersonality().getTypeStr();
+                            String personality  = getPersonalityType(userid.toString(), mongoDatastore);
                             double sum_prob;
                             switch (personality) {
                                 case "Extraversion":
@@ -437,42 +443,107 @@ public class UpdateStrategiesProbabilities  implements Job{
 
     //Calculate the probability of a single user selecting the recommended route
     //based Kaptein Approach (Binomial random variable)
-    //n denotes the number of tries to persuade the user using the specific strategy and
-    //p denotes the probability of success i.e. the probability of taking the recommended route.
-    public static double getBinomial(int n, int p) {
-        /*double x = 0.0;
-        for(int i = 0; i < n; i++) {
-            if(Math.random() < p)
-                x++;
-        }*/
-        return (double) p/(n+p);
-    }
-    public static double getBinomialDouble(double n, int p) {
-        /*double x = 0.0;
-        for(int i = 0; i < n; i++) {
-            if(Math.random() < p)
-                x++;
-        }*/
-        return (double) p/(n+p);
-    }
-    public static  double calculateUserProbability(int total_attempts, int strategy_prob, int attempt, int user_attempts, double user_prob){
-        //Get n, p
-        //n plh8os prospa9eiwn gia thn sugkekrimenh strathgikh
-        //p pi8anothta epituxias ths sugkekrimenhs strathgikhs
-        //p=epituxia/plh8os
-        //int n=30;
-        //double p=0.8;
-        //double StrategyProbability= getBinomial(total_attempts, strategy_prob);
-        double StrategyProbability= user_prob;
-        System.out.println(StrategyProbability);
-        //return getBinomial(attempt+user_attempts,total_attempts-attempt+user_attempts*(1-(int)StrategyProbability));
-        int s = total_attempts+strategy_prob;
-        double pi=1.0-StrategyProbability;
 
-        return getBinomialDouble(user_attempts-attempt+pi*s,attempt+total_attempts+strategy_prob);
+    //Likelihood
+    //n denotes the number of tries to persuade the user using the specific strategy and
+    //k denotes the number of success of the specific strategy
+
+    //Prior
+    //m denotes the prior probability of success (StrategyProbabilitySuccess based on model )
+    //M denotes the number of attempts of prior.
+
+    public static  double calculateUserProbability(int total_attempts, int total_successes, int k, int n, double m){
+
+        //Set M to 10
+        int M = 10;
+        System.out.println((k+M*m)/(n+M));
+
+        return (k+M*m)/(n+M);
+    }
+
+    public String getPersonalityType(String id, Datastore mongoDatastore) throws UnknownHostException {
+
+        //Datastore mongoDatastore;
+        //mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+        Personality pers = mongoDatastore.createQuery(User.class).field("id").equal(id).get().getPersonality();
+        String pref_mode= pers.getPreferredMode();
+
+        if (!pers.isScores_calculated()){
+            //calculate scores
+            double extraversion_score = ( reverse(pers.getQ1()) + pers.getQ6() )/2.0;
+            double agreeableness_score = ( pers.getQ2() + reverse(pers.getQ7() ) )/2.0;
+            double conscientiousness_score = ( reverse(pers.getQ3() ) + pers.getQ8() )/2.0;
+            double neuroticism_score = ( reverse(pers.getQ4()) + pers.getQ9() )/2.0;
+            double openness_score = (reverse(pers.getQ5()) + pers.getQ10() )/2.0;
+            pers.setExtraversion(extraversion_score);
+            pers.setAgreeableness(agreeableness_score);
+            pers.setConsientiousness(conscientiousness_score);
+            pers.setNeuroticism(neuroticism_score);
+            pers.setOpenness(openness_score);
+            pers.setScores_calculated(true);
+            //Find max score
+            List<String> personalities =  Arrays.asList("Extraversion", "Agreeableness", "Conscientiousness", "Neuroticism", "Openness");
+            List<Double> scores = Arrays.asList( pers.getExtraversion(), pers.getAgreeableness(), pers.getConsientiousness(), pers.getNeuroticism(), pers.getOpenness() );
+            double max = 0.0;
+            for(int i=0; i<personalities.size(); i++){
+                if (scores.get(i) > max) {
+                    max= scores.get(i);
+                    pers.setTypeStr(personalities.get(i));
+                    pers.setType(max);
+                }
+            }
+
+            Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal(id);
+            //Update the personality of user.
+            Personality personality = new Personality();
+            personality.setTypeStr(pers.getTypeStr());
+            personality.setType(pers.getType());
+            personality.setQ1(pers.getQ1());
+            personality.setQ2(pers.getQ2());
+            personality.setQ3(pers.getQ3());
+            personality.setQ4(pers.getQ4());
+            personality.setQ5(pers.getQ5());
+            personality.setQ6(pers.getQ6());
+            personality.setQ7(pers.getQ7());
+            personality.setQ8(pers.getQ8());
+            personality.setQ9(pers.getQ9());
+            personality.setQ10(pers.getQ10());
+            personality.setConsientiousness(pers.getConsientiousness());
+            personality.setAgreeableness(pers.getAgreeableness());
+            personality.setOpenness(pers.getOpenness());
+            personality.setNeuroticism(pers.getNeuroticism());
+            personality.setExtraversion(pers.getExtraversion());
+            personality.setScores_calculated(true);
+            personality.setPreferredMode(pref_mode);
+            personality.setMaxPreferredBikeDistance(pers.getMaxPreferredBikeDistance());
+            personality.setMaxPreferredWalkDistance(pers.getMaxPreferredWalkDistance());
+
+            UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("personality",personality);
+            mongoDatastore.update(query, ops);
+        }
+
+        return pers.getTypeStr();
+    }
+
+    private Double reverse(Double score){
+        Double reversed = 0.0;
+        if (score == 1.0){
+            reversed = 5.0;
+        }
+        else if (score == 2.0){
+            reversed = 4.0;
+        }
+        else if (score == 4.0){
+            reversed = 2.0;
+        }
+        else if (score == 5.0){
+            reversed = 1.0;
+        }
+        else{
+            reversed = 3.0;
+        }
+        return reversed;
     }
 
 }
-
-
 

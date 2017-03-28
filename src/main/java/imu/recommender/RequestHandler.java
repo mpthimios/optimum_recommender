@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import imu.recommender.helpers.MongoConnectionHelper;
+import imu.recommender.logs.UserRouteCriteriaViolation;
 import imu.recommender.logs.UserRouteLog;
 import imu.recommender.models.user.OwnedVehicle;
 import imu.recommender.models.user.User;
@@ -48,6 +49,8 @@ public class RequestHandler extends HttpServlet{
 
 		String userID = "";
 		User user = null;
+		Boolean Baseline = Boolean.TRUE;
+		Boolean Classification = Boolean.FALSE;
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.findAndRegisterModules();
@@ -66,19 +69,55 @@ public class RequestHandler extends HttpServlet{
 			RouteFormatRoot recommendedRoutes;
 			Recommender recommenderRoutes= new Recommender(originalRoutes, user);
 			recommenderRoutes.filterDuplicates();
-			//Create 2 groups of users. If user belongs to group A add rank routes and add message
-			user.classify(user, mongoDatastore);
-			System.out.println(user.getPersuasion());
-			if (user.getPersuasion().equals("A")){
-                boolean filtered = recommenderRoutes.filterRoutesForUser(user);
-                recommenderRoutes.rankRoutesForUser(user,mongoDatastore);
+			if (Baseline == Boolean.FALSE) {
+				if (Classification == Boolean.TRUE) {
+					//Create 2 groups of users. If user belongs to group A rank routes and add message
+					user.classify(user, mongoDatastore);
+					System.out.println(user.getPersuasion());
+					if (user.getPersuasion().equals("A")) {
+						boolean filtered = recommenderRoutes.filterRoutesForUser(user);
+						recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
+						recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+						if (filtered) {
+							recommenderRoutes.addMessage(user, mongoDatastore);
+						}
+					} else {
+						recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+
+					}
+				}else {
+					//Rank routes and add persuasive message
+					//recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+					boolean filtered = recommenderRoutes.filterRoutesForUser(user);
+					recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
+					recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+					if (filtered) {
+						recommenderRoutes.addMessage(user, mongoDatastore);
+					}
+				}
+			}
+			else {
 				recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
-                if (filtered){
-                    recommenderRoutes.addMessage(user, mongoDatastore);
-                }
-            }
-            else {
-				recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+
+				//Calculate Persononalized routes and saved the result into RouteCriteriaViolation Collection of mongodb
+				RouteFormatRoot PersonalizedRoutes;
+				Recommender Routes= new Recommender(originalRoutes, user);
+				Routes.filterDuplicates();
+				boolean filtered = Routes.filterRoutesForUser(user);
+				Routes.rankRoutesForUser(user, mongoDatastore);
+				PersonalizedRoutes = Routes.getRankedRoutesResponse();
+				if (filtered) {
+					Routes.addMessage(user, mongoDatastore);
+				}
+
+				String personalizedRoutesStr = mapper.writeValueAsString(PersonalizedRoutes);
+
+				UserRouteCriteriaViolation routeCriteriaViolation = new UserRouteCriteriaViolation();
+				routeCriteriaViolation.setUserId(userID);
+				routeCriteriaViolation.setPersonalizededResults((DBObject)JSON.parse(personalizedRoutesStr));
+				routeCriteriaViolation.setOriginalResults((DBObject)JSON.parse(requestBody));
+				routeCriteriaViolation.setCreatedDate(new Date());
+				mongoDatastore.save(routeCriteriaViolation);
 
 			}
 

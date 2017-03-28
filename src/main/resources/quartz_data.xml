@@ -28,6 +28,7 @@
                 <name>CalculateEmissions</name>
                 <job-name>CalculateEmissions</job-name>
                 <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+                <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
         <job>

@@ -35,7 +35,7 @@ public class CalculateMessageTest{
         //Find the message
         String mes = CalculateMessageUtilities.calculateForUser( contextList, user, target, mongoDatastore);
         System.out.println(mes);
-        Assert.assertThat(mes,CoreMatchers.anyOf(CoreMatchers.is("Today it s sunny! Take the opportunity to walk to save CO2 emissions._suggestion"),CoreMatchers.is("Nice weather for walking._suggestion")));
+        Assert.assertThat(mes, CoreMatchers.anyOf(CoreMatchers.is("Today it s sunny! Take the opportunity to walk to save CO2 emissions._suggestion"),CoreMatchers.is("Nice weather for walking._suggestion")));
     }
 
     @Test
@@ -318,19 +318,19 @@ public class CalculateMessageTest{
     }
     @Test
     //Test case 8
-    public void CalculateMessageTest8() throws Exception{ */
+    public void CalculateMessageTest8() throws Exception{
 
-        /*String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
+        String userID = "6EEGP034JBLydaotzqZrCs65jRdpfR4s";
         //Connect to our test mongo db
-        String connectionStr = "mongodb://OptimumUser1:Optimum123!@83.212.113.64:32085";
+        String connectionStr = "mongodb://OptimumUser1:optimum123!@83.212.113.64:32085";
         MongoClient mongoSingleton = new MongoClient(new MongoClientURI(connectionStr) );
         Morphia morphia = new Morphia();
-        Datastore mongoDatastore = morphia.createDatastore(mongoSingleton, "Optimum");
+        Datastore mongoDatastore = morphia.createDatastore(mongoSingleton, "admin");
         User user = (User) mongoDatastore.find(User.class).field("id").equal(userID).get();
         //Set strategy comparison
-        user.setSugProb(0.0);
-        user.setSelfProb(0.0);
-        user.setCompProb(0.0);
+        //user.setSugProb(0.0);
+        //user.setSelfProb(0.0);
+        //user.setCompProb(0.0);
         //Set personality Extraversion
         Personality personality = new Personality();
         personality.setQ1(1.0);
@@ -343,11 +343,11 @@ public class CalculateMessageTest{
         personality.setQ8(1.0);
         personality.setQ9(1.0);
         personality.setQ10(1.0);
-        user.setPersonality(personality);
+        //user.setPersonality(personality);
 
-        Double UserSug = UpdateStrategiesProbabilities.calculateUserProbability(10, 5, 1, 3, GetProperties.getSugEx());
-        Double UserComp = UpdateStrategiesProbabilities.calculateUserProbability(10, 4, 5, 5, GetProperties.getCompEx());
-        Double UserSelf = UpdateStrategiesProbabilities.calculateUserProbability(10, 3, 0, 2, GetProperties.getSelfEx());
+        Double UserSug = UpdateStrategiesProbabilities.calculateUserProbability(1000, 500, 0, 0, GetProperties.getSugEx()/0.475);
+        Double UserComp = UpdateStrategiesProbabilities.calculateUserProbability(1000, 400, 0, 0, GetProperties.getCompEx()/0.475);
+        Double UserSelf = UpdateStrategiesProbabilities.calculateUserProbability(1000, 300, 0, 0, GetProperties.getSelfEx()/0.475);
         System.out.println("Suggestion");
         System.out.println(UserSug);
         System.out.println("Comp");
@@ -374,8 +374,8 @@ public class CalculateMessageTest{
         System.out.println("Suggestion2");
         System.out.println(Suggestion2);
         System.out.println(Comparison2);
-        System.out.println(SelfMonitoring2);*/
-        /*Double userProb = UpdateStrategiesProbabilities.calculateUserProbability(20, 10, 4, 6, GetProperties.getSugEx());
+        System.out.println(SelfMonitoring2);
+        Double userProb = UpdateStrategiesProbabilities.calculateUserProbability(20, 10, 4, 6, GetProperties.getSugEx());
         Assert.assertThat(userProb, CoreMatchers.is(0.5443483829650977));
 
     }

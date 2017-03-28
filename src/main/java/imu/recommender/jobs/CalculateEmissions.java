@@ -8,6 +8,7 @@ import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
@@ -110,39 +111,31 @@ public class CalculateEmissions implements Job {
                     double min_pt = 0;
                     double min_walk = 0;
                     for (int i = 0; i < arr.length(); i++) {
-                        String mode = "";
+
                         double emissions = 0.0;
 
                         JSONObject object = arr.getJSONObject(i);
-                        Integer sensorActivity = Integer.parseInt(object.get("sensorActivity").toString());
+
+                        String mode = getMode(object);
+
                         double duration = Double.parseDouble(object.get("duration").toString()) / 60000;
 
-                        if (sensorActivity == 1) {
-                            mode = "bike";
-                        } else if (sensorActivity == 9 || sensorActivity == 10) {
-                            mode = "pt";
-                        } else if (sensorActivity == 7 || sensorActivity == 2 || sensorActivity == 3) {
-                            mode = "walk";
-                        } else if (sensorActivity == 8 || sensorActivity == 11 || sensorActivity == 12 || sensorActivity == 0) {
-                            mode = "car";
-                        } else {
-                            mode = "question";
-                        }
                         //Get Distance
-                        double distance = 100;
-                        if (mode.equals("car")) {
+                        double distance = Double.parseDouble(object.get("distance").toString());
+
+                        if (mode.equals("IN_CAR")) {
                             emissions = ((double) (distance * 110) / 1000);
                             min_car = min_car + duration;
                         }
-                        if (mode.equals("pt")) {
+                        if (mode.equals("ON_TRAIN") || mode.equals("IN_BUS") ) {
                             emissions = ((distance * 25.5) / 1000);
                             min_pt = min_pt + duration;
                         }
-                        if (mode.equals("bike")) {
+                        if (mode.equals("ON_BICYCLE")) {
                             emissions = 0;
                             min_bike = min_bike + duration;
                         }
-                        if (mode.equals("walk")) {
+                        if (mode.equals("ON_FOOT") || mode.equals("WALKING")) {
                             emissions = 0;
                             min_walk = min_walk + duration;
                         }
@@ -222,4 +215,28 @@ public class CalculateEmissions implements Job {
 
 
             }
+
+    public String getMode(JSONObject object) throws JSONException {
+        String mode = "";
+        try {
+            JSONObject sensor = object.getJSONObject("sensor_activity_all");
+            Double max = 0.0;
+            for (int j = 0; j < sensor.length(); j++)
+            {
+                String key = sensor.names().getString(j);
+                Double value = Double.parseDouble(sensor.get(key).toString());
+                if (value> max){
+                    max = value;
+                    mode = key;
+                }
+            }
+        }
+        catch (Exception e){
+            return "UNKNOWN";
+        }
+
+        return mode;
+    }
+
+
 }

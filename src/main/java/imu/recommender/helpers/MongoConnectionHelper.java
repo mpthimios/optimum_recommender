@@ -1,23 +1,16 @@
 package imu.recommender.helpers;
 
-import java.net.UnknownHostException;
-import java.util.ResourceBundle;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import imu.recommender.RequestHandler;
 import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-
-import imu.recommender.RequestHandler;
-
-import org.mongodb.morphia.dao.BasicDAO;
-import org.mongodb.morphia.mapping.DefaultCreator;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import java.net.UnknownHostException;
 
 
 public class MongoConnectionHelper implements ServletContextListener {
@@ -56,7 +49,7 @@ public class MongoConnectionHelper implements ServletContextListener {
 //	                        	return Thread.currentThread().getContextClassLoader();
 //	                        }
 //	                    });
-	                    dsSingleton = morphia.createDatastore(mongoSingleton, "Optimum");	                    
+	                    dsSingleton = morphia.createDatastore(mongoSingleton,"Optimum");
 	                }
 	            }
 	        }
