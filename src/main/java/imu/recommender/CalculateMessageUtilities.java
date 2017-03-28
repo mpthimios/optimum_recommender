@@ -1,12 +1,8 @@
 package imu.recommender;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import imu.recommender.helpers.GetProperties;
-import imu.recommender.jobs.UpdateStrategiesProbabilities;
 import imu.recommender.models.message.Message;
-import imu.recommender.models.strategy.Strategy;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
@@ -286,8 +282,10 @@ public class CalculateMessageUtilities {
 
         logger.debug(selected_message_text);
         logger.debug("-"+strategy+"-");
+        selected_message_text = selected_message_text + "_" +strategy;
+        return selected_message_text;
 
-        try {
+        /*try {
 	        //increase the number_of_times_sent of the selected strategy
 	        Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal(strategy);
 	        Strategy dbStrategy = strategyQuery.get();
@@ -592,7 +590,7 @@ public class CalculateMessageUtilities {
 
         	e.printStackTrace();
         	return "";
-        }
+        }*/
 
     }
 

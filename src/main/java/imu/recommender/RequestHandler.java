@@ -58,14 +58,16 @@ public class RequestHandler extends HttpServlet{
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		String requestBody = getBody(request);
-		logger.debug(requestBody);
-		logger.debug("Received Routes:"+new Timestamp(System.currentTimeMillis()));
+		//logger.debug(requestBody);
+		Timestamp received = new Timestamp(System.currentTimeMillis());
 		
 		try{
 			userID = request.getHeader("X-USER-ID");
 			logger.debug("X-USER-ID");
 			logger.debug(userID);
+			logger.error("Starting searching for user:"+new Timestamp(System.currentTimeMillis()));
 			user = User.findById(userID);
+			logger.error("Found user:"+new Timestamp(System.currentTimeMillis()));
 
 			RouteFormatRoot originalRoutes = mapper.readValue(requestBody, RouteFormatRoot.class);
 			RouteFormatRoot recommendedRoutes;
@@ -116,7 +118,9 @@ public class RequestHandler extends HttpServlet{
 			Routes.rankRoutesForUser(user, mongoDatastore);
 			PersonalizedRoutes = Routes.getRankedRoutesResponse();
 			if (filtered) {
+				logger.debug("---Adding message----:"+new Timestamp(System.currentTimeMillis()));
 				Routes.addMessage(user, mongoDatastore);
+				logger.debug("Message added:"+new Timestamp(System.currentTimeMillis()));
 			}
 
 			String personalizedRoutesStr = mapper.writeValueAsString(PersonalizedRoutes);
@@ -136,7 +140,8 @@ public class RequestHandler extends HttpServlet{
 			mongoDatastore.save(routeLog);
 						
 			out.println(recommendedRoutesStr);
-			logger.debug("Response:"+new Timestamp(System.currentTimeMillis()));
+			logger.error("Received Routes:"+received);
+			logger.error("Response:"+new Timestamp(System.currentTimeMillis()));
 		}
 		catch (Exception e){
 			e.printStackTrace();

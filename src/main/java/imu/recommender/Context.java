@@ -1,7 +1,6 @@
 package imu.recommender;
 
 import imu.recommender.helpers.GetProperties;
-import imu.recommender.helpers.WeatherInfo;
 import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.User;
 import org.mongodb.morphia.Datastore;
@@ -68,10 +67,11 @@ public class Context {
             contextList.add("BikeDistance");
 
         }
-        if (WeatherInfo.isWeatherNice(lat, lon, city)) {
+        /*if (WeatherInfo.isWeatherNice(lat, lon, city)) {
             System.out.println("Nice Weather");
             contextList.add("NiceWeather");
-        }
+        }*/
+        contextList.add("NiceWeather");
 
         //Check the weather if withinBikeDistance or withinWalkingDistance is True
        /* if(withinWalkingDistance(route_distance) || withinBikeDistance(route_distance) ) {
