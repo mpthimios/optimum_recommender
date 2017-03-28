@@ -80,6 +80,12 @@
             <artifactId>ariadne-json-route-format</artifactId>
             <version>0.18-SNAPSHOT</version>
         </dependency>
+        
+        <dependency>
+            <groupId>reverse-country-code</groupId>
+            <artifactId>library</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
         <dependency>
         	<groupId>com.google.guava</groupId>
