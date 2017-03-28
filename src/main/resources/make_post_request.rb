@@ -27,9 +27,9 @@ file.close
 
 request = Net::HTTP::Post.new(@path, initheader = {'Content-Type' =>'text/plain;charset=utf-8'})
 #request.initialize_http_header({"X-USER-ID" => "XcwoeOk7RCcN9wilopVGt82nas7GdAG8"})
-#request.initialize_http_header({"X-USER-ID" => "Z5k9EDo9CRIAz7vSDxc6z4QLpf4dVS3T"})
+request.initialize_http_header({"X-USER-ID" => "Z5k9EDo9CRIAz7vSDxc6z4QLpf4dVS3T"})
 #request.initialize_http_header({"X-USER-ID" => "Rw0CA0KQzWKQYCUFQIwF0f808LcpNOMH"})
-request.initialize_http_header({"X-USER-ID" => "ab6nG6ZEX1ESMGDHzlpTQscGZsdvBG0Z"})
+#request.initialize_http_header({"X-USER-ID" => "ab6nG6ZEX1ESMGDHzlpTQscGZsdvBG0Z"})
 
 request.body = @body
 response = Net::HTTP.new(@host, @port).start {|http| http.request(request) }

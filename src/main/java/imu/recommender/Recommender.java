@@ -40,12 +40,17 @@ public class Recommender {
 	private void initialize(){
 		routes = new ArrayList<RouteModel>();
 		logger.debug("---------Setting Routes----------");
+		String[] location = {
+				originalRouteFormatRoutes.getRoutes().get(0).getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(0).toString(),
+				originalRouteFormatRoutes.getRoutes().get(0).getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(1).toString()
+		};
+		double locationValue = BehaviouralModel.getLocationValue(location[0], location[1]);
 		for (int i = 0; i < originalRouteFormatRoutes.getRoutes().size(); i++) {
-			RouteModel recommenderRoute = new RouteModel(originalRouteFormatRoutes.getRoutes().get(i));
-			recommenderRoute.calculateEmissions();
-			recommenderRoute.setMode();
+			RouteModel recommenderRoute = new RouteModel(originalRouteFormatRoutes.getRoutes().get(i));			
+			recommenderRoute.setModeandCalculateEmissions();			
+			
 			if (user != null){
-				recommenderRoute.setBehaviouralModelUtility(BehaviouralModel.calculateBhaviouralModelUtility(recommenderRoute, user));
+				recommenderRoute.setBehaviouralModelUtility(BehaviouralModel.calculateBhaviouralModelUtility(recommenderRoute, user, locationValue));
 			}
 			else{
 				recommenderRoute.setBehaviouralModelUtility(0.0);

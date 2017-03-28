@@ -35,17 +35,22 @@ public class RouteModel {
 		calculateBikeDistance();
 	}
 	
-	public void setMode(){
-		
+	public void setModeandCalculateEmissions(){
+		emissions = 0.0;
 		List<String> Modes = new ArrayList<String>();
 		for (int j=0; j< this.getRoute().getSegments().size(); j++) {
 			RouteSegment segment = this.getRoute().getSegments().get(j);
-			String mode = segment.getModeOfTransport().getGeneralizedType().toString();
-					//.getGeneralizedType().toString();
-			if (!Modes.contains(mode)) {
-				Modes.add(mode);
+			String segment_mode = segment.getModeOfTransport().getGeneralizedType().toString();
+			String detailed_mode = segment.getModeOfTransport().getDetailedType().toString();
+			Integer distance = segment.getDistanceMeters();
+			emissions = emissions + CalculateSegmentEmissions(distance, segment_mode, detailed_mode);
+			if (!Modes.contains(segment_mode)) {
+				Modes.add(segment_mode);
 			}
 		}
+		Map<String, Object> additionalInfo = route.getAdditionalInfo();
+		additionalInfo.put("emissions", emissions);
+		this.route.setAdditionalInfo(additionalInfo);
 		String mode="";
 
 		if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE")  ){
@@ -118,20 +123,6 @@ public class RouteModel {
 		this.bikeDistance = total_bile_distance;
 	}
 	
-	public void calculateEmissions(){
-		for (int j = 0; j < route.getSegments().size(); j++) {
-			RouteSegment segment = route.getSegments().get(j);
-			String mode = segment.getModeOfTransport().getGeneralizedType().toString();
-			String detailed_mode = segment.getModeOfTransport().getDetailedType().toString();
-			Integer distance = segment.getDistanceMeters();
-			emissions = emissions + CalculateSegmentEmissions(distance, mode, detailed_mode);
-		}
-		Map<String, Object> additionalInfo = route.getAdditionalInfo();
-		additionalInfo.put("emissions", emissions);
-		this.route.setAdditionalInfo(additionalInfo);
-		
-	}
-	
 	private double CalculateSegmentEmissions(Integer distance, String travel_mode, String detailed_mode) {
 		double emissions=0.0;
 		
@@ -160,14 +151,6 @@ public class RouteModel {
 
 		return emissions;
 
-	}
-
-	public double getEmissions() {
-		return emissions;
-	}
-
-	public void setEmissions(double emissions) {
-		this.emissions = emissions;
 	}
 
 	public Route getRoute() {
@@ -297,5 +280,14 @@ public class RouteModel {
 	public void setBikeDistance(int bikeDistance) {
 		this.bikeDistance = bikeDistance;
 	}
-	
+
+	public double getEmissions() {
+		return emissions;
+	}
+
+	public void setEmissions(double emissions) {
+		this.emissions = emissions;
+	}
+
+			
 }
