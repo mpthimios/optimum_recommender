@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
 import java.util.*;
 
 //import at.ac.ait.ariadne.routeformat.Sproute.Status;
@@ -58,6 +59,7 @@ public class RequestHandler extends HttpServlet{
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		String requestBody = getBody(request);
 		logger.debug(requestBody);
+		logger.debug("Received Routes:"+new Timestamp(System.currentTimeMillis()));
 		
 		try{
 			userID = request.getHeader("X-USER-ID");
@@ -99,29 +101,32 @@ public class RequestHandler extends HttpServlet{
 			else {
 				recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 
-				//Calculate Persononalized routes and saved the result into RouteCriteriaViolation Collection of mongodb
-				RouteFormatRoot PersonalizedRoutes;
-				Recommender Routes= new Recommender(originalRoutes, user);
-				Routes.filterDuplicates();
-				boolean filtered = Routes.filterRoutesForUser(user);
-				Routes.rankRoutesForUser(user, mongoDatastore);
-				PersonalizedRoutes = Routes.getRankedRoutesResponse();
-				if (filtered) {
-					Routes.addMessage(user, mongoDatastore);
-				}
-
-				String personalizedRoutesStr = mapper.writeValueAsString(PersonalizedRoutes);
-
-				UserRouteCriteriaViolation routeCriteriaViolation = new UserRouteCriteriaViolation();
-				routeCriteriaViolation.setUserId(userID);
-				routeCriteriaViolation.setPersonalizededResults((DBObject)JSON.parse(personalizedRoutesStr));
-				routeCriteriaViolation.setOriginalResults((DBObject)JSON.parse(requestBody));
-				routeCriteriaViolation.setCreatedDate(new Date());
-				mongoDatastore.save(routeCriteriaViolation);
 
 			}
 
 			String recommendedRoutesStr = mapper.writeValueAsString(recommendedRoutes);
+
+
+			//Calculate Persononalized routes and saved the result into RouteCriteriaViolation Collection of mongodb
+
+			RouteFormatRoot PersonalizedRoutes;
+			Recommender Routes= new Recommender(originalRoutes, user);
+			Routes.filterDuplicates();
+			boolean filtered = Routes.filterRoutesForUser(user);
+			Routes.rankRoutesForUser(user, mongoDatastore);
+			PersonalizedRoutes = Routes.getRankedRoutesResponse();
+			if (filtered) {
+				Routes.addMessage(user, mongoDatastore);
+			}
+
+			String personalizedRoutesStr = mapper.writeValueAsString(PersonalizedRoutes);
+
+			UserRouteCriteriaViolation routeCriteriaViolation = new UserRouteCriteriaViolation();
+			routeCriteriaViolation.setUserId(userID);
+			routeCriteriaViolation.setPersonalizededResults((DBObject)JSON.parse(personalizedRoutesStr));
+			routeCriteriaViolation.setOriginalResults((DBObject)JSON.parse(requestBody));
+			routeCriteriaViolation.setCreatedDate(new Date());
+			mongoDatastore.save(routeCriteriaViolation);
 			
 			UserRouteLog routeLog = new UserRouteLog();
 			routeLog.setUserId(userID);
@@ -130,7 +135,8 @@ public class RequestHandler extends HttpServlet{
 			routeLog.setCreatedDate(new Date());
 			mongoDatastore.save(routeLog);
 						
-			out.println(recommendedRoutesStr);			
+			out.println(recommendedRoutesStr);
+			logger.debug("Response:"+new Timestamp(System.currentTimeMillis()));
 		}
 		catch (Exception e){
 			e.printStackTrace();
