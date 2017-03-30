@@ -473,7 +473,7 @@ public class Recommender {
 				target = FinaltargetList.get(j);
 				rankedRoutes2 = new ArrayList<RouteModel>();
 				for (RouteModel route : routes) {
-					if (route.getRoute().getAdditionalInfo().get("mode") == target) {
+					if (route.getRoute().getAdditionalInfo().get("mode") == target && !SetMessage) {
 						try {
 							contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore);
 							mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore);
