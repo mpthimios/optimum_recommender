@@ -69,7 +69,7 @@ public class Recommender {
 	//filterDuplicates 
 	public void filterDuplicates(){
 		logger.debug("filtering duplicates - before size: " + routes.size());
-		HashMap<String, RouteModel> uniquesHash = new HashMap<String, RouteModel>(); 
+		LinkedHashMap<String, RouteModel> uniquesHash = new LinkedHashMap<String, RouteModel>();
 		try{
 			for (RouteModel route : routes){
 				String key = String.valueOf(route.getRoute().getDistanceMeters()) + mapper.writeValueAsString(route.getRoute().getSegments());
