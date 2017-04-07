@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import imu.recommender.helpers.MongoConnectionHelper;
-import imu.recommender.jobs.UpdateStrategiesProbabilities;
 import imu.recommender.logs.UserRouteCriteriaViolation;
 import imu.recommender.logs.UserRouteLog;
 import imu.recommender.models.user.OwnedVehicle;
@@ -18,10 +17,6 @@ import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.Trigger;
-import org.quartz.impl.StdSchedulerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -31,9 +26,6 @@ import java.io.*;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.*;
-
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.TriggerBuilder.newTrigger;
 
 //import at.ac.ait.ariadne.routeformat.Sproute.Status;
 
@@ -157,7 +149,7 @@ public class RequestHandler extends HttpServlet{
 
 			//Trigger UpdateProbabilitiesJob
 
-			Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+			/*Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 
 			scheduler.start();
 
@@ -167,10 +159,10 @@ public class RequestHandler extends HttpServlet{
 					.startNow()
 					.build();
 
-			scheduler.scheduleJob(jobDetail, trigger);
+			scheduler.scheduleJob(jobDetail, trigger);*/
 
 						
-			//out.println(recommendedRoutesStr);
+			out.println(recommendedRoutesStr);
 			logger.error("Received Routes:"+received);
 			logger.error("Response:"+new Timestamp(System.currentTimeMillis()));
 		}
