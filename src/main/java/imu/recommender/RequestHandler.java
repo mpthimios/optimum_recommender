@@ -9,8 +9,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import imu.recommender.helpers.MongoConnectionHelper;
-import imu.recommender.jobs.UpdateStrategiesProbabilities;
-import imu.recommender.logs.UserRouteCriteriaViolation;
 import imu.recommender.logs.UserRouteLog;
 import imu.recommender.models.user.OwnedVehicle;
 import imu.recommender.models.user.User;
@@ -18,10 +16,6 @@ import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.Trigger;
-import org.quartz.impl.StdSchedulerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -31,9 +25,6 @@ import java.io.*;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.*;
-
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.TriggerBuilder.newTrigger;
 
 //import at.ac.ait.ariadne.routeformat.Sproute.Status;
 
@@ -103,6 +94,7 @@ public class RequestHandler extends HttpServlet{
 					boolean filtered = recommenderRoutes.filterRoutesForUser(user);
 					recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
 					recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+					System.out.print(filtered);
 					if (filtered) {
 						recommenderRoutes.addMessage(user, mongoDatastore);
 					}
@@ -119,7 +111,7 @@ public class RequestHandler extends HttpServlet{
 
 			//Calculate Persononalized routes and saved the result into RouteCriteriaViolation Collection of mongodb
 
-			RouteFormatRoot PersonalizedRoutes;
+			/*RouteFormatRoot PersonalizedRoutes;
 			//Recommender Routes= new Recommender(originalRoutes, user);
 			//Routes.filterDuplicates();
 			boolean filtered = recommenderRoutes.filterRoutesForUser(user);
@@ -143,7 +135,8 @@ public class RequestHandler extends HttpServlet{
 			routeCriteriaViolation.setPersonalizededResults((DBObject)JSON.parse(personalizedRoutesStr));
 			routeCriteriaViolation.setOriginalResults(origin);
 			routeCriteriaViolation.setCreatedDate(new Date());
-			mongoDatastore.save(routeCriteriaViolation);
+			mongoDatastore.save(routeCriteriaViolation);*/
+            DBObject origin =(DBObject) JSON.parse(requestBody);
 
 			logger.debug("----Start saving to UserRoute"+new Timestamp(System.currentTimeMillis()));
 			System.out.println("----Start saving to UserRoute"+new Timestamp(System.currentTimeMillis()));
@@ -157,7 +150,7 @@ public class RequestHandler extends HttpServlet{
 
 			//Trigger UpdateProbabilitiesJob
 
-			Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+			/*Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 
 			scheduler.start();
 
@@ -167,7 +160,7 @@ public class RequestHandler extends HttpServlet{
 					.startNow()
 					.build();
 
-			scheduler.scheduleJob(jobDetail, trigger);
+			scheduler.scheduleJob(jobDetail, trigger);*/
 
 						
 			out.println(recommendedRoutesStr);

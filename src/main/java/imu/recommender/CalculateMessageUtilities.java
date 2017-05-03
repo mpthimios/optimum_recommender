@@ -221,61 +221,61 @@ public class CalculateMessageUtilities {
 
         if ( !selected_message_params.equals("no") ){
             if (selected_message_params.equals("CO2Em")){
-                selected_message_text = selected_message_text.replace("X", Double.toString(user.getEmissionsLastWeek()));
+                selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getEmissionsLastWeek())));
             }
             if (selected_message_params.equals("PCar")){
-                selected_message_text = selected_message_text.replace("X", Double.toString(user.getCarUsageComparedToOthers()));
+                selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getCarUsageComparedToOthers())));
             }
             if (selected_message_params.equals("PWalkGW")){
                 if(user.getWalkUsageComparedToOthersGW() > GetProperties.getPWalkGW()){
-                    selected_message_text = selected_message_text.replace("X", Double.toString(user.getWalkUsageComparedToOthersGW()));
+                    selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getWalkUsageComparedToOthersGW())));
                 }
                 else {
-                    selected_message_text = selected_message_text.replace("X", Double.toString(PWalkGW));
+                    selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PWalkGW)));
                 }
             }
             if (selected_message_params.equals("PBikeGW")){
                 if(user.getBikeUsageComparedToOthersGW() > GetProperties.getPBikeGW()) {
-                    selected_message_text = selected_message_text.replace("X", Double.toString(user.getBikeUsageComparedToOthersGW()));
+                    selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getBikeUsageComparedToOthersGW())));
                 }
                 else {
-                    selected_message_text = selected_message_text.replace("X", Double.toString(PBikeGW));
+                    selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PBikeGW)));
                 }
             }
             if (selected_message_params.equals("PPtGW")){
                 if(user.getPtUsageComparedToOthers() > GetProperties.getPPtGW()) {
-                    selected_message_text = selected_message_text.replace("X", Double.toString(user.getPtUsageComparedToOthers()));
+                    selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getPtUsageComparedToOthers())));
                 }
                 else {
-                    selected_message_text = selected_message_text.replace("X", Double.toString(PPtGW));
+                    selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PPtGW)));
                 }
             }
             if (selected_message_params.equals("MinWalked")){
-                selected_message_text = selected_message_text.replace("X", Double.toString(user.getMinWalked()));
+                selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getMinWalked())));
             }
             if (selected_message_params.equals("MinBiked")){
-                selected_message_text = selected_message_text.replace("X", Double.toString(user.getMinBiked()));
+                selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getMinBiked())));
             }
             if (selected_message_params.equals("MinPT")){
-                selected_message_text = selected_message_text.replace("X", Double.toString(user.getMinPT()));
+                selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getMinPT())));
             }
             if (selected_message_params.equals("PReduceDriving")){
-                selected_message_text = selected_message_text.replace("X", Double.toString(user.getPercentageReduceDriving()));
+                selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getPercentageReduceDriving())));
             }
             if (selected_message_params.equals("PWalkSD")){
                 if(user.getWalkUsageComparedToOthers() > GetProperties.getPWalkGW()) {
-                    selected_message_text = selected_message_text.replace("X", Double.toString(user.getWalkUsageComparedToOthers()));
+                    selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getWalkUsageComparedToOthers())));
                 }
                 else {
-                    selected_message_text = selected_message_text.replace("X", Double.toString(PWalkSD));
+                    selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PWalkSD)));
                 }
             }
             if (selected_message_params.equals("PBikeSD")){
                 if(user.getBikeUsageComparedToOthers() > GetProperties.getPBikeGW()) {
-                    selected_message_text = selected_message_text.replace("X", Double.toString(user.getBikeUsageComparedToOthers()));
+                    selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getBikeUsageComparedToOthers())));
                 }
                 else{
-                    selected_message_text = selected_message_text.replace("X", Double.toString(PBikeSD));
+                    selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PBikeSD)));
                 }
             }
         }
