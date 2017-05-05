@@ -6,7 +6,7 @@ import at.ac.ait.ariadne.routeformat.location.Address;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.mongodb.*;
+import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.logs.UserRouteLog;
@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -32,7 +31,7 @@ public class RequestHandler extends HttpServlet{
 
 	private static boolean PRINT_JSON = true;
 	private Logger logger = Logger.getLogger(RequestHandler.class);
-	private String exampleFile = "src/main/resources/route.txt";
+	private static String exampleFile = "src/main/resources/route.txt";
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -77,7 +76,7 @@ public class RequestHandler extends HttpServlet{
 					//Create 2 groups of users. If user belongs to group A rank routes and add message
 					user.classify(user, mongoDatastore);
 					System.out.println(user.getPersuasion());
-					if (user.getPersuasion().equals("A")) {
+					if ("A".equals(user.getPersuasion())) {
 						boolean filtered = recommenderRoutes.filterRoutesForUser(user);
 						recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
 						recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
@@ -168,23 +167,21 @@ public class RequestHandler extends HttpServlet{
 			logger.error("Response:"+new Timestamp(System.currentTimeMillis()));
 		}
 		catch (Exception e){
-			e.printStackTrace();
+			logger.debug(e.getMessage());
 			logger.debug("user not found");
 			
 			Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
 			RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
 			logger.debug(response_route);
-			List<Route> Trips = new ArrayList<Route>();			
 			for (int i = 0; i < response_route.getRoutes().size(); i++) {
 				String mes ="";
-				Route route = response_route.getRoutes().get(i);
 				if (response_route.getRoutes().get(i).getAdditionalInfo().get("mode") == "car") {
 					mes = "";
 				} else {
 					try {
 						//mes = CalculateMessageUtilities.calculateForUser(response_route, route, user);
 					} catch (Exception ex) {
-						ex.printStackTrace();
+						logger.debug(e.getMessage());
 					}
 				}
 				Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
@@ -213,8 +210,6 @@ public class RequestHandler extends HttpServlet{
 		mapper.findAndRegisterModules();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-		RouteFormatRoot newroute = new RouteFormatRoot();
-		Route newr = new Route();
 		RouteFormatRoot routes = mapper.readValue(new File(exampleFile), RouteFormatRoot.class);
 
 		String mes = null;
@@ -254,7 +249,6 @@ public class RequestHandler extends HttpServlet{
 			logger.debug(routes.getRoutes().get(0));
 			Optional<Address> address =route1.getFrom().getAddress();
 			if (address.isPresent()){
-				java.util.Optional<String> city = address.get().getCity();
 				address.get().getStreetName();
 			}
 			Optional<Address> address_dest=route1.getTo().getAddress();
@@ -299,7 +293,7 @@ public class RequestHandler extends HttpServlet{
 //				}
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.debug(e.getMessage());
 			}
 	    }
 	    else{
@@ -344,23 +338,6 @@ public class RequestHandler extends HttpServlet{
 
 	    body = stringBuilder.toString();
 	    return body;
-	}
-		
-	private void CalculateOtherUserPercentages(){
-		//Connect to mongodb
-		MongoClient mongo = null;
-		try {
-			mongo = new MongoClient("euprojects.net",3368);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		//Print all database names
-		//logger.debug(mongo.getDatabaseNames());
-		DB db = mongo.getDB("Optimum");
-		DBCollection table = db.getCollection("OptimumUsers");
-		//Select the messages where persuasive strategy is Reward
-		BasicDBObject searchQuery = new BasicDBObject();
-
 	}
 
 }

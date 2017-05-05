@@ -2,7 +2,6 @@ package imu.recommender.jobs;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.user.User;
@@ -44,7 +43,7 @@ public class CalculateReduceDrivingPercentage implements Job {
             mongoDatastore = MongoConnectionHelper.getMongoDatastore();
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.debug(e.getMessage());
             return;
         }
 
@@ -59,14 +58,12 @@ public class CalculateReduceDrivingPercentage implements Job {
 
         long last_week = startOfLastWeek.toEpochSecond()*1000;
         long previous_week = startOfPreviousWeek.toEpochSecond()*1000;
-        long now = input.toEpochSecond()*1000;
 
 
         //for (Object accessToken : userTokens ){
         for (Object id : userIds ){
             try {
                 logger.debug((String) id);
-                DBObject user = m.findOne(id);
 
                 try{
                     URL obj = new URL(activitiesUrl+"?from="+previous_week+"&to="+last_week+"&user="+id.toString());
@@ -78,11 +75,11 @@ public class CalculateReduceDrivingPercentage implements Job {
 
                 } catch (MalformedURLException e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.debug(e.getMessage());
                     return;
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.debug(e.getMessage());
                     return;
                 }
 
@@ -113,16 +110,12 @@ public class CalculateReduceDrivingPercentage implements Job {
 
                     JSONObject object = arr.getJSONObject(i);
                     String mode = getMode(object);
-                    double duration = Double.parseDouble(object.get("duration").toString())/ 60000;
 
                     //Get total car routes
-                    if (mode.equals("IN_CAR") ){
+                    if ("IN_CAR".equals(mode) ){
                         total_car = total_car + 1;
                     }
                 }
-
-                //Calculate average minutes per day for each mode
-                double average_min_car = ( (double)(total_car)*100/(double) arr.length() );
 
 
                 //Query<User> query = mongoDatastore.createQuery(User.class).field("access_token").equal((String) accessToken);
@@ -132,7 +125,7 @@ public class CalculateReduceDrivingPercentage implements Job {
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("CarPercentagePreviousWeek", total_car));
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.debug(e.getMessage());
             }
 
         }
@@ -140,7 +133,6 @@ public class CalculateReduceDrivingPercentage implements Job {
         DBCollection mongo = mongoDatastore.getCollection( User.class );
         for (Object current_id : userIds ) {
             try {
-                DBObject current_user = mongo.findOne(current_id);
                 double total_emissions=0.0;
                 Integer total_users = 0;
                 Integer users_reduce_driving = 0;
@@ -159,11 +151,11 @@ public class CalculateReduceDrivingPercentage implements Job {
                             }
                             catch (Exception e){
                                 total_users++;
+                                logger.debug(e.getMessage());
                             }
                         }
                     } catch (Exception e) {
-                        //
-                        e.printStackTrace();
+                        logger.debug(e.getMessage());
                     }
                 }
                 double PercentageReduceDriving = users_reduce_driving/(double)total_users;
@@ -172,7 +164,7 @@ public class CalculateReduceDrivingPercentage implements Job {
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("PercentageReduceDriving", PercentageReduceDriving));
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.debug(e.getMessage());
             }
         }
 
@@ -195,6 +187,7 @@ public class CalculateReduceDrivingPercentage implements Job {
             }
         }
         catch (Exception e){
+            logger.debug(e.getMessage());
             return "UNKNOWN";
         }
 

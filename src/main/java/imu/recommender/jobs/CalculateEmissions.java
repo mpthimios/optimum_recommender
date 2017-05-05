@@ -2,7 +2,6 @@ package imu.recommender.jobs;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.user.User;
@@ -44,7 +43,7 @@ public class CalculateEmissions implements Job {
             mongoDatastore = MongoConnectionHelper.getMongoDatastore();
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.debug(e.getMessage());
             return;
         }
 
@@ -63,7 +62,6 @@ public class CalculateEmissions implements Job {
         for (Object id : userIds ){
             try {
                 logger.debug((String) id);
-                DBObject user = m.findOne(id);
 
                 try{
                     URL obj = new URL(activitiesUrl+"?user="+id.toString()+"&from="+last_week+"&to="+now);
@@ -75,11 +73,11 @@ public class CalculateEmissions implements Job {
 
                 } catch (MalformedURLException e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.debug(e.getMessage());
                     return;
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.debug(e);
                     return;
                 }
 
@@ -123,19 +121,19 @@ public class CalculateEmissions implements Job {
                         //Get Distance
                         double distance = Double.parseDouble(object.get("distance").toString());
 
-                        if (mode.equals("IN_CAR")) {
+                        if ("IN_CAR".equals(mode)) {
                             emissions = ((double) (distance * 110) / 1000);
                             min_car = min_car + duration;
                         }
-                        if (mode.equals("ON_TRAIN") || mode.equals("IN_BUS") ) {
+                        if ("ON_TRAIN".equals(mode) || "IN_BUS".equals(mode) ) {
                             emissions = ((distance * 25.5) / 1000);
                             min_pt = min_pt + duration;
                         }
-                        if (mode.equals("ON_BICYCLE")) {
+                        if ("ON_BICYCLE".equals("mode")) {
                             emissions = 0;
                             min_bike = min_bike + duration;
                         }
-                        if (mode.equals("ON_FOOT") || mode.equals("WALKING")) {
+                        if ("ON_FOOT".equals(mode) || "WALKING".equals(mode)) {
                             emissions = 0;
                             min_walk = min_walk + duration;
                         }
@@ -172,6 +170,7 @@ public class CalculateEmissions implements Job {
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("MinDrived", 0.0), true);
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("MinWalked", 0.0), true);
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("MinPT", 0.0), true);
+                logger.debug(e.getMessage());
             }
 
         }
@@ -179,7 +178,6 @@ public class CalculateEmissions implements Job {
         DBCollection mongo = mongoDatastore.getCollection( User.class );
         for (Object current_id : userIds ) {
             try {
-                DBObject current_user = mongo.findOne(current_id);
                 double total_emissions=0.0;
                 Integer total_users = 0;
                 for (Object id : userIds ) {
@@ -192,11 +190,12 @@ public class CalculateEmissions implements Job {
                             }
                             catch (Exception e){
                                 total_users++;
+                                logger.debug(e.getMessage());
                             }
                         }
                     } catch (Exception e) {
 
-                        e.printStackTrace();
+                        logger.debug(e.getMessage());
                     }
                 }
                 double AverageEmissions = total_emissions/(double)total_users;
@@ -209,6 +208,7 @@ public class CalculateEmissions implements Job {
                 Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
                 //Update the AverageEmissions field
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("AverageEmissions", 0.0), true);
+                logger.debug(e.getMessage());
 
             }
         }
@@ -232,6 +232,7 @@ public class CalculateEmissions implements Job {
             }
         }
         catch (Exception e){
+            logger.debug(e.getMessage());
             return "UNKNOWN";
         }
 

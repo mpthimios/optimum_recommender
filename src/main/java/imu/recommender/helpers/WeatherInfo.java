@@ -1,7 +1,7 @@
 package imu.recommender.helpers;
 
 import imu.recommender.models.weather.Weather;
-import org.bitpipeline.lib.owm.OwmClient;
+import org.apache.log4j.Logger;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
@@ -20,6 +20,8 @@ public class WeatherInfo implements ServletContextListener {
 
     private static String weatherId;
 
+    private static Logger logger = Logger.getLogger(WeatherInfo.class);
+
     public static boolean isWeatherNice(String city, Datastore mongoDatastore) throws Exception {
 
         //Find the last inserted weather Data
@@ -31,8 +33,6 @@ public class WeatherInfo implements ServletContextListener {
     }
 
     public static boolean isHistoricalWeatherNice(Float lat, Float lon, Integer start, Integer end) throws Exception {
-
-        OwmClient owm = new OwmClient();
 
         //owm.setAPPID("e0f5c1a1d86a8bd69e497197804d411c");
         //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity("Tokyo", "JP");
@@ -64,11 +64,9 @@ public class WeatherInfo implements ServletContextListener {
         in.close();
         System.out.println(response.toString());
         JSONObject js = new JSONObject(response.toString());
-        System.out.println(js.get("weather").toString().contains("Rain") || js.get("weather").toString().contains("Rain"));
-        //System.out.println(js.getJSONArray("weather").get(1));
 
         try {
-            if(js.get("weather").toString().contains("Rain") || js.get("weather").toString().contains("Rain") ) {
+            if(js.get("weather").toString().contains("Rain") ) {
                 return false;
             }
             else{
@@ -76,6 +74,7 @@ public class WeatherInfo implements ServletContextListener {
             }
 
         }catch (Exception e){
+            logger.debug(e.getMessage());
             return true;
         }
 
@@ -96,7 +95,7 @@ public class WeatherInfo implements ServletContextListener {
 
         }
         catch (Exception e){
-            e.printStackTrace();
+            logger.debug(e.getMessage());
         }
     }
 	

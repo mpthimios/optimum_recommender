@@ -27,15 +27,12 @@ public class CalculateMessageUtilities {
         //Get user language
         String lang = user.getLanguage();
 
-        //Connect to mongodb
-        //Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
-
 
         String selected_message_text= "";
         String selected_message_params= "";
 
         //Get the user percentages that are true
-        List<String> PercentageList = new ArrayList<String>();
+        List<String> PercentageList = new ArrayList<>();
         double emissions = user.getEmissionsLastWeek();
         if(emissions>0.1){
             PercentageList.add("CO2Em");
@@ -152,7 +149,7 @@ public class CalculateMessageUtilities {
 
         Double max_message_utility = 0.0;
         //Select a list of messages with the maximum utility based on context
-        List<Message> messages = new ArrayList<Message>();
+        List<Message> messages = new ArrayList<>();
         for (Message message : mes ) {
             //Calculate message utility based on context.
             Double messageUtility = calculateUtility(message.getContext(), target, user);
@@ -175,10 +172,10 @@ public class CalculateMessageUtilities {
             m.setUtility(messageUtility);
             if (messageUtility > max_message_utility2) {
                 max_message_utility2 = messageUtility;
-                if (lang.equals("de")) {
+                if ("de".equals(lang)) {
                     selected_message_text = m.getMessage_text_german();
                 }
-                else if(lang.equals("sl")){
+                else if("sl".equals(lang)){
                     selected_message_text = m.getMessage_text_slo();
                 }
                 else {
@@ -196,37 +193,38 @@ public class CalculateMessageUtilities {
         }
         catch (Exception e){
             startDate = Timestamp.valueOf("2017-02-21 10:51:55.415");
+            logger.debug(e.getMessage());
         }
-        long days_long = Math.abs( (endDate.getTime()-startDate.getTime())/86400000);
-        Integer days = Math.round(days_long);
-
-        if (selected_message_text.contains("last week")){
+        Integer days = Math.round(Math.abs( (endDate.getTime()-startDate.getTime())/86400000));
+        String lastWeek = "last week";
+        if (selected_message_text.contains(lastWeek)){
             if(days.equals(1) || days.equals(0)){
-                selected_message_text = selected_message_text.replace("last week", "last day");
+                selected_message_text = selected_message_text.replace(lastWeek, "last day");
             }
             if(days>=2 && days<=6){
-                selected_message_text = selected_message_text.replace("last week", "last "+days+"days");
+                selected_message_text = selected_message_text.replace(lastWeek, "last "+days+"days");
             }
         }
-        if (selected_message_text.contains("Last week")){
+        String LastWeek = "Last week";
+        if (selected_message_text.contains(LastWeek)){
             if(days.equals(1) || days.equals(0)){
-                selected_message_text = selected_message_text.replace("Last week", "Last day");
+                selected_message_text = selected_message_text.replace(LastWeek, "Last day");
             }
             if(days>=2 && days<=6){
-                selected_message_text = selected_message_text.replace("Last week", "Last "+days+"days");
+                selected_message_text = selected_message_text.replace(LastWeek, "Last "+days+"days");
             }
         }
 
 
 
-        if ( !selected_message_params.equals("no") ){
-            if (selected_message_params.equals("CO2Em")){
+        if ( !"no".equals(selected_message_params) ){
+            if ("CO2Em".equals(selected_message_params)){
                 selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getEmissionsLastWeek())));
             }
-            if (selected_message_params.equals("PCar")){
+            if ("PCar".equals(selected_message_params)){
                 selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getCarUsageComparedToOthers())));
             }
-            if (selected_message_params.equals("PWalkGW")){
+            if ("PWalkGW".equals(selected_message_params)){
                 if(user.getWalkUsageComparedToOthersGW() > GetProperties.getPWalkGW()){
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getWalkUsageComparedToOthersGW())));
                 }
@@ -234,7 +232,7 @@ public class CalculateMessageUtilities {
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PWalkGW)));
                 }
             }
-            if (selected_message_params.equals("PBikeGW")){
+            if ("PBikeGW".equals(selected_message_params)){
                 if(user.getBikeUsageComparedToOthersGW() > GetProperties.getPBikeGW()) {
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getBikeUsageComparedToOthersGW())));
                 }
@@ -242,7 +240,7 @@ public class CalculateMessageUtilities {
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PBikeGW)));
                 }
             }
-            if (selected_message_params.equals("PPtGW")){
+            if ("PPtGW".equals(selected_message_params)){
                 if(user.getPtUsageComparedToOthers() > GetProperties.getPPtGW()) {
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getPtUsageComparedToOthers())));
                 }
@@ -250,19 +248,19 @@ public class CalculateMessageUtilities {
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PPtGW)));
                 }
             }
-            if (selected_message_params.equals("MinWalked")){
+            if ("MinWalked".equals(selected_message_params)){
                 selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getMinWalked())));
             }
-            if (selected_message_params.equals("MinBiked")){
+            if ("MinBiked".equals(selected_message_params)){
                 selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getMinBiked())));
             }
-            if (selected_message_params.equals("MinPT")){
+            if ("MinPT".equals(selected_message_params)){
                 selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getMinPT())));
             }
-            if (selected_message_params.equals("PReduceDriving")){
+            if ("PReduceDriving".equals(selected_message_params)){
                 selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getPercentageReduceDriving())));
             }
-            if (selected_message_params.equals("PWalkSD")){
+            if ("PWalkSD".equals(selected_message_params)){
                 if(user.getWalkUsageComparedToOthers() > GetProperties.getPWalkGW()) {
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getWalkUsageComparedToOthers())));
                 }
@@ -270,7 +268,7 @@ public class CalculateMessageUtilities {
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PWalkSD)));
                 }
             }
-            if (selected_message_params.equals("PBikeSD")){
+            if ("PBikeSD".equals(selected_message_params)){
                 if(user.getBikeUsageComparedToOthers() > GetProperties.getPBikeGW()) {
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getBikeUsageComparedToOthers())));
                 }
@@ -285,491 +283,191 @@ public class CalculateMessageUtilities {
         selected_message_text = selected_message_text + "_" +strategy;
         return selected_message_text;
 
-        /*try {
-	        //increase the number_of_times_sent of the selected strategy
-	        Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal(strategy);
-	        Strategy dbStrategy = strategyQuery.get();
-	        logger.debug("number of times sent: " + strategyQuery.get().getNumber_of_times_sent());
-	        Integer number_of_times_sent = strategyQuery.get().getNumber_of_times_sent();
-	        number_of_times_sent ++;
-	        mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_times_sent", number_of_times_sent));
-	        //Increase the number of attemps for the current user
-	        Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
-	        Integer user_attempts;
-            DBCollection trips = mongoDatastore.getDB().getCollection("UserTrip");
-	        if (strategy.equals("suggestion") ) {
-	            try {
-	                user_attempts = userQuery.get().getSugAttempts();
-	            }
-	            catch (Exception e){
-	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", 0));
-	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", 0));
-	                user_attempts = userQuery.get().getSugAttempts();
-	            }
-	            user_attempts = user_attempts + 1;
-	            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", user_attempts));
-	            //Find all saved trips with persusasive message (suggestion)
-                BasicDBObject TripQuery = new BasicDBObject();
-                TripQuery.put("favourite", true);
-                TripQuery.put("body.additionalInfo.additionalProperties.strategy", strategy);
-                DBCursor tripsIds = trips.find(TripQuery);
-                Integer number_of_success = tripsIds.count();
-                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_successes", number_of_success));
-
-                //Calculate probability
-                Double probability;
-                if (number_of_success.equals(0) | number_of_times_sent.equals(0)) {
-                    probability = 0.0;
-                } else {
-                    probability = (double) number_of_success / (double) number_of_times_sent;
-                }
-                //Update Strategy probability on mongodb
-                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("probability", probability));
-
-                //---------------------------------------------------------------------------
-
-                //Calculate and update Strategy Probability of this user
-                //Find all saved trips of current user with persusasive message (suggestion)
-                BasicDBObject searchTripQuery = new BasicDBObject();
-                searchTripQuery.put("favourite", true);
-                searchTripQuery.put("userId", user.getId());
-                searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "suggestion");
-                DBCursor tripIds = trips.find(searchTripQuery);
-                Integer user_success = tripIds.count();
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", user_success));
-
-                Double userProb = 0.0;
-                double sum_prob;
-                switch (personality) {
-                    case "Extraversion":
-                        sum_prob = GetProperties.getCompEx() + GetProperties.getSelfEx() + GetProperties.getSugEx();
-                        if (sum_prob!= 0.0) {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugEx() / sum_prob);
-                        }
-                        else{
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugEx());
-                        }
-                        break;
-                    case "Agreeableness":
-                        sum_prob = GetProperties.getCompAg() + GetProperties.getSelfAg() + GetProperties.getSugAg();
-                        if (sum_prob != 0.0){
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugAg()/sum_prob);
-                        }
-                        else {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugAg());
-                        }
-                        break;
-                    case "Openness":
-                        sum_prob = GetProperties.getCompOp() + GetProperties.getSelfOp() + GetProperties.getSugOp();
-                        if (sum_prob !=0){
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugOp()/sum_prob);
-                        }
-                        else {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugOp());
-                        }
-                        break;
-                    case "Conscientiousness":
-                        sum_prob = GetProperties.getCompCons() + GetProperties.getSelfCons() + GetProperties.getSugCons();
-                        if (sum_prob !=0.0){
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugCons()/sum_prob);
-
-                        }
-                        else {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugCons());
-                        }
-                        break;
-                    case "Neuroticism":
-                        sum_prob = GetProperties.getCompN() + GetProperties.getSelfN() + GetProperties.getSugN();
-                        if(sum_prob!=0.0) {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugN() / sum_prob);
-                        }
-                        else{
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSugN());
-                        }
-                        break;
-                }
-                //Update user probability of each strategy, user attempts and user success on mongodb
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugProb", userProb));
-
-            }
-	        else if (strategy.equals("comparison") ) {
-	            try {
-	                user_attempts = userQuery.get().getCompAttempts();
-	            }
-	            catch (Exception e){
-	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", 0));
-	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", 0));
-	                user_attempts = userQuery.get().getCompAttempts();
-	            }
-	            user_attempts = user_attempts + 1;
-	            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", user_attempts));
-                //Find all saved trips with persusasive message (suggestion)
-                BasicDBObject TripQuery = new BasicDBObject();
-                TripQuery.put("favourite", true);
-                TripQuery.put("body.additionalInfo.additionalProperties.strategy", strategy);
-                DBCursor tripsIds = trips.find(TripQuery);
-                Integer number_of_success = tripsIds.count();
-                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_successes", number_of_success));
-
-                //Calculate probability
-                Double probability;
-                if (number_of_success.equals(0) | number_of_times_sent.equals(0)) {
-                    probability = 0.0;
-                } else {
-                    probability = (double) number_of_success / (double) number_of_times_sent;
-                }
-                //Update Strategy probability on mongodb
-                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("probability", probability));
-
-                //---------------------------------------------------------------------------
-
-                //Calculate and update Strategy Probability of this user
-                //Find all saved trips of current user with persusasive message (suggestion)
-                BasicDBObject searchTripQuery = new BasicDBObject();
-                searchTripQuery.put("favourite", true);
-                searchTripQuery.put("userId", user.getId());
-                searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", strategy);
-                DBCursor tripIds = trips.find(searchTripQuery);
-                Integer user_success = tripIds.count();
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", user_success));
-
-                Double userProb = 0.0;
-                double sum_prob;
-                switch (personality) {
-                    case "Extraversion":
-                        sum_prob = GetProperties.getCompEx() + GetProperties.getSelfEx() + GetProperties.getSugEx();
-                        if (sum_prob!= 0.0) {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompEx() / sum_prob);
-                        }
-                        else{
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompEx());
-                        }
-                        break;
-                    case "Agreeableness":
-                        sum_prob = GetProperties.getCompAg() + GetProperties.getSelfAg() + GetProperties.getSugAg();
-                        if (sum_prob != 0.0){
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompAg()/sum_prob);
-                        }
-                        else {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompAg());
-                        }
-                        break;
-                    case "Openness":
-                        sum_prob = GetProperties.getCompOp() + GetProperties.getSelfOp() + GetProperties.getSugOp();
-                        if (sum_prob !=0){
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompOp()/sum_prob);
-                        }
-                        else {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompOp());
-                        }
-                        break;
-                    case "Conscientiousness":
-                        sum_prob = GetProperties.getCompCons() + GetProperties.getSelfCons() + GetProperties.getSugCons();
-                        if (sum_prob !=0.0){
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompCons()/sum_prob);
-
-                        }
-                        else {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompCons());
-                        }
-                        break;
-                    case "Neuroticism":
-                        sum_prob = GetProperties.getCompN() + GetProperties.getSelfN() + GetProperties.getSugN();
-                        if(sum_prob!=0.0) {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompN() / sum_prob);
-                        }
-                        else{
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getCompN());
-                        }
-                        break;
-                }
-                //Update user probability of each strategy, user attempts and user success on mongodb
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compProb", userProb));
-	        }
-	        if (strategy.equals("self-monitoring") ) {
-	            try {
-	                user_attempts = userQuery.get().getSelfAttempts();
-	            }
-	            catch (Exception e){
-	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", 0));
-	                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", 0));
-	                user_attempts = userQuery.get().getSelfAttempts();
-	            }
-	            user_attempts = user_attempts + 1;
-	            mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", user_attempts));
-                //Find all saved trips with persusasive message (suggestion)
-                BasicDBObject TripQuery = new BasicDBObject();
-                TripQuery.put("favourite", true);
-                TripQuery.put("body.additionalInfo.additionalProperties.strategy", strategy);
-                DBCursor tripsIds = trips.find(TripQuery);
-                Integer number_of_success = tripsIds.count();
-                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_successes", number_of_success));
-
-                //Calculate probability
-                Double probability;
-                if (number_of_success.equals(0) | number_of_times_sent.equals(0)) {
-                    probability = 0.0;
-                } else {
-                    probability = (double) number_of_success / (double) number_of_times_sent;
-                }
-                //Update Strategy probability on mongodb
-                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("probability", probability));
-
-                //---------------------------------------------------------------------------
-
-                //Calculate and update Strategy Probability of this user
-                //Find all saved trips of current user with persusasive message (suggestion)
-                BasicDBObject searchTripQuery = new BasicDBObject();
-                searchTripQuery.put("favourite", true);
-                searchTripQuery.put("userId", user.getId());
-                searchTripQuery.put("body.additionalInfo.additionalProperties.strategy",strategy);
-                DBCursor tripIds = trips.find(searchTripQuery);
-                Integer user_success = tripIds.count();
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", user_success));
-
-                Double userProb = 0.0;
-                double sum_prob;
-                switch (personality) {
-                    case "Extraversion":
-                        sum_prob = GetProperties.getCompEx() + GetProperties.getSelfEx() + GetProperties.getSugEx();
-                        if (sum_prob!= 0.0) {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfEx() / sum_prob);
-                        }
-                        else{
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfEx());
-                        }
-                        break;
-                    case "Agreeableness":
-                        sum_prob = GetProperties.getCompAg() + GetProperties.getSelfAg() + GetProperties.getSugAg();
-                        if (sum_prob != 0.0){
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfAg()/sum_prob);
-                        }
-                        else {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfAg());
-                        }
-                        break;
-                    case "Openness":
-                        sum_prob = GetProperties.getCompOp() + GetProperties.getSelfOp() + GetProperties.getSugOp();
-                        if (sum_prob !=0){
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfOp()/sum_prob);
-                        }
-                        else {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfOp());
-                        }
-                        break;
-                    case "Conscientiousness":
-                        sum_prob = GetProperties.getCompCons() + GetProperties.getSelfCons() + GetProperties.getSugCons();
-                        if (sum_prob !=0.0){
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfCons()/sum_prob);
-
-                        }
-                        else {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfCons());
-                        }
-                        break;
-                    case "Neuroticism":
-                        sum_prob = GetProperties.getCompN() + GetProperties.getSelfN() + GetProperties.getSugN();
-                        if(sum_prob!=0.0) {
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfN() / sum_prob);
-                        }
-                        else{
-                            userProb = UpdateStrategiesProbabilities.calculateUserProbability(number_of_times_sent, number_of_success, user_success, user_attempts, GetProperties.getSelfN());
-                        }
-                        break;
-                }
-
-                //Update user probability of each strategy, user attempts and user success on mongodb
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfProb", userProb));
-	        }
-	        selected_message_text = selected_message_text + "_" +strategy;
-	        return selected_message_text;
-        }
-        catch(Exception e){
-        	Strategy newStrategy = new Strategy();
-        	mongoDatastore.save(newStrategy);
-
-        	e.printStackTrace();
-        	return "";
-        }*/
-
     }
 
     private static double calculateUtility( String context, String mode, User user){
         double utility=0.0;
-        switch (mode) {
-            case "walk":
-                if (user.tooManyCarRoutes()) {
-                    if (context.equals("WalkDistance")) {
-                        utility = 0.4218;
-                    }
-                    if (context.equals("Duration")) {
-                        utility = 0.3228;
-                    }
-                    if (context.equals("TooManyCarRoutes")) {
-                        utility = 0.0456;
-                    }
-                    if (context.equals("EmissionComparetoOthers")) {
-                        utility = 0.0777;
-                    }
-                    if (context.equals("NiceWeather")) {
-                        utility = 0.1321;
-                    }
-                }
-                if (user.tooManyPublicTransportRoutes()) {
-                    if (context.equals("WalkDistance")) {
-                        utility = 0.4074;
-                    }
-                    if (context.equals("Duration")) {
-                        utility = 0.3157;
-                    }
-                    if (context.equals("TooManyTransportRoutes")) {
-                        utility = 0.0353;
-                    }
-                    if (context.equals("EmissionComparetoOthers")) {
-                        utility = 0.0776;
-                    }
-                    if (context.equals("NiceWeather")) {
-                        utility = 0.164;
-                    }
-                } else {
-                    if (context.equals("WalkDistance")) {
-                        utility = 0.4;
-                    }
-                    if (context.equals("Duration")) {
-                        utility = 0.3;
-                    }
-                    if (context.equals("EmissionComparetoOthers")) {
-                        utility = 0.1;
-                    }
-                    if (context.equals("NiceWeather")) {
-                        utility = 0.1;
-                    }
+        String WalkDistance = "WalkDistance";
+        String BikeDistance = "BikeDistance";
+        String Duration = "Duration";
+        String TooManyCarRoutes = "TooManyCarRoutes";
+        String EmissionComparetoOthers = "EmissionComparetoOthers";
+        String NiceWeather = "NiceWeather";
+        String TooManyTransportRoutes = "TooManyTransportRoutes";
+        String emissionsIncreasing = "emissionsIncreasing";
 
-                }
-                break;
-            case "bicycle":
-            case "bikeSharing":
-                if (user.tooManyCarRoutes()) {
-                    if (context.equals("BikeDistance")) {
-                        utility = 0.422;
-                    }
-                    if (context.equals("Duration")) {
-                        utility = 0.3228;
-                    }
-                    if (context.equals("TooManyCarRoutes")) {
-                        utility = 0.0456;
-                    }
-                    if (context.equals("EmissionComparetoOthers")) {
-                        utility = 0.0777;
-                    }
-                    if (context.equals("NiceWeather")) {
-                        utility = 0.1321;
-                    }
-                }
-                if (user.tooManyPublicTransportRoutes()) {
-                    if (context.equals("BikeDistance")) {
-                        utility = 0.4074;
-                    }
-                    if (context.equals("Duration")) {
-                        utility = 0.3157;
-                    }
-                    if (context.equals("TooManyTransportRoutes")) {
-                        utility = 0.0353;
-                    }
-                    if (context.equals("EmissionComparetoOthers")) {
-                        utility = 0.0776;
-                    }
-                    if (context.equals("NiceWeather")) {
-                        utility = 0.164;
-                    }
-                } else {
-                    if (context.equals("BikeDistance")) {
-                        utility = 0.4;
-                    }
-                    if (context.equals("Duration")) {
-                        utility = 0.3;
-                    }
-                    if (context.equals("EmissionComparetoOthers")) {
-                        utility = 0.1;
-                    }
-                    if (context.equals("NiceWeather")) {
-                        utility = 0.2;
-                    }
 
+        if ("walk".equals(mode)) {
+            if (user.tooManyCarRoutes()) {
+                if (WalkDistance.equals(context)) {
+                    utility = 0.4218;
                 }
-                break;
-            case "bike&ride":
-                if (user.tooManyCarRoutes()) {
-                    if (context.equals("Duration")) {
-                        utility = 0.5152;
-                    }
-                    if (context.equals("TooManyCarRoutes")) {
-                        utility = 0.0901;
-                    }
-                    if (context.equals("EmissionComparetoOthers")) {
-                        utility = 0.179;
-                    }
-                    if (context.equals("NiceWeather")) {
-                        utility = 0.2157;
-                    }
+                if (Duration.equals(context)) {
+                    utility = 0.3228;
                 }
-                if (user.tooManyPublicTransportRoutes()) {
-                    if (context.equals("Duration")) {
-                        utility = 0.5193;
-                    }
-                    if (context.equals("TooManyCarRoutes")) {
-                        utility = 0.049;
-                    }
-                    if (context.equals("EmissionComparetoOthers")) {
-                        utility = 0.1958;
-                    }
-                    if (context.equals("NiceWeather")) {
-                        utility = 0.2359;
-                    }
-                } else {
-                    if (context.equals("BikeDistance")) {
-                        utility = 0.422;
-                    }
-                    if (context.equals("Duration")) {
-                        utility = 0.3228;
-                    }
-                    if (context.equals("EmissionComparetoOthers")) {
-                        utility = 0.0777;
-                    }
-                    if (context.equals("NiceWeather")) {
-                        utility = 0.1321;
-                    }
+                if (TooManyCarRoutes.equals(context)) {
+                    utility = 0.0456;
                 }
-                break;
-            case "pt":
-                if (context.equals("Duration")) {
-                    utility = 0.5125;
+                if (EmissionComparetoOthers.equals(context)) {
+                    utility = 0.0777;
                 }
-                if (context.equals("emissionsIncreasing")) {
-                    utility = 0.315;
+                if (NiceWeather.equals(context)) {
+                    utility = 0.1321;
                 }
-                if (context.equals("NiceWeather")) {
-                    utility = 0.0775;
+            }
+            if (user.tooManyPublicTransportRoutes()) {
+                if (WalkDistance.equals(context)) {
+                    utility = 0.4074;
                 }
-                if (context.equals("TooManyCarRoutes")) {
-                    utility = 0.0949;
+                if (Duration.equals(context)) {
+                    utility = 0.3157;
+                }
+                if (TooManyTransportRoutes.equals(context)) {
+                    utility = 0.0353;
+                }
+                if (EmissionComparetoOthers.equals(context)) {
+                    utility = 0.0776;
+                }
+                if (NiceWeather.equals(context)) {
+                    utility = 0.164;
+                }
+            } else {
+                if (WalkDistance.equals(context)) {
+                    utility = 0.4;
+                }
+                if (Duration.equals(context)) {
+                    utility = 0.3;
+                }
+                if (EmissionComparetoOthers.equals(context)) {
+                    utility = 0.1;
+                }
+                if (NiceWeather.equals(context)) {
+                    utility = 0.1;
                 }
 
-                break;
-            case "park&ride":
-                if (context.equals("Duration")) {
+            }
+        }
+        else if ("bicycle".equals(mode) || "bikeSharing".equals(mode)) {
+            if (user.tooManyCarRoutes()) {
+                if (BikeDistance.equals(context)) {
+                    utility = 0.422;
+                }
+                if (Duration.equals(context)) {
+                    utility = 0.3228;
+                }
+                if (TooManyCarRoutes.equals(context)) {
+                    utility = 0.0456;
+                }
+                if (EmissionComparetoOthers.equals(context)) {
+                    utility = 0.0777;
+                }
+                if (NiceWeather.equals(context)) {
+                    utility = 0.1321;
+                }
+            }
+            if (user.tooManyPublicTransportRoutes()) {
+                if (BikeDistance.equals(context)) {
+                    utility = 0.4074;
+                }
+                if (Duration.equals(context)) {
+                    utility = 0.3157;
+                }
+                if (TooManyTransportRoutes.equals(context)) {
+                    utility = 0.0353;
+                }
+                if (EmissionComparetoOthers.equals(context)) {
+                    utility = 0.0776;
+                }
+                if (NiceWeather.equals(context)) {
+                    utility = 0.164;
+                }
+            } else {
+                if (BikeDistance.equals(context)) {
+                    utility = 0.4;
+                }
+                if (Duration.equals(context)) {
+                    utility = 0.3;
+                }
+                if (EmissionComparetoOthers.equals(context)) {
+                    utility = 0.1;
+                }
+                if (NiceWeather.equals(context)) {
+                    utility = 0.2;
+                }
+
+            }
+        }
+        else if("bike&ride".equals(mode)) {
+            if (user.tooManyCarRoutes()) {
+                if (Duration.equals(context)) {
                     utility = 0.5152;
                 }
-                if (context.equals("EmissionComparetoOthers")) {
-                    utility = 0.179;
-                }
-                if (context.equals("NiceWeather")) {
-                    utility = 0.2157;
-                }
-                if (context.equals("TooManyCarRoutes")) {
+                if (TooManyCarRoutes.equals(context)) {
                     utility = 0.0901;
                 }
-                break;
+                if (EmissionComparetoOthers.equals(context)) {
+                    utility = 0.179;
+                }
+                if (NiceWeather.equals(context)) {
+                    utility = 0.2157;
+                }
+            }
+            if (user.tooManyPublicTransportRoutes()) {
+                if (Duration.equals(context)) {
+                    utility = 0.5193;
+                }
+                if (TooManyCarRoutes.equals(context)) {
+                    utility = 0.049;
+                }
+                if (EmissionComparetoOthers.equals(context)) {
+                    utility = 0.1958;
+                }
+                if (NiceWeather.equals(context)) {
+                    utility = 0.2359;
+                }
+            } else {
+                if (BikeDistance.equals(context)) {
+                    utility = 0.422;
+                }
+                if (Duration.equals(context)) {
+                    utility = 0.3228;
+                }
+                if (EmissionComparetoOthers.equals(context)) {
+                    utility = 0.0777;
+                }
+                if (NiceWeather.equals(context)) {
+                    utility = 0.1321;
+                }
+            }
+        }
+        else if ("pt".equals(mode)) {
+            if (Duration.equals(context)) {
+                utility = 0.5125;
+            }
+            if (emissionsIncreasing.equals(context)) {
+                utility = 0.315;
+            }
+            if (NiceWeather.equals(context)) {
+                utility = 0.0775;
+            }
+            if (TooManyCarRoutes.equals(context)) {
+                utility = 0.0949;
+            }
+
+        }
+        else if ("park&ride".equals(mode)){
+            if (Duration.equals(context)) {
+                utility = 0.5152;
+            }
+            if (EmissionComparetoOthers.equals(context)) {
+                utility = 0.179;
+            }
+            if (NiceWeather.equals(context)) {
+                utility = 0.2157;
+            }
+            if (TooManyCarRoutes.equals(context)) {
+                utility = 0.0901;
+            }
         }
 
         return utility;

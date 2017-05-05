@@ -11,11 +11,11 @@ public class RecommenderModes {
 	public static final int CAR = 7;
 	public static final int UNKNOWN = 8;
 	
-	public static int[] recommenderModesOrder = {
+	public static final int[] recommenderModesOrder = {
 			WALK, BICYCLE, BIKE_SHARING, BIKE_AND_RIDE, PUBLIC_TRANSPORT, PARK_AND_RIDE_WITH_BIKE, PARK_AND_RIDE, CAR, UNKNOWN
 		};
 	
-	public static String[] recommenderModesStr = {
+	public static final String[] recommenderModesStr = {
 		"walk",
 		"bicycle",
 		"bikeSharing",

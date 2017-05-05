@@ -83,7 +83,7 @@ public class MongoConnectionHelper implements ServletContextListener {
 	    		this.pass = mongoPass;
 			}
 			catch (Exception e){
-				e.printStackTrace();
+				logger.debug(e.getMessage());
 			}
 		}
 

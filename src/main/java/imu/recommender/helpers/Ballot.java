@@ -4,6 +4,8 @@ package imu.recommender.helpers;
  * Created by evangelie on 5/12/2016.
  */
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,8 @@ public class Ballot {
      * Holds what will be the actual ballot. Each string will be the name of each
      * candidate and the index will be the ranking of that candidate.
      */
+
+    private Logger logger = Logger.getLogger(Ballot.class);
     private List<String> theBallot;
 
     /**
@@ -77,7 +81,7 @@ public class Ballot {
      * 					higher (more preferred) preferences (candidates).
      */
     public void setBallot(String[] ballot){
-        theBallot.removeAll(theBallot);
+        theBallot.clear();
 
         for(String candidate : ballot){
             if(!theBallot.contains(candidate))
@@ -106,7 +110,7 @@ public class Ballot {
      * 					higher (more preferred) preferences (candidates).
      */
     public void setBallot(String ballot){
-        theBallot.removeAll(theBallot);
+        theBallot.clear();
 
         int index = -1; //The index for searching the candidates string.
 
@@ -149,6 +153,7 @@ public class Ballot {
         try {
             return theBallot.get(index); //Returns the candidate with specified index.
         } catch(IndexOutOfBoundsException e){
+            logger.debug(e.getMessage());
             return "";
         }
     }

@@ -4,15 +4,10 @@ import at.ac.ait.ariadne.routeformat.RouteSegment;
 import imu.recommender.helpers.RecommenderModes;
 import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.User;
+import org.apache.log4j.Logger;
 import uk.recurse.geocoding.reverse.Country;
 import uk.recurse.geocoding.reverse.ReverseGeocoder;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Optional;
 
 public class BehaviouralModel {
@@ -20,10 +15,9 @@ public class BehaviouralModel {
 	private static Logger logger = Logger.getLogger(BehaviouralModel.class);
 	
 	public static double calculateBhaviouralModelUtility (RouteModel route, User user, double locationValue){
-		double final_utility = 0.0;
 		double utility = 0.0;
 				double cost = 0.0;
-		double segment_cost = 0.0;
+		double segment_cost;
 		double time = (double) route.getRoute().getDurationSeconds()/60;
 		logger.debug("Mode : "+route.getRoute().getAdditionalInfo().get("mode"));
 		logger.debug("Time: "+time);
@@ -34,6 +28,7 @@ public class BehaviouralModel {
 
 			}
 			catch (Exception e){
+				logger.debug(e.getMessage());
 				segment_cost = 0.0;
 			}
 			cost = segment_cost + cost;
@@ -129,7 +124,7 @@ public class BehaviouralModel {
 				g2*educationValue(user.getDemographics().getEducation()) +
 				g3*genderValue(user.getDemographics().getGender()) +
 				g4*locationValue;				
-		return 0.0;
+		return result;
 	}
 	
 	private static double educationValue(String education){
@@ -162,7 +157,7 @@ public class BehaviouralModel {
 			else return 0.0;
 		}
 		catch (Exception e){
-			e.printStackTrace();
+			logger.debug(e.getMessage());
 			return 0.0;
 		}		
 	}

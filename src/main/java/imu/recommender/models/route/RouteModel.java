@@ -106,7 +106,7 @@ public class RouteModel {
 	public void calculateWalkingDistance(){
 		int total_walk_distance = 0;
 		for (RouteSegment segment :  this.route.getSegments()){
-			if (segment.getModeOfTransport().getGeneralizedType().toString().equals("FOOT") ){
+			if ("FOOT".equals(segment.getModeOfTransport().getGeneralizedType().toString()) ){
 				total_walk_distance = total_walk_distance + segment.getDistanceMeters();
 			}
 		}
@@ -116,7 +116,7 @@ public class RouteModel {
 	public void calculateBikeDistance(){
 		int total_bile_distance = 0;
 		for (RouteSegment segment :  this.route.getSegments()){
-			if (segment.getModeOfTransport().getGeneralizedType().toString().equals("FOOT") ){
+			if ("FOOT".equals(segment.getModeOfTransport().getGeneralizedType().toString()) ){
 				total_bile_distance = total_bile_distance + segment.getDistanceMeters();
 			}
 		}
@@ -127,25 +127,25 @@ public class RouteModel {
 		double emissions=0.0;
 		
 		//logger.debug("distance: " + distance + " travel_mode: " + travel_mode + " detailed_mode: " + detailed_mode);
-		if (travel_mode.equals("FOOT") ){
+		if ("FOOT".equals(travel_mode) ){
 			emissions = 0;
 		}
-		if (travel_mode.equals("BICYCLE") ){
+		if ("BICYCLE".equals(travel_mode) ){
 			emissions = 0;
 		}
-		if (travel_mode.equals("PUBLIC_TRANSPORT") ) {
+		if ("PUBLIC_TRANSPORT".equals(travel_mode) ) {
 
-			if (detailed_mode.equals("Optional[SUBWAY]")) {
+			if ("Optional[SUBWAY]".equals(detailed_mode)) {
 				emissions = ( (double)(distance*20)/1000 );
 			}
-			if (detailed_mode.equals("Optional[HEAVY_RAIL]")) {
+			if ("Optional[HEAVY_RAIL]".equals(detailed_mode)) {
 				emissions = ( (double)(distance*50)/1000 );
 			}
-			if (detailed_mode.equals("Optional[BUS]")) {
+			if ("Optional[BUS]".equals(detailed_mode)) {
 				emissions = ( (distance*25.5)/1000 );
 			}
 		}
-		if (travel_mode.equals("CAR") ){
+		if ("CAR".equals(travel_mode) ){
 			emissions = ( (double)(distance*110)/1000 );
 		}
 

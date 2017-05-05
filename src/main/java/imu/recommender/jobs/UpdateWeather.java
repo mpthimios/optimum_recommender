@@ -1,13 +1,11 @@
 package imu.recommender.jobs;
 
-import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.weather.Weather;
 import org.apache.log4j.Logger;
-import org.bitpipeline.lib.owm.OwmClient;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
@@ -40,13 +38,9 @@ public class UpdateWeather implements Job{
             mongoDatastore = MongoConnectionHelper.getMongoDatastore();
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.debug(e.getMessage());
             return;
         }
-
-        DBCollection m = mongoDatastore.getCollection(Weather.class);
-
-        OwmClient owm = new OwmClient();
 
         //owm.setAPPID("e0f5c1a1d86a8bd69e497197804d411c");
         //WeatherStatusResponse currentWeather = owm.currentWeatherAtCity("Tokyo", "JP");
@@ -86,11 +80,10 @@ public class UpdateWeather implements Job{
                 in.close();
                 System.out.println(response.toString());
                 JSONObject js = new JSONObject(response.toString());
-                System.out.println(js.get("weather").toString().contains("Rain") || js.get("weather").toString().contains("Rain"));
                 //System.out.println(js.getJSONArray("weather").get(1));
                 Boolean GoodWeather = Boolean.FALSE;
                 try {
-                    if(js.get("weather").toString().contains("Rain") || js.get("weather").toString().contains("Rain") ) {
+                    if(js.get("weather").toString().contains("Rain") ) {
                         GoodWeather =  Boolean.FALSE;
                     }
                     else{
@@ -99,6 +92,7 @@ public class UpdateWeather implements Job{
 
                 }catch (Exception e){
                     GoodWeather = Boolean.TRUE;
+                    logger.debug(e.getMessage());
                 }
 
                 Weather weatherInfo = new Weather();
@@ -112,7 +106,7 @@ public class UpdateWeather implements Job{
 
         }
         catch (Exception e){
-            logger.debug("error");
+            logger.debug(e.getMessage());
         }
 
     }

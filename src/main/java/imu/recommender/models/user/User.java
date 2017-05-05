@@ -5,6 +5,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
+import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Embedded;
@@ -89,7 +90,9 @@ public class User {
 	
 	@Embedded("route_preferences")
 	private ArrayList<RoutePreference> routePreferences;
-	
+
+	private static Logger logger = Logger.getLogger(User.class);
+
 	public User(){
 		//initialize variables
 		this.id="6EEGP034JBLydaotzqZrCs65jRdpfR4s";
@@ -166,7 +169,7 @@ public class User {
 			mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug(e.getMessage());
 			return null;
 		}
 		
@@ -184,7 +187,7 @@ public class User {
 			mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug(e.getMessage());
 			return null;
 		}
 		
@@ -262,7 +265,7 @@ public class User {
 		List<String> target = new ArrayList<String>();
 		try {
 			String user_mode="car";
-			if(this.getTotal_activities()<=10 || (this.getMode_usage().getPt_percent()==0.0 && this.getMode_usage().getCar_percent()==0.0 && this.getMode_usage().getWalk_percent()==0.0 && this.getMode_usage().getBike_percent()==0.0 )){
+			if(this.getTotal_activities()<=10 || (this.getMode_usage().getPt_percent()==0.0d && this.getMode_usage().getCar_percent()==0.0d && this.getMode_usage().getWalk_percent()==0.0d && this.getMode_usage().getBike_percent()==0.0d )){
 				user_mode = this.personality.convertPreferredMode();
 			}
 			else {
@@ -280,22 +283,22 @@ public class User {
 					user_mode = "bicycle";
 				}
 			}
-			if (user_mode.equals("pt")){
+			if ("pt".equals(user_mode)){
 				target.add("bike&ride");
 				target.add("bicycle");
 				target.add("walk");
 				//target.add("bikeSharing");
 			}
-			if (user_mode.equals("bicycle")){
+			if ("bicycle".equals(user_mode)){
 			    target.add("bicycle");
 				target.add("walk");
 				//target.add("bikeSharing");
 			}
-			if (user_mode.equals("walk")){
+			if ("walk".equals(user_mode)){
 	            target.add("bicycle");
 				target.add("walk");
 			}
-			if (user_mode.equals("car")){
+			if ("car".equals(user_mode)){
 				//target.add("carSharing");
 				target.add("park&ride");
 				target.add("pt");
@@ -310,6 +313,7 @@ public class User {
 			target.add("bike&ride");
 			target.add("bicycle");
 			target.add("walk");
+			logger.debug(e.getMessage());
 		}
 
 		return target;
@@ -581,12 +585,13 @@ public class User {
 			UserSug = 0.0;
 			UserComp = 0.0;
 			UserSelf = 0.0;
+			logger.debug(e.getMessage());
 		}
 
 		String strategy = "";
 		switch (personality) {
 			case "Extraversion":
-				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
+				if (UserSug == 0.0d & UserComp == 0.0d & UserSelf == 0.0d) {
 					Suggestion = GetProperties.getSugEx();
 					Comparison = GetProperties.getCompEx();
 					SelfMonitoring = GetProperties.getSelfEx();
@@ -599,7 +604,7 @@ public class User {
 				break;
 			case "Agreeableness":
 
-				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
+				if (UserSug == 0.0d & UserComp == 0.0d & UserSelf == 0.0d) {
 					Suggestion = GetProperties.getSugAg();
 					Comparison = GetProperties.getCompAg();
 					SelfMonitoring = GetProperties.getSelfAg();
@@ -612,7 +617,7 @@ public class User {
 				break;
 			case "Openness":
 
-				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
+				if (UserSug == 0.0d & UserComp == 0.0d & UserSelf == 0.0d) {
 					Suggestion = GetProperties.getSugOp();
 					Comparison = GetProperties.getCompOp();
 					SelfMonitoring = GetProperties.getSelfOp();
@@ -625,7 +630,7 @@ public class User {
 				break;
 			case "Conscientiousness":
 
-				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
+				if (UserSug == 0.0d & UserComp == 0.0d & UserSelf == 0.0d) {
 					Suggestion = GetProperties.getSugCons();
 					Comparison = GetProperties.getCompCons();
 					SelfMonitoring = GetProperties.getSelfCons();
@@ -638,7 +643,7 @@ public class User {
 				break;
 			case "Neuroticism":
 
-				if (UserSug == 0.0 & UserComp == 0.0 & UserSelf == 0.0) {
+				if (UserSug == 0.0d & UserComp == 0.0d & UserSelf == 0.0d) {
 					Suggestion = GetProperties.getSugN();
 					Comparison = GetProperties.getCompN();
 					SelfMonitoring = GetProperties.getSelfN();
@@ -669,17 +674,17 @@ public class User {
 	}
 
 	private Double reverse(Double score){
-		Double reversed = 0.0;
-		if (score == 1.0){
+		Double reversed;
+		if (score == 1.0d){
 			reversed = 5.0;
 		}
-		else if (score == 2.0){
+		else if (score == 2.0d){
 			reversed = 4.0;
 		}
-		else if (score == 4.0){
+		else if (score == 4.0d){
 			reversed = 2.0;
 		}
-		if (score == 5.0){
+		if (score == 5.0d){
 			reversed = 1.0;
 		}
 		else{
@@ -748,7 +753,7 @@ public class User {
 	}
 
 	public void setCarPercentagePreviousWeek(double CarPercentagePreviousWeek) {
-		CarPercentagePreviousWeek = CarPercentagePreviousWeek;
+		this.CarPercentagePreviousWeek = CarPercentagePreviousWeek;
 	}
 	public double getPercentageReduceDriving() {
 		return PercentageReduceDriving;
@@ -811,7 +816,7 @@ public class User {
 		if (query.field("persuasion").exists().asList().isEmpty()) {  // .asList().isEmpty()
 			String personality = this.getPersonality().getTypeStr();
 			query = mongoDatastore.createQuery(User.class).field("id").equal( user.getId());
-			if (personality.equals("Openess") || personality.equals("Extraversion")) {
+			if ("Openess".equals(personality) || "Extraversion".equals(personality)) {
 				this.setPersuasion("A");
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("persuasion", "A"),true);
 
@@ -866,7 +871,7 @@ public class User {
 			try {
 				startDate = df.parse(feedback_date);
 			} catch (ParseException e) {
-				e.printStackTrace();
+				logger.debug(e.getMessage());
 			}
 			//Timestamp startDate =  Timestamp.valueOf(feedback_date);
 			long days_long = Math.abs( (endDate.getTime()-startDate.getTime())/86400000);
@@ -874,6 +879,7 @@ public class User {
 		}
 		catch (Exception e){
 			days = 4;
+			logger.debug(e.getMessage());
 		}
 
 

@@ -8,7 +8,6 @@ import javax.servlet.ServletContextListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Properties;
 /**
  * Created by evangelie on 21/10/2016.
@@ -154,14 +153,11 @@ public class GetProperties implements ServletContextListener {
                 throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
             }
 
-            Date time = new Date(System.currentTimeMillis());
-
             // get the username
             username = prop.getProperty("username");
+            inputStream.close();
         } catch (Exception e) {
         	logger.debug("Exception: " + e);
-        } finally {
-            inputStream.close();
         }
         return username;
     }
@@ -180,15 +176,12 @@ public class GetProperties implements ServletContextListener {
                 throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
             }
 
-            Date time = new Date(System.currentTimeMillis());
-
             // get the password
             password = prop.getProperty("password");
+            inputStream.close();
 
         } catch (Exception e) {
         	logger.debug("Exception: " + e);
-        } finally {
-            inputStream.close();
         }
         return password;
     }
@@ -329,7 +322,7 @@ public class GetProperties implements ServletContextListener {
 
 		}
 		catch (Exception e){
-			e.printStackTrace();
+			logger.debug(e.getMessage());
 		}
 		
 	}

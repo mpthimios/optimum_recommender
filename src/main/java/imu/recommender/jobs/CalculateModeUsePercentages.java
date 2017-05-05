@@ -2,7 +2,6 @@ package imu.recommender.jobs;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import imu.recommender.helpers.MongoConnectionHelper;
 import imu.recommender.models.user.ModeUsage;
 import imu.recommender.models.user.User;
@@ -42,7 +41,7 @@ public class CalculateModeUsePercentages implements Job {
 			mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug(e.getMessage());
 			return;
 		}
 
@@ -60,15 +59,14 @@ public class CalculateModeUsePercentages implements Job {
 				con.setRequestProperty("token",id.toString());
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.debug(e.getMessage());
 				return;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.debug(e.getMessage());
 				return;
 			}
     		try {
-				DBObject user = m.findOne(id);
 
         		//con.setRequestProperty("user", (String) id.toString());
         		int responseCode = con.getResponseCode();
@@ -121,10 +119,10 @@ public class CalculateModeUsePercentages implements Job {
 						System.out.println(mode);
 
 						//Get location and date
-						float lat = 12;
+						/*float lat = 12;
 						float longitude = 23;
 						Integer start = 12;
-						Integer end = 13;
+						Integer end = 13;*/
 
 						//Boolean NiceWeather = WeatherInfo.isHistoricalWeatherNice(lat, longitude, start, end);
 						Boolean NiceWeather = Boolean.TRUE;
@@ -136,16 +134,16 @@ public class CalculateModeUsePercentages implements Job {
 								String mode1 = getMode(object1);
 								Integer endTime = Integer.parseInt(object.get("end_time").toString());
 								Integer startTime = Integer.parseInt(object1.get("start_time").toString());
-								if( ( mode1.equals("ON_TRAIN") || mode1.equals("IN_BUS") ) && (startTime-endTime>300)){
+								if( ( "ON_TRAIN".equals(mode1) || "IN_BUS".equals(mode1) ) && (startTime-endTime>300)){
 									n_parkride++;
 									i++;
 								}
-								else if(mode1.equals("STILL") ) {
+								else if("STILL".equals(mode1) ) {
 									JSONObject object2 = arr.getJSONObject(i + 2);
 									String mode2 = getMode(object2);
 									Integer endTime1 = Integer.parseInt(object1.get("end_time").toString());
 									Integer startTime1 = Integer.parseInt(object2.get("start_time").toString());
-									if ( (mode2.equals("ON_TRAIN") || mode2.equals("IN_BUS")) && (startTime1-endTime1)>300) {
+									if ( ("ON_TRAIN".equals(mode2) || "IN_BUS".equals(mode2)) && (startTime1-endTime1)>300) {
 										n_parkride++;
 										i = i + 2;
 									} else {
@@ -159,28 +157,29 @@ public class CalculateModeUsePercentages implements Job {
 							}
 							catch(Exception e){
 									n_car++;
+									logger.debug(e.getMessage());
 								}
 
 						}
-						if (mode.equals("ON_TRAIN") || mode.equals("IN_BUS")) {
+						if ("ON_TRAIN".equals(mode) || "IN_BUS".equals(mode)) {
 							n_pt++;
 						}
-						if (mode.equals("ON_BICYCLE")) {
+						if ("ON_BICYCLE".equals(mode)) {
 							try {
 								JSONObject object1 = arr.getJSONObject(i + 1);
 								String mode1 = getMode(object1);
 								Integer endTime = Integer.parseInt(object.get("end_time").toString());
 								Integer startTime = Integer.parseInt(object1.get("start_time").toString());
-								if( (mode1.equals("ON_TRAIN") || mode1.equals("IN_BUS")) && (startTime-endTime>300)){
+								if( ("ON_TRAIN".equals(mode1) || "IN_BUS".equals(mode1)) && (startTime-endTime>300)){
 									n_bikeride++;
 									i++;
 								}
-								else if(mode1.equals("STILL") ) {
+								else if("STILL".equals(mode1) ) {
 									JSONObject object2 = arr.getJSONObject(i + 2);
 									String mode2 = getMode(object2);
 									Integer endTime1 = Integer.parseInt(object1.get("end_time").toString());
 									Integer startTime1 = Integer.parseInt(object2.get("start_time").toString());
-									if ( (mode2.equals("ON_TRAIN") || mode2.equals("IN_BUS") ) && (startTime1-endTime1>300)) {
+									if ( ("ON_TRAIN".equals(mode2) || "IN_BUS".equals(mode2) ) && (startTime1-endTime1>300)) {
 										n_bikeride++;
 										i = i + 2;
 									}else {
@@ -203,10 +202,11 @@ public class CalculateModeUsePercentages implements Job {
 								if (NiceWeather) {
 									n_bike_GW++;
 								}
+								logger.debug(e.getMessage());
 							}
 
 						}
-						if (mode.equals("ON_FOOT") || mode.equals("WALKING")) {
+						if ("ON_FOOT".equals(mode) || "WALKING".equals(mode)) {
 							n_walk++;
 							if (NiceWeather) {
 								n_walk_GW++;
@@ -247,7 +247,7 @@ public class CalculateModeUsePercentages implements Job {
 
 
 			} catch (Exception e) {
-				 e.printStackTrace();
+				logger.debug(e.getMessage());
 				//percentages should be saved to mongo
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("total_activities", 0),true);
@@ -267,7 +267,6 @@ public class CalculateModeUsePercentages implements Job {
 
     	}
 		//Calculate Average Mode Use percentages
-		DBCollection mongo = mongoDatastore.getCollection( User.class );
 		for (Object current_id : userIds ) {
 			try {
 				double total_car_perc=0.0;
@@ -296,12 +295,12 @@ public class CalculateModeUsePercentages implements Job {
 							}
 							catch (Exception e){
 								//total_users++;
-								e.printStackTrace();
+								logger.debug(e.getMessage());
 							}
 						}
 					} catch (Exception e) {
 						//
-						e.printStackTrace();
+						logger.debug(e.getMessage());
 					}
 				}
 				double bikeUsageComparedToOthers = total_bike_perc/(double)total_users;
@@ -325,7 +324,7 @@ public class CalculateModeUsePercentages implements Job {
 
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.debug(e.getMessage());
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
 				//Update the AverageEmissions field
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthers", 0.0),true);
@@ -358,6 +357,7 @@ public class CalculateModeUsePercentages implements Job {
 			}
 		}
 		catch (Exception e){
+    		logger.debug(e.getMessage());
     		return "UNKNOWN";
 		}
 
