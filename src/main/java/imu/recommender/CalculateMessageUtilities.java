@@ -193,7 +193,7 @@ public class CalculateMessageUtilities {
         }
         catch (Exception e){
             startDate = Timestamp.valueOf("2017-02-21 10:51:55.415");
-            logger.debug(e.getMessage());
+            logger.debug(e);
         }
         Integer days = Math.round(Math.abs( (endDate.getTime()-startDate.getTime())/86400000));
         String lastWeek = "last week";
