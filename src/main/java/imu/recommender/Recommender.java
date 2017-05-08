@@ -83,10 +83,10 @@ public class Recommender {
 			for (Map.Entry<String, RouteModel> entry : uniquesHash.entrySet()){
 				routes.add(entry.getValue());				
 			}
-			logger.debug("filtering duplicates - after size: " + routes.size());
+			logger.debug("filtering duplicates - after size: " + routes.size());			
 		}
-		catch(Exception e){
-			logger.debug(e.getMessage());
+		catch(Exception e){			
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 		}
 	}
 	

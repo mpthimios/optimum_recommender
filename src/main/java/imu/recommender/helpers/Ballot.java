@@ -153,7 +153,7 @@ public class Ballot {
         try {
             return theBallot.get(index); //Returns the candidate with specified index.
         } catch(IndexOutOfBoundsException e){
-            logger.debug(e.getMessage());
+            logger.debug(e);
             return "";
         }
     }
