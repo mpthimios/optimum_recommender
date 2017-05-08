@@ -19,11 +19,8 @@ public class Context {
 
     public static List<String> getRelevantContextForUser(Recommender route, RouteModel trip, User user, Datastore mongoDatastore) throws Exception {
 
-        String WalkDistance = "WalkDistance";
-        String BikeDistance = "BikeDistance";
-        String Duration = "Duration";
-        String TooManyCarRoutes = "TooManyCarRoutes";
-        String EmissionComparetoOthers = "EmissionComparetoOthers";
+    	String Duration = "Duration";
+        String TooManyCarRoutes = "TooManyCarRoutes";       
         String NiceWeather = "NiceWeather";
         String TooManyTransportRoutes = "TooManyTransportRoutes";
         String emissionsIncreasing = "emissionsIncreasing";
@@ -31,8 +28,6 @@ public class Context {
         //Get trip properties
         Integer routeDistance = trip.getRoute().getDistanceMeters();
 
-        Float lat = trip.getRoute().getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(0).floatValue();
-        Float lon = trip.getRoute().getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(1).floatValue();
         String city = "Vienna";
         //String city = trip.getFrom().getAddress().get().getCity().get();
         Integer duration = trip.getRoute().getDurationSeconds();
@@ -153,7 +148,6 @@ public class Context {
         Double transportCost = 1.4;
         Double drivingCost = 5.0;
         return drivingCost - transportCost >= 2.0;
-
     }
 
     public static boolean DurationComparetoDriving(Integer transportDuration, Integer drivingDuration) {
@@ -171,7 +165,7 @@ public class Context {
 
         }
         catch (Exception e){
-            logger.debug(e.getMessage());
+            logger.debug(e);
             return false;
         }
 

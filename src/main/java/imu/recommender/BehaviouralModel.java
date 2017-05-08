@@ -28,7 +28,7 @@ public class BehaviouralModel {
 
 			}
 			catch (Exception e){
-				logger.debug(e.getMessage());
+				logger.debug(e);
 				segment_cost = 0.0;
 			}
 			cost = segment_cost + cost;
@@ -157,7 +157,7 @@ public class BehaviouralModel {
 			else return 0.0;
 		}
 		catch (Exception e){
-			logger.debug(e.getMessage());
+			logger.debug(e);
 			return 0.0;
 		}		
 	}
