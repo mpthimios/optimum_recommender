@@ -157,7 +157,7 @@ public class GetProperties implements ServletContextListener {
             username = prop.getProperty("username");
             inputStream.close();
         } catch (Exception e) {
-        	logger.debug("Exception: " + e);
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
         }
         return username;
     }
@@ -181,7 +181,7 @@ public class GetProperties implements ServletContextListener {
             inputStream.close();
 
         } catch (Exception e) {
-        	logger.debug("Exception: " + e);
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
         }
         return password;
     }
@@ -322,7 +322,7 @@ public class GetProperties implements ServletContextListener {
 
 		}
 		catch (Exception e){
-			logger.debug(e.getMessage());
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 		}
 		
 	}
@@ -334,7 +334,6 @@ public class GetProperties implements ServletContextListener {
 	public static void setMaxWalkingDistance(int maxWalkingDistance) {
 		GetProperties.maxWalkingDistance = maxWalkingDistance;
 	}
-
 	public static int getMaxBikeDistance() {
 		return maxBikeDistance;
 	}

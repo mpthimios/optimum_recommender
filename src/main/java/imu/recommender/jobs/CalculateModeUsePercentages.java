@@ -41,7 +41,7 @@ public class CalculateModeUsePercentages implements Job {
 			mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
-			logger.debug(e.getMessage());
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 			return;
 		}
 
@@ -59,11 +59,11 @@ public class CalculateModeUsePercentages implements Job {
 				con.setRequestProperty("token",id.toString());
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
-				logger.debug(e.getMessage());
+				logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 				return;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				logger.debug(e.getMessage());
+				logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 				return;
 			}
     		try {
@@ -127,7 +127,7 @@ public class CalculateModeUsePercentages implements Job {
 						//Boolean NiceWeather = WeatherInfo.isHistoricalWeatherNice(lat, longitude, start, end);
 						Boolean NiceWeather = Boolean.TRUE;
 
-						if (mode.equals("IN_CAR")) {
+						if ("IN_CAR".equals(mode)) {
 							//Check if the next mode is sitting or pt
 							try {
 								JSONObject object1 = arr.getJSONObject(i+1);
@@ -157,7 +157,7 @@ public class CalculateModeUsePercentages implements Job {
 							}
 							catch(Exception e){
 									n_car++;
-									logger.debug(e.getMessage());
+									logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 								}
 
 						}
@@ -202,7 +202,7 @@ public class CalculateModeUsePercentages implements Job {
 								if (NiceWeather) {
 									n_bike_GW++;
 								}
-								logger.debug(e.getMessage());
+								logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 							}
 
 						}
@@ -247,7 +247,7 @@ public class CalculateModeUsePercentages implements Job {
 
 
 			} catch (Exception e) {
-				logger.debug(e.getMessage());
+				logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 				//percentages should be saved to mongo
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("total_activities", 0),true);
@@ -295,12 +295,12 @@ public class CalculateModeUsePercentages implements Job {
 							}
 							catch (Exception e){
 								//total_users++;
-								logger.debug(e.getMessage());
+								logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 							}
 						}
 					} catch (Exception e) {
 						//
-						logger.debug(e.getMessage());
+						logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 					}
 				}
 				double bikeUsageComparedToOthers = total_bike_perc/(double)total_users;
@@ -324,7 +324,7 @@ public class CalculateModeUsePercentages implements Job {
 
 
 			} catch (Exception e) {
-				logger.debug(e.getMessage());
+				logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
 				//Update the AverageEmissions field
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthers", 0.0),true);
@@ -357,7 +357,7 @@ public class CalculateModeUsePercentages implements Job {
 			}
 		}
 		catch (Exception e){
-    		logger.debug(e.getMessage());
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
     		return "UNKNOWN";
 		}
 

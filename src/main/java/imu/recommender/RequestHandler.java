@@ -167,7 +167,7 @@ public class RequestHandler extends HttpServlet{
 			logger.error("Response:"+new Timestamp(System.currentTimeMillis()));
 		}
 		catch (Exception e){
-			logger.debug(e.getMessage());
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 			logger.debug("user not found");
 			
 			Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
@@ -181,7 +181,7 @@ public class RequestHandler extends HttpServlet{
 					try {
 						//mes = CalculateMessageUtilities.calculateForUser(response_route, route, user);
 					} catch (Exception ex) {
-						logger.debug(e.getMessage());
+						logger.error("Exception while filtering duplicate routes: " + ex.getMessage(), ex);
 					}
 				}
 				Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
@@ -293,7 +293,7 @@ public class RequestHandler extends HttpServlet{
 //				}
 
 			} catch (Exception e) {
-				logger.debug(e.getMessage());
+				logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 			}
 	    }
 	    else{

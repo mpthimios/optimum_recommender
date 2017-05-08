@@ -38,7 +38,7 @@ public class UpdateWeather implements Job{
             mongoDatastore = MongoConnectionHelper.getMongoDatastore();
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
-            logger.debug(e.getMessage());
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             return;
         }
 
@@ -92,7 +92,7 @@ public class UpdateWeather implements Job{
 
                 }catch (Exception e){
                     GoodWeather = Boolean.TRUE;
-                    logger.debug(e.getMessage());
+                    logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
                 }
 
                 Weather weatherInfo = new Weather();
@@ -106,7 +106,7 @@ public class UpdateWeather implements Job{
 
         }
         catch (Exception e){
-            logger.debug(e.getMessage());
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
         }
 
     }

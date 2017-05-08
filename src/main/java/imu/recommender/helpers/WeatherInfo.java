@@ -74,7 +74,7 @@ public class WeatherInfo implements ServletContextListener {
             }
 
         }catch (Exception e){
-            logger.debug(e.getMessage());
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             return true;
         }
 
@@ -95,7 +95,7 @@ public class WeatherInfo implements ServletContextListener {
 
         }
         catch (Exception e){
-            logger.debug(e.getMessage());
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
         }
     }
 	

@@ -86,7 +86,7 @@ public class Recommender {
 			logger.debug("filtering duplicates - after size: " + routes.size());
 		}
 		catch(Exception e){
-			logger.debug(e.getMessage());
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 		}
 	}
 	
@@ -257,7 +257,7 @@ public class Recommender {
 				userPreferedModes.put((double) order, i);
 				i++;
 			}
-			logger.debug(e.getMessage());
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 		}
 		
 		Map<Integer, RouteModel> rankedRoutesMap = new LinkedHashMap<>();
@@ -447,7 +447,7 @@ public class Recommender {
 					try {
 						contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore);
 					} catch (Exception e) {
-						logger.debug(e.getMessage());
+						logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 					}
 					if ( Context.GetRelevantContext(target, contextList)== Boolean.TRUE ){
 						//break;
@@ -471,7 +471,7 @@ public class Recommender {
 							message = mes.split("_")[0];
 							strategy = mes.split("_")[1];
 						} catch (Exception e) {
-							logger.debug(e.getMessage());
+							logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 						}
 					} else {
 						message = "";

@@ -43,7 +43,7 @@ public class CalculateReduceDrivingPercentage implements Job {
             mongoDatastore = MongoConnectionHelper.getMongoDatastore();
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
-            logger.debug(e.getMessage());
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             return;
         }
 
@@ -75,11 +75,11 @@ public class CalculateReduceDrivingPercentage implements Job {
 
                 } catch (MalformedURLException e) {
                     // TODO Auto-generated catch block
-                    logger.debug(e.getMessage());
+                    logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
                     return;
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
-                    logger.debug(e.getMessage());
+                    logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
                     return;
                 }
 
@@ -125,7 +125,7 @@ public class CalculateReduceDrivingPercentage implements Job {
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("CarPercentagePreviousWeek", total_car));
 
             } catch (Exception e) {
-                logger.debug(e.getMessage());
+                logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             }
 
         }
@@ -151,11 +151,11 @@ public class CalculateReduceDrivingPercentage implements Job {
                             }
                             catch (Exception e){
                                 total_users++;
-                                logger.debug(e.getMessage());
+                                logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
                             }
                         }
                     } catch (Exception e) {
-                        logger.debug(e.getMessage());
+                        logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
                     }
                 }
                 double PercentageReduceDriving = users_reduce_driving/(double)total_users;
@@ -164,7 +164,7 @@ public class CalculateReduceDrivingPercentage implements Job {
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("PercentageReduceDriving", PercentageReduceDriving));
 
             } catch (Exception e) {
-                logger.debug(e.getMessage());
+                logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             }
         }
 
@@ -187,7 +187,7 @@ public class CalculateReduceDrivingPercentage implements Job {
             }
         }
         catch (Exception e){
-            logger.debug(e.getMessage());
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             return "UNKNOWN";
         }
 

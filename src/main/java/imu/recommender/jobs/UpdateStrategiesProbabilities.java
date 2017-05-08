@@ -36,7 +36,7 @@ public class UpdateStrategiesProbabilities  implements Job{
             mongoDatastore = MongoConnectionHelper.getMongoDatastore();
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
-            logger.debug(e.getMessage());
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             return;
         }
 
@@ -177,7 +177,7 @@ public class UpdateStrategiesProbabilities  implements Job{
                                     mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", 0));
                                     user_attempts = userQuery.get().getSugAttempts();
                                     user_success = userQuery.get().getSugSuccess();
-                                    logger.debug(e.getMessage());
+                                    logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
                                 }
                                 //Update user attempts and user success on mongodb
                                 mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", user_attempts));
@@ -266,7 +266,7 @@ public class UpdateStrategiesProbabilities  implements Job{
 
                                 } catch (Exception e) {
                                     //Create the fields
-                                    logger.debug(e.getMessage());
+                                    logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
                                     mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", 0));
                                     mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", 0));
                                     user_attempts = userQuery.get().getCompAttempts();
@@ -363,7 +363,7 @@ public class UpdateStrategiesProbabilities  implements Job{
                                     mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", 0));
                                     user_attempts = userQuery.get().getSelfAttempts();
                                     user_success = userQuery.get().getSelfSuccess();
-                                    logger.debug(e.getMessage());
+                                    logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
                                 }
 
                                 //Update strategy attempts and success on mongodb
@@ -430,11 +430,11 @@ public class UpdateStrategiesProbabilities  implements Job{
                     }
 
                 } catch (Exception e) {
-                    logger.debug(e.getMessage());
+                    logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 
                 }
             } catch (Exception e) {
-                logger.debug(e.getMessage());
+                logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             }
         }
 

@@ -43,7 +43,7 @@ public class CalculateEmissions implements Job {
             mongoDatastore = MongoConnectionHelper.getMongoDatastore();
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
-            logger.debug(e.getMessage());
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             return;
         }
 
@@ -129,7 +129,7 @@ public class CalculateEmissions implements Job {
                             emissions = ((distance * 25.5) / 1000);
                             min_pt = min_pt + duration;
                         }
-                        if ("ON_BICYCLE".equals("mode")) {
+                        if ("ON_BICYCLE".equals(mode)) {
                             emissions = 0;
                             min_bike = min_bike + duration;
                         }
@@ -170,12 +170,11 @@ public class CalculateEmissions implements Job {
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("MinDrived", 0.0), true);
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("MinWalked", 0.0), true);
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("MinPT", 0.0), true);
-                logger.debug(e.getMessage());
+                logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             }
 
         }
         //Calculate Average Emissions
-        DBCollection mongo = mongoDatastore.getCollection( User.class );
         for (Object current_id : userIds ) {
             try {
                 double total_emissions=0.0;
@@ -190,12 +189,12 @@ public class CalculateEmissions implements Job {
                             }
                             catch (Exception e){
                                 total_users++;
-                                logger.debug(e.getMessage());
+                                logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
                             }
                         }
                     } catch (Exception e) {
 
-                        logger.debug(e.getMessage());
+                        logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
                     }
                 }
                 double AverageEmissions = total_emissions/(double)total_users;
@@ -208,7 +207,7 @@ public class CalculateEmissions implements Job {
                 Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
                 //Update the AverageEmissions field
                 mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("AverageEmissions", 0.0), true);
-                logger.debug(e.getMessage());
+                logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 
             }
         }
@@ -232,7 +231,7 @@ public class CalculateEmissions implements Job {
             }
         }
         catch (Exception e){
-            logger.debug(e.getMessage());
+            logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             return "UNKNOWN";
         }
 

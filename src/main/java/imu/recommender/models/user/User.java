@@ -169,7 +169,7 @@ public class User {
 			mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
-			logger.debug(e.getMessage());
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 			return null;
 		}
 		
@@ -187,7 +187,7 @@ public class User {
 			mongoDatastore = MongoConnectionHelper.getMongoDatastore();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
-			logger.debug(e.getMessage());
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 			return null;
 		}
 		
@@ -313,7 +313,7 @@ public class User {
 			target.add("bike&ride");
 			target.add("bicycle");
 			target.add("walk");
-			logger.debug(e.getMessage());
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 		}
 
 		return target;
@@ -585,7 +585,7 @@ public class User {
 			UserSug = 0.0;
 			UserComp = 0.0;
 			UserSelf = 0.0;
-			logger.debug(e.getMessage());
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 		}
 
 		String strategy = "";
@@ -871,7 +871,7 @@ public class User {
 			try {
 				startDate = df.parse(feedback_date);
 			} catch (ParseException e) {
-				logger.debug(e.getMessage());
+				logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 			}
 			//Timestamp startDate =  Timestamp.valueOf(feedback_date);
 			long days_long = Math.abs( (endDate.getTime()-startDate.getTime())/86400000);
@@ -879,7 +879,7 @@ public class User {
 		}
 		catch (Exception e){
 			days = 4;
-			logger.debug(e.getMessage());
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 		}
 
 
