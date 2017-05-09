@@ -330,7 +330,7 @@ public class Recommender {
 					if (ManyCar == 1){
 						context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
 					}
-					else if (ManyPT == 1.0){
+					else if (ManyPT == 1){
 						context_utility = ( 0.4074*BikeDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
 					}
 					else {

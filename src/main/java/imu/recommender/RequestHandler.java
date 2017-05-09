@@ -183,50 +183,52 @@ public class RequestHandler extends HttpServlet{
 			logger.error("Response:"+new Timestamp(System.currentTimeMillis()));
 		}
 		catch (Exception e){
-			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
-			logger.debug("user not found");
-			
-			Recommender recommenderRoutes = null;
-			try {
-				recommenderRoutes = new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				logger.error("Could not get recommender routes: " + e1.getMessage(), e1);
-			}
-			RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
-			logger.debug(response_route);
-			for (int i = 0; i < response_route.getRoutes().size(); i++) {
-				String mes ="";
-				if (response_route.getRoutes().get(i).getAdditionalInfo().get("mode") == "car") {
-					mes = "";
-				} else {
-					try {
-						//mes = CalculateMessageUtilities.calculateForUser(response_route, route, user);
-					} catch (Exception ex) {
-						logger.error("Exception while filtering duplicate routes: " + ex.getMessage(), ex);
+				logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
+				logger.debug("user not found");
+				
+				Recommender recommenderRoutes = null;
+				try {
+					recommenderRoutes = new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
+					RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
+					logger.debug(response_route);
+					for (int i = 0; i < response_route.getRoutes().size(); i++) {
+						String mes ="";
+						if (response_route.getRoutes().get(i).getAdditionalInfo().get("mode") == "car") {
+							mes = "";
+						} else {
+							try {
+								//mes = CalculateMessageUtilities.calculateForUser(response_route, route, user);
+							} catch (Exception ex) {
+								logger.error("Exception while filtering duplicate routes: " + ex.getMessage(), ex);
+							}
+						}
+						Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
+						additionalInfoRouteRequest.put("mode", response_route.getRoutes().get(i).getAdditionalInfo().get("mode"));
+						additionalInfoRouteRequest.put("message", mes);
+						response_route.getRoutes().get(i).setAdditionalInfo(additionalInfoRouteRequest);
 					}
+					RouteFormatRoot final_route = new RouteFormatRoot()
+							.setRequestId(response_route.getRequestId())
+							.setRouteFormatVersion(response_route.getRouteFormatVersion())
+							.setProcessedTime(response_route.getProcessedTime())
+							.setStatus(response_route.getStatus())
+							.setCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem())
+							.setRequest(response_route.getRequest().get())
+							.setRoutes(response_route.getRoutes());
+					//String geoJson = mapper.writeValueAsString(routeResponseStr.toString());
+					String geoJson = "";
+					try {
+						geoJson = mapper.writeValueAsString(final_route);
+					} catch (Exception e1) {
+						logger.error("Exception while getting json response string: " + e1.getMessage(), e1);
+					}
+					out.println(geoJson);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					logger.error("Could not get recommender routes: " + e1.getMessage(), e1);
+					out.println("");
 				}
-				Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
-				additionalInfoRouteRequest.put("mode", response_route.getRoutes().get(i).getAdditionalInfo().get("mode"));
-				additionalInfoRouteRequest.put("message", mes);
-				response_route.getRoutes().get(i).setAdditionalInfo(additionalInfoRouteRequest);
-			}
-			RouteFormatRoot final_route = new RouteFormatRoot()
-					.setRequestId(response_route.getRequestId())
-					.setRouteFormatVersion(response_route.getRouteFormatVersion())
-					.setProcessedTime(response_route.getProcessedTime())
-					.setStatus(response_route.getStatus())
-					.setCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem())
-					.setRequest(response_route.getRequest().get())
-					.setRoutes(response_route.getRoutes());
-			//String geoJson = mapper.writeValueAsString(routeResponseStr.toString());
-			String geoJson = "";
-			try {
-				geoJson = mapper.writeValueAsString(final_route);
-			} catch (Exception e1) {
-				logger.error("Exception while getting json response string: " + e1.getMessage(), e1);
-			}
-			out.println(geoJson);
+				
 		}		
 	}
 
