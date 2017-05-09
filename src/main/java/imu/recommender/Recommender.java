@@ -296,11 +296,11 @@ public class Recommender {
 			int mode = route.getMode();
 
 			//Return 1 if context exists else return 0
-			double BikeDistance = boolToDouble(Context.withinBikeDistance(routeDistance));
-			double WalkDistance = boolToDouble(Context.withinWalkingDistance(routeDistance));
-			double ManyPT = boolToDouble(user.tooManyPublicTransportRoutes());
-			double ManyCar = boolToDouble(user.tooManyCarRoutes());
-			double Emissions = boolToDouble(user.emissionsIncreasing());
+			int BikeDistance = boolToInt(Context.withinBikeDistance(routeDistance));
+			int WalkDistance = boolToInt(Context.withinWalkingDistance(routeDistance));
+			int ManyPT = boolToInt(user.tooManyPublicTransportRoutes());
+			int ManyCar = boolToInt(user.tooManyCarRoutes());
+			int Emissions = boolToInt(user.emissionsIncreasing());
 			//double NiceWeather = boolToDouble(WeatherInfo.isWeatherNice(lat, lon, city))
 			double NiceWeather = 1.0;
 			double Duration = 0.0;
@@ -311,10 +311,10 @@ public class Recommender {
 			double utility;
 			switch (mode) {
 				case (int)RecommenderModes.WALK:
-					if (ManyCar == 1.0d){
+					if (ManyCar == 1){
 						context_utility = ( 0.4218*WalkDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
 					}
-					else if (ManyPT == 1.0d){
+					else if (ManyPT == 1){
 						context_utility = ( 0.4074*WalkDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
 					}
 					else {
@@ -327,7 +327,7 @@ public class Recommender {
 					break;
 				case (int)RecommenderModes.BICYCLE:
 				case (int)RecommenderModes.BIKE_SHARING:					
-					if (ManyCar == 1.0d){
+					if (ManyCar == 1){
 						context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
 					}
 					else if (ManyPT == 1.0){
@@ -341,10 +341,10 @@ public class Recommender {
 					rankedRoutesMap.put(route, utility);
 					break;
 				case (int)RecommenderModes.BIKE_AND_RIDE:
-					if (ManyCar == 1.0d) {
+					if (ManyCar == 1) {
 						context_utility = (0.0901 * ManyCar + 0.5152 * Duration + 0.179 * Emissions + 0.2157 * NiceWeather) / 4.0;
 					}
-					else if (ManyPT == 1.0d) {
+					else if (ManyPT == 1) {
 						context_utility = (0.049 * ManyCar + 0.5193 * Duration + 0.1958 * Emissions + 0.2359 * NiceWeather) / 4.0;
 					}
 					else{
@@ -549,6 +549,13 @@ public class Recommender {
 			return 1.0;
 		return 0.0;
 	}
+	
+	//This function converts boolean to Integer
+		private int boolToInt( boolean b ) {
+			if (b)
+				return 1;
+			return 0;
+		}
 
 	private ArrayList<Ballot> getBallots(List<RouteModel> routes){
 		//Add routes as candidates
