@@ -273,17 +273,17 @@ public class User {
 				user_mode = this.personality.convertPreferredMode();
 			}
 			else {
-				Double max = this.getMode_usage().getCar_percent();
+				//Double max = this.getMode_usage().getCar_percent();
 				if (this.getMode_usage().getPt_percent() > max) {
-					max = this.getMode_usage().getPt_percent();
+					//max = this.getMode_usage().getPt_percent();
 					user_mode = "pt";
 				}
 				if (this.getMode_usage().getWalk_percent() > max) {
-					max = this.getMode_usage().getWalk_percent();
+					//max = this.getMode_usage().getWalk_percent();
 					user_mode = "walk";
 				}
 				if (this.getMode_usage().getBike_percent() > max) {
-					max = this.getMode_usage().getBike_percent();
+					//max = this.getMode_usage().getBike_percent();
 					user_mode = "bicycle";
 				}
 			}
@@ -688,7 +688,7 @@ public class User {
 		else if (valueEquals(score, 4.0)){
 			reversed = 2.0;
 		}
-		if (valueEquals(score, 5.0)){
+		else if (valueEquals(score, 5.0)){
 			reversed = 1.0;
 		}
 		else{
