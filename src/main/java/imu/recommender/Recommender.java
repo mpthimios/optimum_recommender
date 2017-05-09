@@ -175,12 +175,8 @@ public class Recommender {
 	}
 	
 	public void rankRoutesForUser (User user, Datastore mongoDatastore){
-		//function aggregated
-
-		
+	
 		rankBasedonUserPreferences(user, routes);
-		
-		//List<RouteModel> rankedRoutes = this.rankBasedonCO2();		
 		
 		rankBasedonSystemView(user, routes);
 		
@@ -315,10 +311,10 @@ public class Recommender {
 			double utility;
 			switch (mode) {
 				case (int)RecommenderModes.WALK:
-					if (ManyCar == 1.0){
+					if (ManyCar == 1.0d){
 						context_utility = ( 0.4218*WalkDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
 					}
-					else if (ManyPT == 1.0){
+					else if (ManyPT == 1.0d){
 						context_utility = ( 0.4074*WalkDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
 					}
 					else {
@@ -331,7 +327,7 @@ public class Recommender {
 					break;
 				case (int)RecommenderModes.BICYCLE:
 				case (int)RecommenderModes.BIKE_SHARING:					
-					if (ManyCar == 1.0){
+					if (ManyCar == 1.0d){
 						context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
 					}
 					else if (ManyPT == 1.0){
@@ -345,10 +341,10 @@ public class Recommender {
 					rankedRoutesMap.put(route, utility);
 					break;
 				case (int)RecommenderModes.BIKE_AND_RIDE:
-					if (ManyCar == 1.0) {
+					if (ManyCar == 1.0d) {
 						context_utility = (0.0901 * ManyCar + 0.5152 * Duration + 0.179 * Emissions + 0.2157 * NiceWeather) / 4.0;
 					}
-					else if (ManyPT == 1.0) {
+					else if (ManyPT == 1.0d) {
 						context_utility = (0.049 * ManyCar + 0.5193 * Duration + 0.1958 * Emissions + 0.2359 * NiceWeather) / 4.0;
 					}
 					else{

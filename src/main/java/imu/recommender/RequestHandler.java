@@ -30,21 +30,32 @@ import java.util.*;
 public class RequestHandler extends HttpServlet{
 
 	private static boolean PRINT_JSON = true;
-	private Logger logger = Logger.getLogger(RequestHandler.class);
+	private static Logger logger = Logger.getLogger(RequestHandler.class);
 	private static String exampleFile = "src/main/resources/route.txt";
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 		
 		//get the datastore
-		Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+		Datastore mongoDatastore = null;
+		try {
+			mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			logger.error("could not get mongo datastore " + e1.getMessage(), e1);
+		}
 		
 		//prepare the response
 		// Set the response message's MIME type
 	    response.setContentType("application/json; charset=UTF-8");
 	    response.setCharacterEncoding("utf-8");
 	    // Allocate a output writer to write the response message into the network socket
-	    PrintWriter out = response.getWriter();
+	    PrintWriter out = null;
+		try {
+			out = response.getWriter();
+		} catch (Exception e1) {
+			logger.error("could not get response writer " + e1.getMessage(), e1);
+		}
 
 		String userID = "";
 		User user = null;
@@ -55,7 +66,12 @@ public class RequestHandler extends HttpServlet{
 		mapper.findAndRegisterModules();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		String requestBody = getBody(request);
+		String requestBody = "";
+		try {
+			requestBody = getBody(request);
+		} catch (Exception e1) {
+			logger.error("could not get request body " + e1.getMessage(), e1);
+		}
 		//logger.debug(requestBody);
 		Timestamp received = new Timestamp(System.currentTimeMillis());
 		
@@ -170,7 +186,13 @@ public class RequestHandler extends HttpServlet{
 			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 			logger.debug("user not found");
 			
-			Recommender recommenderRoutes= new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
+			Recommender recommenderRoutes = null;
+			try {
+				recommenderRoutes = new Recommender(mapper.readValue(requestBody, RouteFormatRoot.class), user);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				logger.error("Could not get recommender routes: " + e1.getMessage(), e1);
+			}
 			RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
 			logger.debug(response_route);
 			for (int i = 0; i < response_route.getRoutes().size(); i++) {
@@ -198,7 +220,12 @@ public class RequestHandler extends HttpServlet{
 					.setRequest(response_route.getRequest().get())
 					.setRoutes(response_route.getRoutes());
 			//String geoJson = mapper.writeValueAsString(routeResponseStr.toString());
-			String geoJson = mapper.writeValueAsString(final_route);
+			String geoJson = "";
+			try {
+				geoJson = mapper.writeValueAsString(final_route);
+			} catch (Exception e1) {
+				logger.error("Exception while getting json response string: " + e1.getMessage(), e1);
+			}
 			out.println(geoJson);
 		}		
 	}
@@ -210,20 +237,37 @@ public class RequestHandler extends HttpServlet{
 		mapper.findAndRegisterModules();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-		RouteFormatRoot routes = mapper.readValue(new File(exampleFile), RouteFormatRoot.class);
+		RouteFormatRoot routes = null;
+		try {
+			routes = mapper.readValue(new File(exampleFile), RouteFormatRoot.class);
+		} catch (Exception e1) {
+			logger.error("Exception while getting routes from mapper: " + e1.getMessage(), e1);
+		}
 
 		String mes = null;
 
 		// Set the response message's MIME type
 	    response.setContentType("text/html; charset=UTF-8");
 	    // Allocate a output writer to write the response message into the network socket
-	    PrintWriter out = response.getWriter();
+	    PrintWriter out = null;
+		try {
+			out = response.getWriter();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while allocating a output writer to write the response message into the network socket: " + e1.getMessage(), e1);
+		}
 		boolean PRINT_JSON = true;
 
 
 	    // Write the response message, in an HTML page
 	    if (PRINT_JSON){
-	    	Datastore mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+	    	Datastore mongoDatastore = null;
+			try {
+				mongoDatastore = MongoConnectionHelper.getMongoDatastore();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				logger.error("Exception while getting mongo datastore: " + e1.getMessage(), e1);
+			}
 	    	User newUser = new User(); 	    	
 	    	mongoDatastore.save(newUser);
 	    	logger.debug(newUser.getId());
