@@ -265,7 +265,7 @@ public class User {
 		List<String> target = new ArrayList<String>();
 		try {
 			String user_mode="car";
-			if(this.getTotal_activities()<=10 || (this.getMode_usage().getPt_percent()==0.0d && this.getMode_usage().getCar_percent()==0.0d && this.getMode_usage().getWalk_percent()==0.0d && this.getMode_usage().getBike_percent()==0.0d )){
+			if(this.getTotal_activities()<=10 || (this.getMode_usage().getPt_percent()==0d && this.getMode_usage().getCar_percent()==0d && this.getMode_usage().getWalk_percent()==0d && this.getMode_usage().getBike_percent()==0d )){
 				user_mode = this.personality.convertPreferredMode();
 			}
 			else {
