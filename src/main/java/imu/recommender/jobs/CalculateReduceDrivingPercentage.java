@@ -130,7 +130,7 @@ public class CalculateReduceDrivingPercentage implements Job {
 
         }
         //Calculate Average Emissions
-        DBCollection mongo = mongoDatastore.getCollection( User.class );
+        //DBCollection mongo = mongoDatastore.getCollection( User.class );
         for (Object current_id : userIds ) {
             try {
                 double total_emissions=0.0;

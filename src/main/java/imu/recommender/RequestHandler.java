@@ -377,7 +377,7 @@ public class RequestHandler extends HttpServlet{
 	            try {
 	                bufferedReader.close();
 	            } catch (IOException ex) {
-	                throw ex;
+	            	logger.error("Exception while closing buffered reader: " + ex.getMessage(), ex);
 	            }
 	        }
 	    }
