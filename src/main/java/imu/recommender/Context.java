@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class Context {
 
-    public static Logger logger = Logger.getLogger(Context.class);
+    public static final Logger logger = Logger.getLogger(Context.class);
 
     public static List<String> getRelevantContextForUser(Recommender route, RouteModel trip, User user, Datastore mongoDatastore) throws Exception {
 
