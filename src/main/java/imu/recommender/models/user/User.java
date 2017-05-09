@@ -265,7 +265,11 @@ public class User {
 		List<String> target = new ArrayList<String>();
 		try {
 			String user_mode="car";
-			if(this.getTotal_activities()<=10 || (this.getMode_usage().getPt_percent()==0d && this.getMode_usage().getCar_percent()==0d && this.getMode_usage().getWalk_percent()==0d && this.getMode_usage().getBike_percent()==0d )){
+			if(this.getTotal_activities()<=10 || 
+					(valueEquals(this.getMode_usage().getPt_percent(), 0) && 
+							valueEquals(this.getMode_usage().getCar_percent(), 0) && 
+							valueEquals(this.getMode_usage().getWalk_percent(), 0) && 
+							valueEquals(this.getMode_usage().getBike_percent(), 0) )){
 				user_mode = this.personality.convertPreferredMode();
 			}
 			else {
@@ -591,7 +595,7 @@ public class User {
 		String strategy = "";
 		switch (personality) {
 			case "Extraversion":
-				if (UserSug == 0.0d & UserComp == 0.0d & UserSelf == 0.0d) {
+				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0)) {
 					Suggestion = GetProperties.getSugEx();
 					Comparison = GetProperties.getCompEx();
 					SelfMonitoring = GetProperties.getSelfEx();
@@ -604,7 +608,7 @@ public class User {
 				break;
 			case "Agreeableness":
 
-				if (UserSug == 0.0d & UserComp == 0.0d & UserSelf == 0.0d) {
+				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0)) {
 					Suggestion = GetProperties.getSugAg();
 					Comparison = GetProperties.getCompAg();
 					SelfMonitoring = GetProperties.getSelfAg();
@@ -617,7 +621,7 @@ public class User {
 				break;
 			case "Openness":
 
-				if (UserSug == 0.0d & UserComp == 0.0d & UserSelf == 0.0d) {
+				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0)) {
 					Suggestion = GetProperties.getSugOp();
 					Comparison = GetProperties.getCompOp();
 					SelfMonitoring = GetProperties.getSelfOp();
@@ -630,7 +634,7 @@ public class User {
 				break;
 			case "Conscientiousness":
 
-				if (UserSug == 0.0d & UserComp == 0.0d & UserSelf == 0.0d) {
+				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0)) {
 					Suggestion = GetProperties.getSugCons();
 					Comparison = GetProperties.getCompCons();
 					SelfMonitoring = GetProperties.getSelfCons();
@@ -643,7 +647,7 @@ public class User {
 				break;
 			case "Neuroticism":
 
-				if (UserSug == 0.0d & UserComp == 0.0d & UserSelf == 0.0d) {
+				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0)) {
 					Suggestion = GetProperties.getSugN();
 					Comparison = GetProperties.getCompN();
 					SelfMonitoring = GetProperties.getSelfN();
@@ -675,16 +679,16 @@ public class User {
 
 	private Double reverse(Double score){
 		Double reversed;
-		if (score == 1.0d){
+		if (valueEquals(score, 1.0)){
 			reversed = 5.0;
 		}
-		else if (score == 2.0d){
+		else if (valueEquals(score, 2.0)){
 			reversed = 4.0;
 		}
-		else if (score == 4.0d){
+		else if (valueEquals(score, 4.0)){
 			reversed = 2.0;
 		}
-		if (score == 5.0d){
+		if (valueEquals(score, 5.0)){
 			reversed = 1.0;
 		}
 		else{
@@ -907,4 +911,8 @@ public class User {
 	public void setBikerideUsageComparedToOthers(double bikerideUsageComparedToOthers) {
 		this.bikerideUsageComparedToOthers = bikerideUsageComparedToOthers;
 	}
+	
+	private boolean valueEquals(double a, double b) {
+        return (Math.abs(a - b) < 0.0000001);
+    }
 }
