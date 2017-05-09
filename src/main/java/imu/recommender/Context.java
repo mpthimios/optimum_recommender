@@ -101,7 +101,7 @@ public class Context {
 
     public static Boolean GetRelevantContext(String target, List<String> context){
         Boolean relevantContext = Boolean.TRUE;
-        String WalkDistance = "WalkDistance";
+        String WalkDistance = "WalkingDistance";
         String BikeDistance = "BikeDistance";
         String Duration = "Duration";
         String TooManyCarRoutes = "TooManyCarRoutes";
