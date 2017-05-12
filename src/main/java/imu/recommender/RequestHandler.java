@@ -222,6 +222,23 @@ public class RequestHandler extends HttpServlet{
 					} catch (Exception e1) {
 						logger.error("Exception while getting json response string: " + e1.getMessage(), e1);
 					}
+					//Save routes to UserRouteLog collection of mongodb
+					try {
+						logger.debug("----Start saving to UserRoute" + new Timestamp(System.currentTimeMillis()));
+						System.out.println("----Start saving to UserRoute" + new Timestamp(System.currentTimeMillis()));
+
+						DBObject origin = (DBObject) JSON.parse(requestBody);
+
+						UserRouteLog routeLog = new UserRouteLog();
+						routeLog.setUserId(userID);
+						routeLog.setOriginalResults(origin);
+						routeLog.setRecommendedResults((DBObject) JSON.parse(final_route.toString()));
+						routeLog.setCreatedDate(new Date());
+						mongoDatastore.save(routeLog);
+					}
+					catch (Exception e2){
+						logger.debug("Exception while saving to UserRouteLog:"+e2.getMessage(),e2);
+					}
 					out.println(geoJson);
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block

@@ -69,6 +69,19 @@
             </cron>
         </trigger>
 
+        <job>
+            <name>PersuasiveMessages</name>
+            <job-class>imu.recommender.jobs.PersuasiveMessages</job-class>
+        </job>
+        <trigger>
+            <cron>
+                <name>PersuasiveMessages</name>
+                <job-name>PersuasiveMessages</job-name>
+                <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+                <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
+            </cron>
+        </trigger>
+
     </schedule>
 
 </job-scheduling-data>

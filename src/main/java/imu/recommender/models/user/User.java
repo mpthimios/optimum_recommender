@@ -289,32 +289,34 @@ public class User {
 			}
 			if ("pt".equals(user_mode)){
 				target.add("bike&ride");
+				target.add("BikeSharing");
 				target.add("bicycle");
 				target.add("walk");
-				//target.add("bikeSharing");
+
 			}
 			if ("bicycle".equals(user_mode)){
 			    target.add("bicycle");
 				target.add("walk");
-				//target.add("bikeSharing");
+				target.add("BikeSharing");
 			}
 			if ("walk".equals(user_mode)){
 	            target.add("bicycle");
 				target.add("walk");
 			}
 			if ("car".equals(user_mode)){
-				//target.add("carSharing");
+				target.add("CarSharing");
 				target.add("park&ride");
 				target.add("pt");
 				target.add("bike&ride");
-				//target.add("bikeSharing");
-				target.add("bike");
+				target.add("BikeSharing");
+				target.add("bicycle");
 				target.add("walk");
 			}
 		}
 		catch (Exception e){
 			target.add("pt");
 			target.add("bike&ride");
+			target.add("BikeSharing");
 			target.add("bicycle");
 			target.add("walk");
 			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
@@ -854,32 +856,38 @@ public class User {
 			RouteQuery1.put("route_feedback.helpful", true);
 			RouteQuery1.put("userId",userId);
 			DBCursor RequsetIds = routes.find(RouteQuery1);
-			List<Integer> requestIds = new ArrayList<Integer>();
-			while (RequsetIds.hasNext() ) {
-				requestIds.add(Integer.parseInt(RequsetIds.next().get("_id").toString()));
-			}
-			//sort request Ids and get the last one
-			Collections.sort(requestIds, Collections.reverseOrder());
+			if (RequsetIds.size() > 0) {
+				List<Integer> requestIds = new ArrayList<Integer>();
+				while (RequsetIds.hasNext()) {
+					requestIds.add(Integer.parseInt(RequsetIds.next().get("_id").toString()));
+				}
+				//sort request Ids and get the last one
+				Collections.sort(requestIds, Collections.reverseOrder());
 
-			BasicDBObject TripQuery = new BasicDBObject();
-			TripQuery.put("requestId", requestIds.get(0).toString());
-			DBCursor tripsIds = trips.find(TripQuery);
-			String feedback_date = "";
-			if (tripsIds.hasNext() ) {
-				feedback_date = tripsIds.next().get("createdat").toString();
+				BasicDBObject TripQuery = new BasicDBObject();
+				TripQuery.put("requestId", requestIds.get(0).toString());
+				DBCursor tripsIds = trips.find(TripQuery);
+				String feedback_date = "";
+				if (tripsIds.hasNext()) {
+					feedback_date = tripsIds.next().get("createdat").toString();
+				}
+				//Calculate the number of days since last feedback
+				Timestamp endDate = new Timestamp(System.currentTimeMillis());
+				DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
+				Date startDate = null;
+				try {
+					startDate = df.parse(feedback_date);
+				} catch (ParseException e) {
+					logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
+				}
+				//Timestamp startDate =  Timestamp.valueOf(feedback_date);
+				long days_long = Math.abs((endDate.getTime() - startDate.getTime()) / 86400000);
+				days = Math.round(days_long);
 			}
-			//Calculate the number of days since last feedback
-			Timestamp endDate = new Timestamp(System.currentTimeMillis());
-			DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
-			Date startDate = null;
-			try {
-				startDate = df.parse(feedback_date);
-			} catch (ParseException e) {
-				logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
+			else{
+				//Define days 4 in order to enable feedback
+				days = 4;
 			}
-			//Timestamp startDate =  Timestamp.valueOf(feedback_date);
-			long days_long = Math.abs( (endDate.getTime()-startDate.getTime())/86400000);
-			days = Math.round(days_long);
 		}
 		catch (Exception e){
 			days = 4;

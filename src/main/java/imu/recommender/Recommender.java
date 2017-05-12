@@ -129,7 +129,7 @@ public class Recommender {
 			}
 //					//Filter out bike modes for users that don’t own a bike and for routes containing biking more than 3 Km
 			else if (mode == RecommenderModes.BICYCLE){
-				if((bikeOwner) && (recommenderRoute.getBikeDistance() < maxBikeDistance) && (recommenderRoute.getWalkingDistance()<maxWalkDistance)){
+				if((bikeOwner) && (recommenderRoute.getBikeDistance() <= (int) maxBikeDistance) && (recommenderRoute.getWalkingDistance()<= (int) maxWalkDistance)){
 					filteredRoutes.add(recommenderRoute);
 				}
 				else{
@@ -139,7 +139,7 @@ public class Recommender {
 			}
 			//Filter out walk modes for routes containing walking more than 1 Km
 			else if(mode == RecommenderModes.WALK){
-				if( recommenderRoute.getBikeDistance() < maxBikeDistance && recommenderRoute.getWalkingDistance()<maxWalkDistance){
+				if( recommenderRoute.getBikeDistance() <= (int) maxBikeDistance && recommenderRoute.getWalkingDistance()<= (int) maxWalkDistance){
 					filteredRoutes.add(recommenderRoute);
 				}
 				else{
@@ -149,7 +149,7 @@ public class Recommender {
 				}
 			}
 			else{
-				if( recommenderRoute.getBikeDistance() < (int) maxBikeDistance && recommenderRoute.getWalkingDistance()<(int) maxWalkDistance){
+				if( recommenderRoute.getBikeDistance() <= (int) maxBikeDistance && recommenderRoute.getWalkingDistance()<= (int) maxWalkDistance){
 					filteredRoutes.add(recommenderRoute);
 				}
 				else{

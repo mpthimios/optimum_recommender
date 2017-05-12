@@ -43,6 +43,18 @@ public class RouteModel {
 			String segment_mode = segment.getModeOfTransport().getGeneralizedType().toString();
 			String detailed_mode = segment.getModeOfTransport().getDetailedType().toString();
 			Integer distance = segment.getDistanceMeters();
+			if (segment_mode.equals("CAR")){
+				Boolean sharing = segment.getModeOfTransport().getSharingType().isPresent();
+				if (sharing){
+					segment_mode = "CAR_SHARING";
+				}
+			}
+			if (segment_mode.equals("BICYCLE")){
+				Boolean sharing = segment.getModeOfTransport().getSharingType().isPresent();
+				if (sharing){
+					segment_mode = "BIKE_SHARING";
+				}
+			}
 			emissions = emissions + CalculateSegmentEmissions(distance, segment_mode, detailed_mode);
 			if (!Modes.contains(segment_mode)) {
 				Modes.add(segment_mode);
@@ -69,7 +81,7 @@ public class RouteModel {
 			this.setMode(RecommenderModes.PUBLIC_TRANSPORT);
 			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
-		else if (Modes.contains("BICYCLE") && Modes.contains("FOOT") ){
+		else if (Modes.contains("BICYCLE") && Modes.contains("FOOT") && Modes.size()==2 ){
 			this.setMode(RecommenderModes.BICYCLE);
 			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
@@ -91,6 +103,14 @@ public class RouteModel {
 		}
 		else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.size()==1 ){
 			this.setMode(RecommenderModes.PUBLIC_TRANSPORT);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
+		}
+		else if (Modes.contains("CAR_SHARING")){
+			this.setMode(RecommenderModes.CAR_SHARING);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
+		}
+		else if (Modes.contains("BIKE_SHARING") ){
+			this.setMode(RecommenderModes.BIKE_SHARING);
 			mode = RecommenderModes.recommenderModesStr[this.getMode()];
 		}
 		else {
@@ -116,7 +136,7 @@ public class RouteModel {
 	public void calculateBikeDistance(){
 		int total_bile_distance = 0;
 		for (RouteSegment segment :  this.route.getSegments()){
-			if ("FOOT".equals(segment.getModeOfTransport().getGeneralizedType().toString()) ){
+			if ("BICYCLE".equals(segment.getModeOfTransport().getGeneralizedType().toString()) ){
 				total_bile_distance = total_bile_distance + segment.getDistanceMeters();
 			}
 		}
