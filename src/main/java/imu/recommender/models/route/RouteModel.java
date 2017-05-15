@@ -24,6 +24,7 @@ public class RouteModel {
 	private double CO2EmissionsRank = 0.0;
 	private String message = "";
 	private String strategy = "";
+	private String messageId = "";
 	private boolean popup = false;
 	private int walkingDistance = 0;
 	private int bikeDistance = 0;
@@ -309,5 +310,15 @@ public class RouteModel {
 		this.emissions = emissions;
 	}
 
-			
+
+	public String getMessageId() {
+		return messageId;
+	}
+
+	public void setMessageId(String messageId) {
+		this.messageId = messageId;
+		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
+		additionalInfo.put("messageId", messageId);
+		this.route.setAdditionalInfo(additionalInfo);
+	}
 }

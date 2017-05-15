@@ -50,13 +50,13 @@ public class Message {
 
     public String getPersuasive_strategy() { return persuasive_strategy; }
 
-    public void setPersuasive_strategy(ObjectId id) {
+    public void setPersuasive_strategy(String persuasive_strategy) {
         this.persuasive_strategy =persuasive_strategy;
     }
 
     public String getContext() { return context; }
 
-    public void setContext(ObjectId id) {
+    public void setContext(String context) {
         this.context =context;
     }
 
@@ -68,7 +68,7 @@ public class Message {
 
     public String getMessage_text() { return message_text; }
 
-    public void setMessage_text(ObjectId id) {
+    public void setMessage_text(String message_text) {
         this.message_text =message_text;
     }
 
@@ -80,7 +80,7 @@ public class Message {
 
     public String getTarget() { return target; }
 
-    public void setTarget(ObjectId id) {
+    public void setTarget(String target) {
         this.target = target;
     }
 

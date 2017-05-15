@@ -434,6 +434,7 @@ public class Recommender {
 		String mes="";
 		String message = "";
 		String strategy = "";
+		String messageId = "";
 		List<String> contextList = new ArrayList<>();
 		List<String> FinaltargetList = new ArrayList<>();
 		for (int i = 0; i < targetList.size(); i++) {
@@ -466,16 +467,20 @@ public class Recommender {
 							mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore);
 							message = mes.split("_")[0];
 							strategy = mes.split("_")[1];
+							messageId = mes.split("_")[2];
+							logger.debug(messageId+"----");
 						} catch (Exception e) {
 							logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 						}
 					} else {
 						message = "";
 						strategy = "";
+						messageId = "";
 					}
 					if (!message.isEmpty()) {
 						route.setMessage(message);
 						route.setStrategy(strategy);
+						route.setMessageId(messageId);
 						//set popup_display false
 						route.setPopup(user.getFeedback(user.getId(),mongoDatastore));
 						logger.debug("-------Feedback----"+user.getFeedback(user.getId(),mongoDatastore));
