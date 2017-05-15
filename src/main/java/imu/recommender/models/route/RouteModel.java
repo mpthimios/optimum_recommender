@@ -45,6 +45,9 @@ public class RouteModel {
 			String detailed_mode = segment.getModeOfTransport().getDetailedType().toString();
 			Integer distance = segment.getDistanceMeters();
 			if (segment_mode.equals("CAR")){
+				if(detailed_mode.equals("MOTORHOME")){
+					segment_mode = "MOTORHOME";
+				}
 				Boolean sharing = segment.getModeOfTransport().getSharingType().isPresent();
 				if (sharing){
 					segment_mode = "CAR_SHARING";
@@ -66,7 +69,11 @@ public class RouteModel {
 		this.route.setAdditionalInfo(additionalInfo);
 		String mode="";
 
-		if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE")  ){
+		if(Modes.contains("MOTORHOME")){
+			this.setMode(RecommenderModes.MOTORHOME);
+			mode = RecommenderModes.recommenderModesStr[this.getMode()];
+		}
+		else if (Modes.contains("PUBLIC_TRANSPORT") && Modes.contains("FOOT") && Modes.contains("CAR") && Modes.contains("BICYCLE")  ){
 			this.setMode(RecommenderModes.PARK_AND_RIDE_WITH_BIKE);
 			mode = RecommenderModes.recommenderModesStr[this.getMode()];			
 		}

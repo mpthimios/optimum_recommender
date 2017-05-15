@@ -11,9 +11,10 @@ public class RecommenderModes {
 	public static final int CAR = 7;
 	public static final int UNKNOWN = 8;
 	public static final int CAR_SHARING = 9;
+	public static final int MOTORHOME = 10;
 	
 	public static final int[] recommenderModesOrder = {
-			WALK, BICYCLE, BIKE_SHARING, BIKE_AND_RIDE, PUBLIC_TRANSPORT, PARK_AND_RIDE_WITH_BIKE, PARK_AND_RIDE, CAR, UNKNOWN, CAR_SHARING
+			WALK, BICYCLE, BIKE_SHARING, BIKE_AND_RIDE, PUBLIC_TRANSPORT, PARK_AND_RIDE_WITH_BIKE, PARK_AND_RIDE, CAR, UNKNOWN, CAR_SHARING, MOTORHOME
 		};
 	
 	public static final String[] recommenderModesStr = {
@@ -26,6 +27,7 @@ public class RecommenderModes {
 		"park&ride",
 		"car",
 		"unknown",
-		"CarSharing"
+		"CarSharing",
+		"motorhome"
 	};
 }
