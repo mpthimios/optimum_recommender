@@ -78,7 +78,7 @@
 		<dependency>
             <groupId>ait</groupId>
             <artifactId>ariadne-json-route-format</artifactId>
-            <version>0.18-SNAPSHOT</version>
+            <version>0.19-SNAPSHOT</version>
         </dependency>
         
         <dependency>

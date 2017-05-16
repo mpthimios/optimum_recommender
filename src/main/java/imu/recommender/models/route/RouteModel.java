@@ -45,6 +45,7 @@ public class RouteModel {
 			String detailed_mode = segment.getModeOfTransport().getDetailedType().toString();
 			Integer distance = segment.getDistanceMeters();
 			if (segment_mode.equals("CAR")){
+				logger.debug(detailed_mode+"-------");
 				if(detailed_mode.equals("MOTORHOME")){
 					segment_mode = "MOTORHOME";
 				}
@@ -318,7 +319,7 @@ public class RouteModel {
 	}
 
 
-	public String getMessageId() {
+	public Object getMessageId() {
 		return messageId;
 	}
 

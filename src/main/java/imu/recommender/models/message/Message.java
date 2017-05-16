@@ -13,7 +13,7 @@ import org.mongodb.morphia.annotations.Id;
 public class Message {
 
     @Id
-    private ObjectId id;
+    private ObjectId _id;
 
     private String persuasive_strategy;
     private String context;
@@ -25,6 +25,7 @@ public class Message {
     private String parameters;
     private String message_text_german;
     private String message_text_slo;
+    private String id;
 
     public Message(){
 
@@ -40,11 +41,11 @@ public class Message {
         this.message_text_slo = "";
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -113,5 +114,13 @@ public class Message {
 
     public void setMessage_text_slo(String message_text_slo) {
         this.message_text_slo = message_text_slo;
+    }
+
+    public ObjectId get_id() {
+        return _id;
+    }
+
+    public void set_id(ObjectId _id) {
+        this._id = _id;
     }
 }

@@ -17,7 +17,7 @@ require 'net/http'
 #file = File.new("body_23_06_2014.txt", "r")
 #file = File.new("dublin_route.txt", "r")
 #file = File.new("body_23_06_2014.txt", "r")
-file = File.new("sharingtest2.txt", "r")
+file = File.new("motorhomeTest2.txt", "r")
 #file = File.new("multiple_routes5.txt", "r")
 
 while (line = file.gets)

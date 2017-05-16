@@ -289,7 +289,7 @@ public class CalculateMessageUtilities {
         try {
             //increase the number_of_times_sent of the selected message
             Query<Message> query2 = mongoDatastore.createQuery(Message.class);
-            query2.criteria("_id").equal(selectedMessageId);
+            query2.criteria("id").equal(selectedMessageId);
             Message messageObj = query2.get();
             Integer numberOfTimesMessageSent = messageObj.getNumber_of_times_sent();
             numberOfTimesMessageSent++;

@@ -5,6 +5,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
+import imu.recommender.models.message.Message;
 import imu.recommender.models.strategy.Strategy;
 import imu.recommender.models.user.Personality;
 import imu.recommender.models.user.User;
@@ -43,6 +44,10 @@ public class UpdateStrategiesProbabilities  implements Job{
         DBCollection m = mongoDatastore.getCollection( Strategy.class );
         DBCollection trips = mongoDatastore.getDB().getCollection("UserTrip");
         DBCollection routes = mongoDatastore.getDB().getCollection("UserRoute");
+        DBCollection messages = mongoDatastore.getDB().getCollection("OptimumMessages");
+        //Get all Message Ids of sent messages
+        List messageIds = trips.distinct("body.additionalInfo.additionalProperties.messageId");
+        logger.debug(messageIds);
         //Update the probabilities of each strategy based on all users.
         List strategies = m.distinct( "persuasive_strategy", new BasicDBObject());
 
@@ -429,6 +434,27 @@ public class UpdateStrategiesProbabilities  implements Job{
 
                     }
 
+                    for (Object mesId : messageIds ) {
+                        try {
+                            //Get total attemps
+                            Query<Message> messageQuery = mongoDatastore.createQuery(Message.class).field("id").equal(mesId);
+                            //messageQuery.criteria("id").equal("20");
+                            //Query<Message> messageQuery = mongoDatastore.createQuery(Message.class).field("id").equal(mesId);
+                            //logger.debug(messageQuery.get().getMessage_text());
+                            //Update the number of success
+                            //Find all saved trips with persusasive message (suggestion)
+                            BasicDBObject TripQuery4 = new BasicDBObject();
+                            TripQuery4.put("body.additionalInfo.additionalProperties.messageId", mesId);
+                            TripQuery4.put("requestId", new BasicDBObject("$in", requestId));
+                            List tr = trips.find(TripQuery4).toArray();
+                            Integer messagesucess = tr.size();
+                            logger.debug("N of success of mes"+mesId+"----:"+messagesucess);
+
+                            mongoDatastore.update(messageQuery, mongoDatastore.createUpdateOperations(Message.class).set("number_of_successes", messagesucess));
+                        } catch (Exception e1) {
+                            logger.error("Exception while filtering duplicate routes: " + e1.getMessage(), e1);
+                        }
+                    }
                 } catch (Exception e) {
                     logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 
