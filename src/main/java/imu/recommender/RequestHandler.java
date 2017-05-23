@@ -232,7 +232,7 @@ public class RequestHandler extends HttpServlet{
 						UserRouteLog routeLog = new UserRouteLog();
 						routeLog.setUserId(userID);
 						routeLog.setOriginalResults(origin);
-						routeLog.setRecommendedResults((DBObject) JSON.parse(final_route.toString()));
+						routeLog.setRecommendedResults((DBObject) JSON.parse(geoJson));
 						routeLog.setCreatedDate(new Date());
 						mongoDatastore.save(routeLog);
 					}
