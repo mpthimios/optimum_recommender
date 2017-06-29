@@ -481,6 +481,7 @@ public class Recommender {
 						route.setMessage(message);
 						route.setStrategy(strategy);
 						route.setMessageId(messageId);
+						route.setContext(contextList);
 						//set popup_display false
 						route.setPopup(user.getFeedback(user.getId(),mongoDatastore));
 						logger.debug("-------Feedback----"+user.getFeedback(user.getId(),mongoDatastore));

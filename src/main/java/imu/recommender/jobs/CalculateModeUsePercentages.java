@@ -95,6 +95,7 @@ public class CalculateModeUsePercentages implements Job {
 				double bikeride_percent = 0.0;
 				double bike_percent_GW = 0.0;
 				double walk_percent_GW = 0.0;
+				double pt_percent_GW = 0.0;
 				Integer total = 0;
 
 				if (arr != null && arr.length() > 0 ) {
@@ -106,6 +107,7 @@ public class CalculateModeUsePercentages implements Job {
 					Integer n_walk_GW = 0;
 					Integer n_parkride=0;
 					Integer n_bikeride=0;
+					Integer n_pt_GW = 0;
 
 					for (int i = 0; i < arr.length(); i++) {
 						String mode = "";
@@ -163,6 +165,9 @@ public class CalculateModeUsePercentages implements Job {
 						}
 						if ("ON_TRAIN".equals(mode) || "IN_BUS".equals(mode)) {
 							n_pt++;
+							if (NiceWeather) {
+								n_pt_GW++;
+							}
 						}
 						if ("ON_BICYCLE".equals(mode)) {
 							try {
@@ -225,6 +230,7 @@ public class CalculateModeUsePercentages implements Job {
 						bikeride_percent = ((double) (n_bikeride * 100) / (double) total);
 						bike_percent_GW = ((double) (n_bike_GW * 100) / (double) total);
 						walk_percent_GW = ((double) (n_walk_GW * 100) / (double) total);
+						pt_percent_GW = ((double) (n_pt_GW * 100) / (double) total);
 					}
 				}
 				 
@@ -240,6 +246,7 @@ public class CalculateModeUsePercentages implements Job {
 				 modeUsage.setParkride_percent(parkride_percent);
 				 modeUsage.setWalk_percentGW(walk_percent_GW);
 				 modeUsage.setBike_percentGW(bike_percent_GW);
+				 modeUsage.setPt_percentGW(pt_percent_GW);
 				 UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage", modeUsage);
 				 mongoDatastore.update(query, ops, true);
 				 logger.debug(parkride_percent);
@@ -260,6 +267,7 @@ public class CalculateModeUsePercentages implements Job {
 				modeUsage.setParkride_percent(0.0);
 				modeUsage.setWalk_percentGW(0.0);
 				modeUsage.setBike_percentGW(0.0);
+				modeUsage.setPt_percentGW(0.0);
 				UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage", modeUsage);
 				mongoDatastore.update(query, ops, true);
 
@@ -277,6 +285,7 @@ public class CalculateModeUsePercentages implements Job {
 				double total_bikeride_perc = 0.0;
 				double total_bike_perc_GW=0.0;
 				double total_walk_perc_GW=0.0;
+				double total_pt_perc_GW=0.0;
 				Integer total_users = 0;
 				for (Object id : userIds ) {
 					try {
@@ -291,6 +300,7 @@ public class CalculateModeUsePercentages implements Job {
 								total_bikeride_perc = total_bikeride_perc + user.get().getMode_usage().getBikeride_percent();
 								total_walk_perc_GW = total_walk_perc_GW + user.get().getMode_usage().getWalk_percentGW();
 								total_bike_perc_GW = total_bike_perc_GW + user.get().getMode_usage().getBike_percentGW();
+								total_pt_perc_GW = total_pt_perc_GW + user.get().getMode_usage().getPt_percentGW();
 								total_users++;
 							}
 							catch (Exception e){
@@ -311,6 +321,7 @@ public class CalculateModeUsePercentages implements Job {
 				double bikeUsageComparedToOthersGW = total_bike_perc_GW/(double)total_users;
 				double parkrideUsageComparedToOthers = total_parkride_perc/(double)total_users;
 				double bikerideUsageComparedToOthers = total_bikeride_perc/(double)total_users;
+				double ptUsageComparedToOthersGW = total_pt_perc_GW/(double)total_users;
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) current_id);
 				//Update the AverageEmissions field
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthers", ptUsageComparedToOthers),true);
@@ -321,6 +332,7 @@ public class CalculateModeUsePercentages implements Job {
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthersGW", walkUsageComparedToOthersGW), true);
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("parkrideUsageComparedToOthers", parkrideUsageComparedToOthers), true);
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikerideUsageComparedToOthers", bikerideUsageComparedToOthers), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthersGW", ptUsageComparedToOthersGW),true);
 
 
 			} catch (Exception e) {
@@ -335,6 +347,7 @@ public class CalculateModeUsePercentages implements Job {
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("walkUsageComparedToOthersGW", 0.0), true);
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("parkrideUsageComparedToOthers", 0.0), true);
 				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("bikerideUsageComparedToOthers", 0.0), true);
+				mongoDatastore.update(query, mongoDatastore.createUpdateOperations(User.class).set("ptUsageComparedToOthersGW", 0.0), true);
 
 
 			}

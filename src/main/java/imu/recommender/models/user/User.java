@@ -48,6 +48,7 @@ public class User {
 	private double walkUsageComparedToOthersGW;
 	private double parkrideUsageComparedToOthers;
 	private double bikerideUsageComparedToOthers;
+	private double ptUsageComparedToOthersGW;
 	private double emissionsLastWeek;
 	private  double AverageEmissions;
 	private  double sugProb;
@@ -102,6 +103,7 @@ public class User {
 		this.walkUsageComparedToOthers = 0.0;
 		this.bikeUsageComparedToOthersGW = 0.0;
 		this.walkUsageComparedToOthersGW = 0.0;
+		this.ptUsageComparedToOthersGW = 0.0;
 		this.carUsageComparedToOthers = 0.0;
 		this.parkrideUsageComparedToOthers = 0.0;
 		this.bikerideUsageComparedToOthers = 0.0;
@@ -923,4 +925,12 @@ public class User {
 	private boolean valueEquals(double a, double b) {
         return (Math.abs(a - b) < 0.0000001);
     }
+
+	public double getPtUsageComparedToOthersGW() {
+		return ptUsageComparedToOthersGW;
+	}
+
+	public void setPtUsageComparedToOthersGW(double ptUsageComparedToOthersGW) {
+		this.ptUsageComparedToOthersGW = ptUsageComparedToOthersGW;
+	}
 }

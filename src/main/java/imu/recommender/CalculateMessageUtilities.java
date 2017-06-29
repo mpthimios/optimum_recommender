@@ -43,7 +43,7 @@ public class CalculateMessageUtilities {
         double PCar = user.getCarUsageComparedToOthers();
         double PWalkGW = user.getWalkUsageComparedToOthersGW();
         double PBikeGW = user.getBikeUsageComparedToOthersGW();
-        double PPtGW = user.getPtUsageComparedToOthers();
+        double PPtGW = user.getPtUsageComparedToOthersGW();
         double MinWalked = user.getMinWalked();
         double MinBiked = user.getMinBiked();
         double MinPT = user.getMinPT();

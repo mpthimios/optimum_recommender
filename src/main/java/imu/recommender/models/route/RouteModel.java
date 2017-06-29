@@ -5,9 +5,7 @@ import at.ac.ait.ariadne.routeformat.RouteSegment;
 import imu.recommender.helpers.RecommenderModes;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RouteModel {
 
@@ -25,6 +23,7 @@ public class RouteModel {
 	private String message = "";
 	private String strategy = "";
 	private String messageId = "";
+	private List<String> context = new ArrayList<>();
 	private boolean popup = false;
 	private int walkingDistance = 0;
 	private int bikeDistance = 0;
@@ -328,5 +327,13 @@ public class RouteModel {
 		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
 		additionalInfo.put("messageId", messageId);
 		this.route.setAdditionalInfo(additionalInfo);
+	}
+
+	public List<String> getContext() {
+		return context;
+	}
+
+	public void setContext(List<String> context) {
+		this.context = context;
 	}
 }

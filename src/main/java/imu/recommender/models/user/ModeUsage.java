@@ -10,6 +10,7 @@ public class ModeUsage {
 	private double bikeride_percent;
 	private double bike_percentGW;
 	private double walk_percentGW;
+	private double pt_percentGW;
 	
 	public ModeUsage(){
 		car_percent = 0.0;
@@ -20,6 +21,7 @@ public class ModeUsage {
 		bikeride_percent = 0.0;
 		bike_percentGW = 0.0;
 		walk_percentGW = 0.0;
+		pt_percentGW = 0.0;
 	}
 
 	public double getCar_percent() {
@@ -84,5 +86,13 @@ public class ModeUsage {
 
 	public void setBikeride_percent(double bikeride_percent) {
 		this.bikeride_percent = bikeride_percent;
+	}
+
+	public double getPt_percentGW() {
+		return pt_percentGW;
+	}
+
+	public void setPt_percentGW(double pt_percentGW) {
+		this.pt_percentGW = pt_percentGW;
 	}
 }
