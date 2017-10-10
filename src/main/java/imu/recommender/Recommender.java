@@ -175,9 +175,7 @@ public class Recommender {
 	}
 	
 	public void rankRoutesForUser (User user, Datastore mongoDatastore){
-	
 		rankBasedonUserPreferences(user, routes);
-		
 		rankBasedonSystemView(user, routes);
 		
 		rankBasedonBehaviouralModel(routes);
@@ -201,6 +199,52 @@ public class Recommender {
 		routes.clear();
 		routes = FinalRankedRoutes;
 	}
+
+	public void rankRoutesForUserNew (User user, Datastore mongoDatastore){
+
+		List<RouteModel> FinalRankedRoutes = new ArrayList<>(Collections.nCopies(routes.size(), null));
+		List<RouteModel> RankedRoutes = new ArrayList<>(Collections.nCopies(routes.size()-1, null));
+
+		for(int i = 0;i<routes.size();i++){
+			RouteModel recommenderRoute = routes.get(i);
+			if (i==0){
+				FinalRankedRoutes.set(i, recommenderRoute);
+			}
+			else {
+				RankedRoutes.set(i-1, recommenderRoute);
+			}
+
+		}
+
+		if (RankedRoutes.size()>=2) {
+
+			rankBasedonUserPreferences(user, RankedRoutes);
+
+			rankBasedonSystemView(user, RankedRoutes);
+
+			rankBasedonBehaviouralModel(RankedRoutes);
+
+			//Implement Borda count
+			ArrayList<Ballot> ballot = getBallots(RankedRoutes);
+			VotingSystem votingSystem = new Borda(ballot.toArray(new Ballot[ballot.size()]));
+			logger.debug(votingSystem.results());
+			String[] sortedRoutesId = votingSystem.getSortedCandidateList();
+			//List<RouteModel> FinalRankedRoutes = new ArrayList<>(Collections.nCopies(routes.size(), null));
+			for (String entry : sortedRoutesId) {
+				logger.debug(entry);
+			}
+			for (RouteModel route : RankedRoutes) {
+				String routeId = String.valueOf(route.getRouteId());
+				int routeIndex = Arrays.asList(sortedRoutesId).indexOf(routeId);
+				FinalRankedRoutes.set(routeIndex+1, route);
+			}
+		}
+		logger.debug(FinalRankedRoutes);
+
+		routes.clear();
+		routes = FinalRankedRoutes;
+	}
+
 
 	public void addMessage(User user, Datastore mongoDatastore){
 		selectTargetRouteandAddMessageForUser(user, mongoDatastore);
@@ -263,6 +307,7 @@ public class Recommender {
 		}
 		
 		for (RouteModel route : routes){
+			logger.debug(route);
 			Integer number = route.getMode();
 			rankedRoutesMap.replace(number,route);			
 		}

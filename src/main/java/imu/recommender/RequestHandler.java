@@ -61,6 +61,7 @@ public class RequestHandler extends HttpServlet{
 		User user = null;
 		Boolean Baseline = Boolean.FALSE;
 		Boolean Classification = Boolean.FALSE;
+		Boolean NewFeature = Boolean.TRUE;
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.findAndRegisterModules();
@@ -94,7 +95,12 @@ public class RequestHandler extends HttpServlet{
 					System.out.println(user.getPersuasion());
 					if ("A".equals(user.getPersuasion())) {
 						boolean filtered = recommenderRoutes.filterRoutesForUser(user);
-						recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
+						if (NewFeature == Boolean.TRUE){
+							recommenderRoutes.rankRoutesForUserNew(user, mongoDatastore);
+						}
+						else {
+							recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
+						}
 						recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 						if (filtered) {
 							recommenderRoutes.addMessage(user, mongoDatastore);
@@ -107,7 +113,12 @@ public class RequestHandler extends HttpServlet{
 					//Rank routes and add persuasive message
 					//recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 					boolean filtered = recommenderRoutes.filterRoutesForUser(user);
-					recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
+					if (NewFeature == Boolean.TRUE){
+						recommenderRoutes.rankRoutesForUserNew(user, mongoDatastore);
+					}
+					else {
+						recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
+					}
 					recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 					System.out.print(filtered);
 					if (filtered) {
