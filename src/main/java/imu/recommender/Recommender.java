@@ -10,6 +10,9 @@ import imu.recommender.helpers.VotingSystem;
 import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 
 import java.io.IOException;
@@ -648,6 +651,87 @@ public class Recommender {
 			sortedEntries.put(entry.getKey(), entry.getValue());
 		}
 		return sortedEntries;
+	}
+
+	public void addGraph(User user, Datastore mongoDatastore) throws JSONException {
+
+		List<String> userIds = Arrays.asList("Z5k9EDo9CRIAz7vSDxc6z4QLpf4dVS3T");
+
+		if (userIds.contains(user.getId()) ) {
+
+			JSONObject graph = new JSONObject();
+
+			graph.put("type", "horizontalBar");
+
+			JSONArray labels = new JSONArray();
+			labels.put("You");
+			labels.put("Optimum Users");
+
+			JSONArray datasets = new JSONArray();
+
+			JSONObject dataset = new JSONObject();
+			dataset.put("label", "Use of green transportation compared to other Optimum users");
+
+			JSONArray data = new JSONArray();
+			data.put( (user.getMode_usage().getPt_percent()+user.getMode_usage().getBike_percent()+ user.getMode_usage().getWalk_percent())/3.0);
+			data.put( (user.getPtUsageComparedToOthers()+user.getWalkUsageComparedToOthers() + user.getBikeUsageComparedToOthers())/3.0 );
+
+			dataset.put("data", data);
+
+			JSONArray background = new JSONArray();
+			background.put("rgba(255, 99, 132, 0.2)");
+			background.put("rgba(54, 162, 235, 0.2)");
+
+			dataset.put("backgroundColor", background);
+
+			JSONArray border = new JSONArray();
+			border.put("rgba(255,99,132,1)");
+			border.put("rgba(54, 162, 235, 1)");
+
+			dataset.put("borderColor", border);
+
+			JSONObject borderWidth = new JSONObject();
+			borderWidth.put("borderWidth", "1");
+
+			dataset.put("borderWidth", borderWidth);
+
+			datasets.put(dataset);
+
+			JSONObject options = new JSONObject();
+			options.put("maintainAspectRatio", "false");
+			options.put("responsive", "false");
+
+			JSONObject scales = new JSONObject();
+
+			JSONArray yAxes = new JSONArray();
+
+			JSONObject ticks = new JSONObject();
+
+			ticks.put("beginAtZero", "true");
+
+			yAxes.put(ticks);
+
+			scales.put("yAxes", yAxes);
+
+			options.put("scales", scales);
+
+			JSONObject item = new JSONObject();
+
+			item.put("labels", labels);
+			item.put("datasets", datasets);
+			item.put("options", options);
+
+			graph.put("data", item);
+
+			//Map <String, Object> map = new HashMap<String, Object>();
+			Map<String, Object> map = new TreeMap<String, Object>();
+			Object m = graph.toString();
+			map.put("data", m);
+
+			originalRouteFormatRoutes.getRequest().get().setAdditionalInfo(map);
+
+		}
+
 	}
 
 

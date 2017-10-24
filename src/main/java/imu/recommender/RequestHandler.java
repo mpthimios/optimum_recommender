@@ -86,6 +86,7 @@ public class RequestHandler extends HttpServlet{
 
 			RouteFormatRoot originalRoutes = mapper.readValue(requestBody, RouteFormatRoot.class);
 			RouteFormatRoot recommendedRoutes;
+			RouteFormatRoot recommendedRoutes2;
 			Recommender recommenderRoutes= new Recommender(originalRoutes, user);
 			recommenderRoutes.filterDuplicates();
 			if (Baseline == Boolean.FALSE) {
@@ -124,6 +125,8 @@ public class RequestHandler extends HttpServlet{
 					if (filtered) {
 						recommenderRoutes.addMessage(user, mongoDatastore);
 					}
+					//Add Graph
+					recommenderRoutes.addGraph(user, mongoDatastore);
 				}
 			}
 			else {
