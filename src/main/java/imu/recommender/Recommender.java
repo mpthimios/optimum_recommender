@@ -665,6 +665,8 @@ public class Recommender {
 			graph.put("type", "horizontalBar");
 
 			JSONArray datasets = new JSONArray();
+			//Map<String, Object> datasets =new HashMap<String, Object>();
+
 
 			JSONArray labels = new JSONArray();
 
@@ -690,6 +692,7 @@ public class Recommender {
 				labels.put("Optimum Users");
 
 				JSONObject dataset = new JSONObject();
+				//Map<String, Object> dataset =new HashMap<String, Object>();
 
 				dataset.put("label", "Use of green transportation compared to other Optimum users");
 
@@ -712,6 +715,7 @@ public class Recommender {
 				dataset.put("borderColor", border);
 
 				JSONObject borderWidth = new JSONObject();
+				//Map<String, Object> borderWidth=new HashMap<String, Object>();
 				borderWidth.put("borderWidth", "1");
 
 				dataset.put("borderWidth", borderWidth);
@@ -811,12 +815,20 @@ public class Recommender {
 			item.put("datasets", datasets);
 			item.put("options", options);
 
-			graph.put("data", item);
+			//graph.put("graphData", item);
+
+			/*Map<String, Object> map1=new HashMap<String, Object>();
+			map1.put("type", "horizontalBar");
+			//map1.put("options", options);
+			map1.put("datasets", datasets);
+
+			Map<String, Object> map2=new HashMap<String, Object>();
+			map2.put("graphData",map1);*/
 
 			//Map <String, Object> map = new HashMap<String, Object>();
-			Map<String, Object> map = new TreeMap<String, Object>();
-			Object m = graph.toString();
-			map.put("data", m);
+			Map<String, java.lang.Object> map = new TreeMap<String, java.lang.Object>();
+			java.lang.Object m = item.toString();
+			map.put("graphData",m);
 
 			originalRouteFormatRoutes.getRequest().get().setAdditionalInfo(map);
 
