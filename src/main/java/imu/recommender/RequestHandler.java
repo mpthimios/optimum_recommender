@@ -119,14 +119,15 @@ public class RequestHandler extends HttpServlet{
 					}
 					else {
 						recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
-					}
-					recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+					}					
 					System.out.print(filtered);
 					if (filtered) {
 						recommenderRoutes.addMessage(user, mongoDatastore);
 					}
 					//Add Graph
 					recommenderRoutes.addGraph(user, mongoDatastore);
+					
+					recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 				}
 			}
 			else {

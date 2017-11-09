@@ -34,7 +34,7 @@ public class MongoConnectionHelper implements ServletContextListener {
 	                	if (user.matches("")){
 	                		mongoSingleton = new MongoClient(host, port);	                		
 	                	}else{
-	                		String connectionStr = "mongodb://" + user + ":" + pass + "@" + host + ":" + port + "/Optimum";
+	                		String connectionStr = "mongodb://" + user + ":" + pass + "@" + host + ":" + port + "/admin";
 	                		mongoSingleton = new MongoClient(	                				
 	                  			new MongoClientURI(connectionStr)
 	                  		);

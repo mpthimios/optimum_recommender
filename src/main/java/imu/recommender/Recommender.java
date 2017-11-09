@@ -576,6 +576,7 @@ public class Recommender {
 				.setStatus(originalRouteFormatRoutes.getStatus())
 				.setCoordinateReferenceSystem(originalRouteFormatRoutes.getCoordinateReferenceSystem())
 				.setRequest(originalRouteFormatRoutes.getRequest().get())
+				.setAdditionalInfo(originalRouteFormatRoutes.getAdditionalInfo())
 				.setRoutes(routesList);
 		
 		//return originalRouteFormatRoutes.toString();
@@ -656,7 +657,7 @@ public class Recommender {
 
 	public void addGraph(User user, Datastore mongoDatastore) throws JSONException {
 
-		List<String> userIds = Arrays.asList("Z5k9EDo9CRIAz7vSDxc6z4QLpf4dVS3T");
+		List<String> userIds = Arrays.asList("Z5k9EDo9CRIAz7vSDxc6z4QLpf4dVS3T", "ab6nG6ZEX1ESMGDHzlpTQscGZsdvBG0Z", "GWqXKjq4tlc20oT0L0ZZ4wGMpw316Isi");
 
 		if (userIds.contains(user.getId()) ) {
 
@@ -692,14 +693,11 @@ public class Recommender {
 				labels.put("Optimum Users");
 
 				JSONObject dataset = new JSONObject();
-				//Map<String, Object> dataset =new HashMap<String, Object>();
-
 				dataset.put("label", "Use of green transportation compared to other Optimum users");
 
 				JSONArray data = new JSONArray();
 				data.put((user.getMode_usage().getPt_percent() + user.getMode_usage().getBike_percent() + user.getMode_usage().getWalk_percent()) / 3.0);
 				data.put((user.getPtUsageComparedToOthers() + user.getWalkUsageComparedToOthers() + user.getBikeUsageComparedToOthers()) / 3.0);
-
 				dataset.put("data", data);
 
 				JSONArray background = new JSONArray();
@@ -713,12 +711,7 @@ public class Recommender {
 				border.put("rgba(54, 162, 235, 1)");
 
 				dataset.put("borderColor", border);
-
-				JSONObject borderWidth = new JSONObject();
-				//Map<String, Object> borderWidth=new HashMap<String, Object>();
-				borderWidth.put("borderWidth", "1");
-
-				dataset.put("borderWidth", borderWidth);
+				dataset.put("borderWidth", "1");
 
 				datasets.put(dataset);
 			}
@@ -728,109 +721,83 @@ public class Recommender {
 				labels.put("Last week");
 
 				JSONObject dataset1 = new JSONObject();
-
 				dataset1.put("label", "Walk");
-
 				dataset1.put("backgroundColor","rgb(255, 159, 64)");
-
 				JSONArray data = new JSONArray();
 				data.put(user.getMode_usage().getWalk_percent());
-				data.put(40);
-
+				data.put(0.4);
 				dataset1.put("data", data);
 
 				//bicycle data
-
 				datasets.put(dataset1);
 
 				JSONObject dataset2 = new JSONObject();
-
 				dataset2.put("label", "Bicycle");
-
 				dataset2.put("backgroundColor","rgb(75, 192, 192)");
-
 				JSONArray data2 = new JSONArray();
 				data2.put(user.getMode_usage().getBike_percent());
-				data2.put(10);
-
+				data2.put(0.1);
 				dataset2.put("data", data2);
 
 				datasets.put(dataset2);
 
 				//pt data
-
 				JSONObject dataset3 = new JSONObject();
-
 				dataset3.put("label", "Public transport");
-
 				dataset3.put("backgroundColor","rgb(54, 162, 235)");
-
 				JSONArray data3 = new JSONArray();
 				data3.put(user.getMode_usage().getPt_percent());
-				data3.put(20);
-
+				data3.put(0.2);
 				dataset3.put("data", data3);
 
 				datasets.put(dataset3);
 
 				//car data
-
 				JSONObject dataset4 = new JSONObject();
-
 				dataset4.put("label", "Car");
-
 				dataset4.put("backgroundColor","rgb(255, 99, 132)");
 
 				JSONArray data4 = new JSONArray();
 				data4.put(user.getMode_usage().getCar_percent());
-				data4.put(50);
-
+				data4.put(0.6);
 				dataset4.put("data", data4);
 
 				datasets.put(dataset4);
 
 			}
 
+			JSONObject beginAtZeroYAxes = new JSONObject();	
+			beginAtZeroYAxes.put("beginAtZero", "true");
+			
+			JSONObject ticks = new JSONObject();
+			ticks.put("ticks", beginAtZeroYAxes);
+			
+			JSONArray yAxes = new JSONArray();
+			yAxes.put(ticks);
+			
+			JSONObject scales = new JSONObject();
+			scales.put("yAxes", yAxes);
+
 			JSONObject options = new JSONObject();
 			options.put("maintainAspectRatio", "false");
 			options.put("responsive", "false");
-
-			JSONObject scales = new JSONObject();
-
-			JSONArray yAxes = new JSONArray();
-
-			JSONObject ticks = new JSONObject();
-
-			ticks.put("beginAtZero", "true");
-
-			yAxes.put(ticks);
-
-			scales.put("yAxes", yAxes);
-
 			options.put("scales", scales);
 
+			JSONObject data = new JSONObject();
+			data.put("labels", labels);
+			data.put("datasets", datasets);
+			
 			JSONObject item = new JSONObject();
-
-			item.put("labels", labels);
-			item.put("datasets", datasets);
+			item.put("type", "horizontalBar");
+			item.put("data", data);
 			item.put("options", options);
 
-			//graph.put("graphData", item);
-
-			/*Map<String, Object> map1=new HashMap<String, Object>();
-			map1.put("type", "horizontalBar");
-			//map1.put("options", options);
-			map1.put("datasets", datasets);
-
-			Map<String, Object> map2=new HashMap<String, Object>();
-			map2.put("graphData",map1);*/
-
-			//Map <String, Object> map = new HashMap<String, Object>();
 			Map<String, java.lang.Object> map = new TreeMap<String, java.lang.Object>();
 			java.lang.Object m = item.toString();
-			map.put("graphData",m);
-
-			originalRouteFormatRoutes.getRequest().get().setAdditionalInfo(map);
+			
+			Map <String, Object> additionalInfo = originalRouteFormatRoutes.getAdditionalInfo();
+			additionalInfo.put("graphData", m);
+			originalRouteFormatRoutes.setAdditionalInfo(additionalInfo);
 
 		}
 
