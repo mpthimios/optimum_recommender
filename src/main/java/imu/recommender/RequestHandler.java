@@ -194,6 +194,7 @@ public class RequestHandler extends HttpServlet{
 
 						
 			out.println(recommendedRoutesStr);
+			//logger.error("Received Routes:"+recommendedRoutesStr);
 			logger.error("Received Routes:"+received);
 			logger.error("Response:"+new Timestamp(System.currentTimeMillis()));
 		}

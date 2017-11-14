@@ -543,6 +543,9 @@ public class Recommender {
 			routes.clear();
 			routes = rankedRoutes2;
 		}
+		else{
+			logger.debug("NO TARGET FOR MESSAGE");
+		}
 
 	}
 	
