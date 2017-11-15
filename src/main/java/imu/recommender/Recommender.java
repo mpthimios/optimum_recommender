@@ -546,20 +546,22 @@ public class Recommender {
 		else{
 			logger.debug("NO TARGET FOR MESSAGE");
 			rankedRoutes2 = new ArrayList<RouteModel>();
-			Boolean addMessage=Boolean.TRUE;
+			//Boolean addMessage=Boolean.TRUE;
+			Integer integer = 0;
 			for (RouteModel route : routes) {
-				if (addMessage == Boolean.TRUE) {
+				if (integer.equals(1)) {
 					message = "";
 					strategy = "";
 					messageId = "";
-					
+
 					route.setMessage(message);
 					route.setStrategy(strategy);
 					route.setMessageId(messageId);
 					//set popup_display false
 					route.setPopup(false);
-					addMessage = Boolean.FALSE;
+					//addMessage = Boolean.FALSE;
 				}
+				integer++;
 				rankedRoutes2.add(route);
 			}
 		routes.clear();
