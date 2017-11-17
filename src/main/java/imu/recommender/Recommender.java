@@ -711,13 +711,21 @@ public class Recommender {
 				strategy="comparison";
 			}
 
-			if (strategy.equals("comparison")) {
-
-				labels.put("You");
-				labels.put("Optimum Users");
+			if (true){ //strategy.equals("comparison")) {
+				
+				JSONArray you =  new JSONArray();
+				you.put("You");
+				you.put("");
+				//labels.put("You");
+				labels.put(you);
+				JSONArray others =  new JSONArray();
+				others.put("Optimum");
+				others.put("Users");				
+				//labels.put("Optimum Users");
+				labels.put(others);
 
 				JSONObject dataset = new JSONObject();
-				dataset.put("label", "Use of green transportation compared to other Optimum users");
+				dataset.put("label", "Use of green transportation modes");
 
 				JSONArray data = new JSONArray();
 				data.put((user.getMode_usage().getPt_percent() + user.getMode_usage().getBike_percent() + user.getMode_usage().getWalk_percent()) / 3.0);
@@ -739,7 +747,7 @@ public class Recommender {
 
 				datasets.put(dataset);
 			}
-			else if (strategy.equals("self-monitoring")){
+			else if (false){ //strategy.equals("self-monitoring")){
 
 				labels.put("This week");
 				labels.put("Last week");
