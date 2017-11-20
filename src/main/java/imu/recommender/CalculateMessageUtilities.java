@@ -350,7 +350,7 @@ public class CalculateMessageUtilities {
             Strategy newStrategy = new Strategy();
             mongoDatastore.save(newStrategy);
             logger.debug("Exception: "+e.getMessage(),e);
-            selected_message_text = selected_message_text + "_" +strategy;
+            selected_message_text = selected_message_text + "_" +strategy+ "_" +selectedMessageId;
             return selected_message_text;
         }
 

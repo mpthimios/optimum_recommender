@@ -3,6 +3,9 @@ package imu.recommender;
 import at.ac.ait.ariadne.routeformat.Route;
 import at.ac.ait.ariadne.routeformat.RouteFormatRoot;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import imu.recommender.helpers.Ballot;
 import imu.recommender.helpers.Borda;
 import imu.recommender.helpers.RecommenderModes;
@@ -710,8 +713,22 @@ public class Recommender {
 			} catch (UnknownHostException e) {
 				strategy="comparison";
 			}
+            DBCollection routes = mongoDatastore.getDB().getCollection("UserRouteLog");
+            BasicDBObject TripQuery = new BasicDBObject();
+            TripQuery.put("userId", user.getId());
+            BasicDBObject fields = new BasicDBObject();
+            fields.put("recommendedResults.additionalInfo.strategy", 1);
 
-			if (true){ //strategy.equals("comparison")) {
+            List<DBObject> trip = routes.find(TripQuery, fields).sort(new BasicDBObject("$natural", -1)).limit(10).toArray();
+            String previous_strategy = trip.get(0).get("recommendedResults").toString();
+            if(previous_strategy.contains("comparison")){
+                strategy="self-monitoring";
+            }
+            if(previous_strategy.contains("self-monitoring")){
+                strategy="comparison";
+            }
+
+			if (strategy.equals("comparison")) {
 				
 				JSONArray you =  new JSONArray();
 				you.put("You");
@@ -747,7 +764,7 @@ public class Recommender {
 
 				datasets.put(dataset);
 			}
-			else if (false){ //strategy.equals("self-monitoring")){
+			else if (strategy.equals("self-monitoring")){
 
 				labels.put("This week");
 				labels.put("Last week");
@@ -829,6 +846,7 @@ public class Recommender {
 			
 			Map <String, Object> additionalInfo = originalRouteFormatRoutes.getAdditionalInfo();
 			additionalInfo.put("graphData", m);
+			additionalInfo.put("strategy",strategy);
 			originalRouteFormatRoutes.setAdditionalInfo(additionalInfo);
 
 		}
