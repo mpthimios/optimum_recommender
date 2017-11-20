@@ -727,18 +727,17 @@ public class Recommender {
             if(previous_strategy.contains("self-monitoring")){
                 strategy="comparison";
             }
-
+            
+            String graphTitle = "";
 			if (strategy.equals("comparison")) {
 				
 				JSONArray you =  new JSONArray();
 				you.put("You");
 				you.put("");
-				//labels.put("You");
 				labels.put(you);
 				JSONArray others =  new JSONArray();
 				others.put("Optimum");
 				others.put("Users");				
-				//labels.put("Optimum Users");
 				labels.put(others);
 
 				JSONObject dataset = new JSONObject();
@@ -763,6 +762,8 @@ public class Recommender {
 				dataset.put("borderWidth", "1");
 
 				datasets.put(dataset);
+				
+				graphTitle = "Your green transportation behaviour vs others";
 			}
 			else if (strategy.equals("self-monitoring")){
 
@@ -812,7 +813,8 @@ public class Recommender {
 				dataset4.put("data", data4);
 
 				datasets.put(dataset4);
-
+				
+				graphTitle = "Your transportation behavior over the last two weeks";
 			}
 
 			JSONObject beginAtZeroYAxes = new JSONObject();	
@@ -826,11 +828,19 @@ public class Recommender {
 			
 			JSONObject scales = new JSONObject();
 			scales.put("yAxes", yAxes);
+			
+			
+			JSONObject title = new JSONObject();
+			title.put("display", "true");
+			title.put("text", graphTitle);
+			
+			scales.put("yAxes", yAxes);
 
 			JSONObject options = new JSONObject();
 			options.put("maintainAspectRatio", "false");
 			options.put("responsive", "false");
 			options.put("scales", scales);
+			options.put("title", title);
 
 			JSONObject data = new JSONObject();
 			data.put("labels", labels);
