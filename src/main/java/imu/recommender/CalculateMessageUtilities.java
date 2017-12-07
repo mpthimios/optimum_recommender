@@ -2,6 +2,7 @@ package imu.recommender;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.models.message.Message;
 import imu.recommender.models.strategy.Strategy;
@@ -11,9 +12,10 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class CalculateMessageUtilities {
 
@@ -29,6 +31,8 @@ public class CalculateMessageUtilities {
         //Get user language
         String lang = user.getLanguage();
 
+        //Get the id of the displayed messages during last X hours
+        List<String> DisplayedMessages = get_presented_messages(user.getId(),strategy, mongoDatastore);
 
         String selected_message_text= "";
         String selected_message_params= "";
@@ -170,23 +174,27 @@ public class CalculateMessageUtilities {
         //Select the message that will be displayed on the user
         Double max_message_utility2 = 0.0;
         for (Message m: messages ) {
-            //Set random messageUtility
-            Double messageUtility = Math.random();
-            m.setUtility(messageUtility);
-            if (messageUtility > max_message_utility2) {
-                max_message_utility2 = messageUtility;
-                if ("de".equals(lang)) {
-                    selected_message_text = m.getMessage_text_german();
+            //If message didn't display during last X hours
+            if ( !DisplayedMessages.contains(m.getId()) ){
+                //Set random messageUtility
+                Double messageUtility = Math.random();
+                m.setUtility(messageUtility);
+                if (messageUtility > max_message_utility2) {
+                    max_message_utility2 = messageUtility;
+                    if ("de".equals(lang)) {
+                        selected_message_text = m.getMessage_text_german();
+                    }
+                    else if("sl".equals(lang)){
+                        selected_message_text = m.getMessage_text_slo();
+                    }
+                    else {
+                        selected_message_text = m.getMessage_text();
+                    }
+                    selected_message_params = m.getParameters();
+                    selectedMessageId = m.getId();
                 }
-                else if("sl".equals(lang)){
-                    selected_message_text = m.getMessage_text_slo();
-                }
-                else {
-                    selected_message_text = m.getMessage_text();
-                }
-                selected_message_params = m.getParameters();
-                selectedMessageId = m.getId();
             }
+
         }
 
         //Calculate the number of days since user login
@@ -543,6 +551,51 @@ public class CalculateMessageUtilities {
 
         return utility;
     }
+
+    private static List<String> get_presented_messages(String userId, String strategy, Datastore mongoDatastore) {
+
+        //check if the graph displayed last X hours.
+        Integer X=GetProperties.getHours();
+        //get the current timestamp and the timestamp of the latestUpdate
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        //Compare if the timestamp is less than X hours.
+        DBCollection routes = mongoDatastore.getDB().getCollection("UserTrip");
+        BasicDBObject TripQuery = new BasicDBObject();
+        TripQuery.put("userId", userId);
+        TripQuery.put("body.additionalInfo.additionalProperties.strategy", strategy);
+        BasicDBObject fields = new BasicDBObject();
+        fields.put("createdat", 1);
+        fields.put("body.additionalInfo.additionalProperties.messageId",1);
+
+        List<DBObject> request = routes.find(TripQuery, fields).sort(new BasicDBObject("$natural", -1)).limit(10).toArray();
+        List<String> DisplayedMessages = new ArrayList<String>();
+
+        if (request.isEmpty()){
+            return DisplayedMessages;
+        }
+        else {
+            for (int i =0; i<request.size();i++) {
+
+                String dateString = request.get(i).get("createdat").toString();
+                logger.debug(dateString);
+                DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.ENGLISH);
+                try {
+                    Date date = format.parse(dateString);
+                    long milliseconds = Math.abs(date.getTime() - now.getTime());
+                    int hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
+                    if (hours > X) {
+                        String messageId = ((DBObject)((DBObject)((DBObject)request.get(i).get("body")).get("additionalInfo")).get("additionalProperties")).get("messageId").toString();
+                        logger.debug(messageId);
+                        DisplayedMessages.add(messageId);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            return DisplayedMessages;
+        }
+    }
+
 
 
 }

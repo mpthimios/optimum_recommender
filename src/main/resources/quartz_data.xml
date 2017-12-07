@@ -57,6 +57,20 @@
         </trigger>
 
         <job>
+            <name>CalculateModeUsageLastWeek</name>
+            <job-class>imu.recommender.jobs.CalculateModeUsageLastWeek</job-class>
+        </job>
+        <trigger>
+            <cron>
+                <name>CalculateModeUsageLastWeek</name>
+                <job-name>CalculateModeUsageLastWeek</job-name>
+                <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+                <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
+            </cron>
+        </trigger>
+
+
+        <job>
             <name>UpdateWeather</name>
             <job-class>imu.recommender.jobs.UpdateWeather</job-class>
         </job>

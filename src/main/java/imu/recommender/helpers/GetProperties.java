@@ -50,6 +50,8 @@ public class GetProperties implements ServletContextListener {
     private static double MinBikeSharing;
     private static double MinBikeRide;
     private static double MinParkRide;
+    private static Integer hours;
+    private static Boolean TestGraphs;
 
     public static double getPCar() {
         return PCar;
@@ -137,6 +139,22 @@ public class GetProperties implements ServletContextListener {
 
     public static void setMinParkRide(double minParkRide) {
         MinParkRide = minParkRide;
+    }
+
+    public static Integer getHours() {
+        return hours;
+    }
+
+    public static void setHours(Integer hours) {
+        GetProperties.hours = hours;
+    }
+
+    public static Boolean getTestGraphs() {
+        return TestGraphs;
+    }
+
+    public static void setTestGraphs(Boolean testGraphs) {
+        TestGraphs = testGraphs;
     }
 
     public String getUsernameValues() throws IOException {
@@ -320,7 +338,15 @@ public class GetProperties implements ServletContextListener {
             logger.debug("MinParkRide: " + MinParkRide);
             GetProperties.MinParkRide = Double.parseDouble(MinParkRide);
 
-		}
+            String hours = sc.getInitParameter("hours");
+            logger.debug("hours: " + hours);
+            GetProperties.hours = Integer.parseInt(hours);
+
+            String TestGraphs = sc.getInitParameter("TestGraphs");
+            logger.debug("TestGraphs: " + TestGraphs);
+            GetProperties.TestGraphs = Boolean.parseBoolean(hours);
+
+        }
 		catch (Exception e){
             logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 		}

@@ -70,6 +70,8 @@ public class User {
 	private Date fistLogin;
 	private Integer total_activities;
 	private String persuasion;
+	private String group;
+	private Integer count;
 
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
@@ -88,6 +90,12 @@ public class User {
 	
 	@Embedded("mode_usage")
 	private ModeUsage mode_usage;
+
+	@Embedded("mode_usage_last_week")
+	private ModeUsageLastWeek mode_usage_last_week;
+
+	@Embedded("mode_usage_previous_week")
+	private ModeUsagePreviousWeek mode_usage_previous_week;
 	
 	@Embedded("route_preferences")
 	private ArrayList<RoutePreference> routePreferences;
@@ -119,6 +127,8 @@ public class User {
 		this.emissionsLastWeek = 0.0;
 		this.routePreferences = new ArrayList<RoutePreference>();
 		this.mode_usage = new ModeUsage();
+		this.mode_usage_last_week = new ModeUsageLastWeek();
+		this.mode_usage_previous_week = new ModeUsagePreviousWeek();
 		this.AverageEmissions =0.0;
 		this.sugProb = 0.0;
 		this.sugAttempts = 0;
@@ -141,6 +151,7 @@ public class User {
 		this.language = "en";
 		this.total_activities = 0;
 		this.persuasion = "";
+		this.count = 0;
 
 	}
 	
@@ -932,5 +943,37 @@ public class User {
 
 	public void setPtUsageComparedToOthersGW(double ptUsageComparedToOthersGW) {
 		this.ptUsageComparedToOthersGW = ptUsageComparedToOthersGW;
+	}
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	public ModeUsageLastWeek getMode_usage_last_week() {
+		return mode_usage_last_week;
+	}
+
+	public void setMode_usage_last_week(ModeUsageLastWeek mode_usage_last_week) {
+		this.mode_usage_last_week = mode_usage_last_week;
+	}
+
+	public ModeUsagePreviousWeek getMode_usage_previous_week() {
+		return mode_usage_previous_week;
+	}
+
+	public void setMode_usage_previous_week(ModeUsagePreviousWeek mode_usage_previous_week) {
+		this.mode_usage_previous_week = mode_usage_previous_week;
+	}
+
+	public Integer getCount() {
+		return count;
+	}
+
+	public void setCount(Integer count) {
+		this.count = count;
 	}
 }
