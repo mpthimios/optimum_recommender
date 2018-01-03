@@ -104,7 +104,7 @@ public class RequestHandler extends HttpServlet{
 						}
 						recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 						if (filtered) {
-							recommenderRoutes.addMessage(user, mongoDatastore);
+							recommenderRoutes.addPersuasiveFeature(user, mongoDatastore);
 						}
 					} else {
 						recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
@@ -122,7 +122,7 @@ public class RequestHandler extends HttpServlet{
 					}					
 					System.out.print(filtered);
 					if (filtered) {
-						recommenderRoutes.addMessage(user, mongoDatastore);
+						recommenderRoutes.addPersuasiveFeature(user, mongoDatastore);
 					}
 					//Add Graph
 					recommenderRoutes.addGraph(user, mongoDatastore);

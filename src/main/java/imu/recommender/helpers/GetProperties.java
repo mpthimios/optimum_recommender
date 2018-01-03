@@ -52,6 +52,8 @@ public class GetProperties implements ServletContextListener {
     private static double MinParkRide;
     private static Integer hours;
     private static Boolean TestGraphs;
+    private static String client_id;
+    private static String client_secret;
 
     public static double getPCar() {
         return PCar;
@@ -155,6 +157,22 @@ public class GetProperties implements ServletContextListener {
 
     public static void setTestGraphs(Boolean testGraphs) {
         TestGraphs = testGraphs;
+    }
+
+    public static String getClient_id() {
+        return client_id;
+    }
+
+    public static void setClient_id(String client_id) {
+        GetProperties.client_id = client_id;
+    }
+
+    public static String getClient_secret() {
+        return client_secret;
+    }
+
+    public static void setClient_secret(String client_secret) {
+        GetProperties.client_secret = client_secret;
     }
 
     public String getUsernameValues() throws IOException {
@@ -345,6 +363,14 @@ public class GetProperties implements ServletContextListener {
             String TestGraphs = sc.getInitParameter("TestGraphs");
             logger.debug("TestGraphs: " + TestGraphs);
             GetProperties.TestGraphs = Boolean.parseBoolean(hours);
+
+            String client_id = sc.getInitParameter("client_id");
+            logger.debug("client_id: " + client_id);
+            GetProperties.client_id = String.valueOf (client_id);
+
+            String client_secret = sc.getInitParameter("client_secret");
+            logger.debug("client_secret: " + client_secret);
+            GetProperties.client_secret = String.valueOf (client_secret);
 
         }
 		catch (Exception e){

@@ -18,7 +18,12 @@ import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -259,8 +264,9 @@ public class Recommender {
 	}
 
 
-	public void addMessage(User user, Datastore mongoDatastore){
-		if (check_if_we_need_to_add_message(user,mongoDatastore)) {
+	public void addMessage(User user, Datastore mongoDatastore, Integer N){
+
+		if (check_if_we_need_to_add_message(user,mongoDatastore,N)) {
 			selectTargetRouteandAddMessageForUser(user, mongoDatastore);
 		}
 	}
@@ -692,6 +698,18 @@ public class Recommender {
 
 	public void addPersuasiveFeature(User user,  Datastore mongoDatastore){
 
+		String purpose = getPurpose();
+		logger.debug(purpose);
+		Integer N;
+		//If trip purpose is leisure high intensity of intervantions
+		if (purpose.equals("leisure")){
+			N=5;
+		}
+		//If trip purpose is non-leisure low intensity of intervantions
+		else {
+			N=3;
+		}
+
 		Query<UserRequestPerGroup> query = mongoDatastore.createQuery(UserRequestPerGroup.class).field("userId").equal( user.getId());
 		String group;
 		if (query.field("Group").exists().asList().isEmpty()) {  // .asList().isEmpty()
@@ -724,7 +742,7 @@ public class Recommender {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				addMessage(user,mongoDatastore);
+				addMessage(user,mongoDatastore,N);
 
 			}
 			else if(group.equals("groupB")){
@@ -738,7 +756,7 @@ public class Recommender {
 			}
 			else if(group.equals("groupC")){
 				//Message only
-				addMessage(user, mongoDatastore);
+				addMessage(user, mongoDatastore,N);
 
 			}
 		}
@@ -746,7 +764,7 @@ public class Recommender {
 
 	public void addGraph(User user, Datastore mongoDatastore) throws JSONException {
 
-		List<String> userIds = Arrays.asList("Z5k9EDo9CRIAz7vSDxc6z4QLpf4dVS3T", "ab6nG6ZEX1ESMGDHzlpTQscGZsdvBG0Z", "GWqXKjq4tlc20oT0L0ZZ4wGMpw316Isi");
+		List<String> userIds = Arrays.asList("Z5k9EDo9CRIAz7vSDxc6z4QLpf4dVS3T", "ab6nG6ZEX1ESMGDHzlpTQscGZsdvBG0Z", "GWqXKjq4tlc20oT0L0ZZ4wGMpw316Isi", "hqtpnR0Zbp5AD7Ue4HRYCrcbu9HWWOBy");
 
 		if (userIds.contains(user.getId()) ) {
 
@@ -986,7 +1004,7 @@ public class Recommender {
 		}
 	}
 
-	public Boolean check_if_we_need_to_add_message(User user,Datastore mongoDatastore) {
+	public Boolean check_if_we_need_to_add_message(User user,Datastore mongoDatastore, Integer N) {
 
 		DBCollection routes = mongoDatastore.getDB().getCollection("UserRoute");
 		BasicDBObject TripQuery = new BasicDBObject();
@@ -1001,8 +1019,8 @@ public class Recommender {
 
 		Integer no_answer= abs(negativeFeedback - positiveFeedback);
 		Integer count = user.getCount();
-		if (no_answer>3){
-			Integer message_display= count%(no_answer-2);
+		if (no_answer>N){
+			Integer message_display= count%(no_answer-(N-1));
 			if (message_display.equals(0)){
 				count=1;
 				user.setCount(count);
@@ -1020,6 +1038,154 @@ public class Recommender {
 
 	}
 
+	public String getPurpose() {
+		String purpose = "non-leisure";
+		String[] location = {
+				originalRouteFormatRoutes.getRoutes().get(0).getTo().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(0).toString(),
+				originalRouteFormatRoutes.getRoutes().get(0).getTo().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(1).toString()
+		};
+		//iF lat log is work or home purpose non-leisure else check Fourspuare
+		HttpURLConnection con;
+		String client_id=GetProperties.getClient_id();
+		String client_secret=GetProperties.getClient_secret();
+		String url = "https://api.foursquare.com/v2/venues/search?client_id=" + client_id +
+				"&client_secret=" + client_secret +
+				"&v=20170801" +
+				"&ll=37.940321,23.697201" +
+				//"&limit=10" +
+				//"&ll=" + location[0] + "," + location[1] + "&limit=10" +
+				"&radius=30" +
+				"&intent=browse";
+		String params = "client_id=" + client_id +
+				"&client_secret=" + client_secret +
+				"&v=20170801" +
+				"&ll=37.940321,23.697201" +
+				//"&limit=10" +
+				//"&ll=" + location[0] + "," + location[1] + "&limit=10" +
+				"&radius=30&" +
+				"&intent=browse";
+
+		try {
+			URL obj = new URL(url);
+			con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("GET");
+
+			con.setRequestProperty("urlParameters", params);
+
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
+			return purpose;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
+			return purpose;
+		}
+
+		//con.setRequestProperty("token",(String) accessToken);
+		//con.setRequestProperty("user", (String) id.toString());
+		try {
+			int responseCode = con.getResponseCode();
+			logger.debug("\nSending 'GET' request to URL : " + url);
+			logger.debug("Response Code : " + responseCode);
+
+			BufferedReader in = new BufferedReader(
+					new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+			//print result
+			logger.debug(response.toString());
+
+			JSONObject jsonObj = new JSONObject(response.toString());
+			JSONObject res = jsonObj.getJSONObject("response");
+			JSONArray arr = res.getJSONArray("venues");
+			logger.debug(arr);
+
+			List PurposeList=new ArrayList();
+			JSONArray sortedJsonArray = new JSONArray();
+			List<JSONObject> jsonList = new ArrayList<JSONObject>();
+
+			for (int i = 0; i < arr.length(); i++) {
+
+				JSONObject object = arr.getJSONObject(i);
+				//String mode = getMode(object);
+				JSONArray categories = object.getJSONArray("categories");
+				String prefix = categories.getJSONObject(0).getJSONObject("icon").get("prefix").toString();
+
+				String catId = categories.getJSONObject(0).get("id").toString();
+
+				String distance = object.getJSONObject("location").getString("distance");
+				logger.debug(distance);
+
+				String categ = prefix.split("categories_v2/")[1];
+				String category = categ.split("/")[0];
+				logger.debug(category);
+				List list1 = new ArrayList();
+				list1.add("arts_entertainment");
+				list1.add("food");
+				list1.add("nightlife");
+				list1.add("parks_outdoors");
+				List education = new ArrayList();
+				education.add("4bf58dd8d48988d1a1941735");
+				education.add("4bf58dd8d48988d1b2941735");
+				education.add("4bf58dd8d48988d1b4941735");
+				education.add("4bf58dd8d48988d1ac941735");
+				List events = new ArrayList();
+				events.add("52f2ab2ebcbc57f1066b8b3b");
+				events.add("5267e4d9e4b0ec79466e48c7");
+				events.add("5267e4d9e4b0ec79466e48d1");
+				events.add("5267e4d9e4b0ec79466e48c8");
+				events.add("52741d85e4b0d5d1e3c6a6d9");
+				List shops = new ArrayList();
+				shops.add("52f2ab2ebcbc57f1066b8b56");
+				shops.add("56aa371be4b08b9a8d5734d3");
+				shops.add("4bf58dd8d48988d1f9941735");
+				shops.add("52f2ab2ebcbc57f1066b8b1c");
+				shops.add("58daa1558bbb0b01f18ec206");
+				if (list1.contains(category)) {
+					purpose = "leisure";
+				} else if (category.equals("education")) {
+					if (education.contains(catId)) {
+						purpose = "leisure";
+					} else {
+						purpose = "non-leisure";
+					}
+				} else if (category.equals("events")) {
+					if (events.contains(catId)) {
+						purpose = "leisure";
+					} else {
+						purpose = "non-leisure";
+					}
+				} else if (category.equals("shops")) {
+					if (shops.contains(catId)) {
+						purpose = "non-leisure";
+					} else {
+						purpose = "leisure";
+					}
+				} else if (category.equals("building")) {
+					purpose = "non-leisure";
+				} else {
+					purpose = "non-leisure";
+				}
+				PurposeList.add(purpose);
+
+			}
+
+			purpose = PurposeList.get(0).toString();
 
 
-}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return purpose;
+	}
+
+
+	}
