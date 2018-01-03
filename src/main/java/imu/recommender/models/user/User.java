@@ -277,8 +277,9 @@ public class User {
 	public List<String> getTargetList() {
 		List<String> target = new ArrayList<String>();
 		try {
-			String user_mode="car";
-			if(this.getTotal_activities()<=10 || 
+			String user_mode = this.personality.convertPreferredMode();
+			/*String user_mode="car";
+			if(this.getTotal_activities()<=10 ||
 					(valueEquals(this.getMode_usage().getPt_percent(), 0) && 
 							valueEquals(this.getMode_usage().getCar_percent(), 0) && 
 							valueEquals(this.getMode_usage().getWalk_percent(), 0) && 
@@ -299,7 +300,7 @@ public class User {
 					max = this.getMode_usage().getBike_percent();
 					user_mode = "bicycle";
 				}
-			}
+			}*/
 			if ("pt".equals(user_mode)){
 				target.add("bike&ride");
 				target.add("BikeSharing");
