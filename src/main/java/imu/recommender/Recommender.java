@@ -714,7 +714,7 @@ public class Recommender {
 		String group;
 		if (!query.field("Group").exists().asList().isEmpty()) {  // .asList().isEmpty()
 			group = query.get().getGroup();
-			logger.debug("---------------------------------GROUP---------");
+			//group=user.getGroup();
 			logger.debug(group);
 		}
 		else {
@@ -726,7 +726,6 @@ public class Recommender {
 			Integer groupA = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupA();
 			Integer groupB = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupB();
 			Integer groupC = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupC();
-			logger.debug(groupA);
 
 			Integer minNumber = groupA;
 			group = "groupA";
@@ -740,12 +739,10 @@ public class Recommender {
 			}
 			Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
 			mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("group", group), false);
-			logger.debug(group);
 			if(group.equals("groupA")){
 				groupA=groupA+1;
 				Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
 				mongoDatastore.update(requestQuery, mongoDatastore.createUpdateOperations(Request.class).set("numberOfUsersGroupA", groupA), false);
-				//mongoDatastore.createQuery(Request.class).get().setNumberOfUsersGroupA(groupA);
 			}
 			else if(group.equals("groupB")){
 				groupB=groupB+1;
@@ -765,7 +762,6 @@ public class Recommender {
 
 		if(group.equals("groupA")){
 			//Combination of Graph and Message
-			logger.debug("-----fehbsd---");
 			try {
 				addGraph(user,mongoDatastore);
 			} catch (JSONException e) {
@@ -789,7 +785,7 @@ public class Recommender {
 		}
 		//Update UserRequestPerGroup Collection
 		UserRequestPerGroup requestPerGroup = new UserRequestPerGroup();
-		requestPerGroup.setGroup(user.getGroup());
+		requestPerGroup.setGroup(group);
 		//requestPerGroup.setStrategy(strategy);
 		requestPerGroup.setUserId(user.getId());
 		requestPerGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
