@@ -6,7 +6,7 @@ import org.mongodb.morphia.annotations.Entity;
  * Created by evangelia on 24/11/2017.
  */
 
-@Entity("RequestStatistics")
+@Entity("Request")
 
 public class Request {
     private Integer numberOfUsersGroupA;

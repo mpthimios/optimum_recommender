@@ -712,54 +712,89 @@ public class Recommender {
 
 		Query<UserRequestPerGroup> query = mongoDatastore.createQuery(UserRequestPerGroup.class).field("userId").equal( user.getId());
 		String group;
-		if (query.field("Group").exists().asList().isEmpty()) {  // .asList().isEmpty()
-			group = query.field("Group").toString();
+		if (!query.field("Group").exists().asList().isEmpty()) {  // .asList().isEmpty()
+			group = query.get().getGroup();
+			logger.debug("---------------------------------GROUP---------");
+			logger.debug(group);
 		}
 		else {
-			Query<User> query1 = mongoDatastore.createQuery(User.class).field("id").equal( user.getId());
-			Integer groupA = Integer.parseInt(mongoDatastore.createQuery(Request.class).field("numberOfUsersGroupA").toString());
-			Integer groupB = Integer.parseInt(mongoDatastore.createQuery(Request.class).field("numberOfUsersGroupB").toString());
-			Integer groupC = Integer.parseInt(mongoDatastore.createQuery(Request.class).field("numberOfUsersGroupC").toString());
+			//Query<User> query1 = mongoDatastore.createQuery(User.class).field("id").equal( user.getId());
+			if (mongoDatastore.createQuery(Request.class).field("numberOfUsersGroupA").exists().asList().isEmpty()) {
+				Request request = new Request();
+				mongoDatastore.save(request);
+			}
+			Integer groupA = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupA();
+			Integer groupB = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupB();
+			Integer groupC = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupC();
+			logger.debug(groupA);
 
 			Integer minNumber = groupA;
-			group="groupA";
-			if (minNumber>groupB){
-				minNumber=groupB;
-				group="groupB";
+			group = "groupA";
+			if (minNumber > groupB) {
+				minNumber = groupB;
+				group = "groupB";
 			}
-			if(minNumber>groupC){
-				minNumber=groupC;
-				group="groupC";
+			if (minNumber > groupC) {
+				minNumber = groupC;
+				group = "groupC";
 			}
-			Query<User> userQuery =mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
-			mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("group", group), true);
-			//groupA ---> Combination,  groupB ----> Graph,  groupC ----->Message
-
+			Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
+			mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("group", group), false);
+			logger.debug(group);
 			if(group.equals("groupA")){
-				//Combination of Graph and Message
-				try {
-					addGraph(user,mongoDatastore);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				addMessage(user,mongoDatastore,N);
-
+				groupA=groupA+1;
+				Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
+				mongoDatastore.update(requestQuery, mongoDatastore.createUpdateOperations(Request.class).set("numberOfUsersGroupA", groupA), false);
+				//mongoDatastore.createQuery(Request.class).get().setNumberOfUsersGroupA(groupA);
 			}
 			else if(group.equals("groupB")){
-				//Graph only
-				try {
-					addGraph(user, mongoDatastore);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-
+				groupB=groupB+1;
+				Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
+				mongoDatastore.update(requestQuery, mongoDatastore.createUpdateOperations(Request.class).set("numberOfUsersGroupB", groupB), false);
 			}
 			else if(group.equals("groupC")){
-				//Message only
-				addMessage(user, mongoDatastore,N);
-
+				groupC=groupC+1;
+				mongoDatastore.createQuery(Request.class).get().setNumberOfUsersGroupC(groupC);
+				Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
+				mongoDatastore.update(requestQuery, mongoDatastore.createUpdateOperations(Request.class).set("numberOfUsersGroupC", groupC), false);
 			}
 		}
+
+		logger.debug(user.getGroup());
+		//groupA ---> Combination,  groupB ----> Graph,  groupC ----->Message
+
+		if(group.equals("groupA")){
+			//Combination of Graph and Message
+			logger.debug("-----fehbsd---");
+			try {
+				addGraph(user,mongoDatastore);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			addMessage(user,mongoDatastore,N);
+
+		}
+		else if(group.equals("groupB")){
+			//Graph only
+			try {
+				addGraph(user, mongoDatastore);
+			} catch(JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		else if(group.equals("groupC")){
+			//Message only
+			addMessage(user, mongoDatastore,N);
+
+		}
+		//Update UserRequestPerGroup Collection
+		UserRequestPerGroup requestPerGroup = new UserRequestPerGroup();
+		requestPerGroup.setGroup(user.getGroup());
+		//requestPerGroup.setStrategy(strategy);
+		requestPerGroup.setUserId(user.getId());
+		requestPerGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
+		//requestPerGroup.setRequestId();
+		mongoDatastore.save(requestPerGroup);
 	}
 
 	public void addGraph(User user, Datastore mongoDatastore) throws JSONException {
@@ -956,14 +991,7 @@ public class Recommender {
 					additionalInfo.put("graphData", m);
 					additionalInfo.put("strategy", strategy);
 					originalRouteFormatRoutes.setAdditionalInfo(additionalInfo);
-					//Update UserRequestPerGroup Collection
-					UserRequestPerGroup requestPerGroup = new UserRequestPerGroup();
-					requestPerGroup.setGroup(user.getGroup());
-					requestPerGroup.setStrategy(strategy);
-					requestPerGroup.setUserId(user.getId());
-					requestPerGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
-					//requestPerGroup.setRequestId();
-					mongoDatastore.save(requestPerGroup);
+
 
 			}
 		}
