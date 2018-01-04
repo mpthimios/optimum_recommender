@@ -710,11 +710,11 @@ public class Recommender {
 			N=3;
 		}
 
-		Query<UserRequestPerGroup> query = mongoDatastore.createQuery(UserRequestPerGroup.class).field("userId").equal( user.getId());
+		Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal( user.getId());
 		String group;
-		if (!query.field("Group").exists().asList().isEmpty()) {  // .asList().isEmpty()
-			group = query.get().getGroup();
-			//group=user.getGroup();
+		if (!query.field("group").exists().asList().isEmpty()) {  // .asList().isEmpty()
+			//group = query.get().getGroup();
+			group=user.getGroup();
 			logger.debug(group);
 		}
 		else {
@@ -783,14 +783,6 @@ public class Recommender {
 			addMessage(user, mongoDatastore,N);
 
 		}
-		//Update UserRequestPerGroup Collection
-		UserRequestPerGroup requestPerGroup = new UserRequestPerGroup();
-		requestPerGroup.setGroup(group);
-		//requestPerGroup.setStrategy(strategy);
-		requestPerGroup.setUserId(user.getId());
-		requestPerGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
-		//requestPerGroup.setRequestId();
-		mongoDatastore.save(requestPerGroup);
 	}
 
 	public void addGraph(User user, Datastore mongoDatastore) throws JSONException {
@@ -987,6 +979,15 @@ public class Recommender {
 					additionalInfo.put("graphData", m);
 					additionalInfo.put("strategy", strategy);
 					originalRouteFormatRoutes.setAdditionalInfo(additionalInfo);
+
+				//Update UserRequestPerGroup Collection
+				UserRequestPerGroup requestPerGroup = new UserRequestPerGroup();
+				requestPerGroup.setGroup(user.getGroup());
+				requestPerGroup.setStrategy(strategy);
+				requestPerGroup.setUserId(user.getId());
+				requestPerGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
+				//requestPerGroup.setRequestId();
+				mongoDatastore.save(requestPerGroup);
 
 
 			}
