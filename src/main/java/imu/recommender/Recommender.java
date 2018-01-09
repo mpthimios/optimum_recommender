@@ -512,7 +512,7 @@ public class Recommender {
 					} catch (Exception e) {
 						logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 					}
-					if ( Context.GetRelevantContext(target, contextList)== Boolean.TRUE ){
+					if (Context.GetRelevantContext(target, contextList) == Boolean.TRUE) {
 						//break;
 						FinaltargetList.add(target);
 					}

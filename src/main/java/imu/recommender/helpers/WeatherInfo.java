@@ -1,11 +1,12 @@
 package imu.recommender.helpers;
 
-import imu.recommender.models.weather.Weather;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import org.apache.log4j.Logger;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.Query;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -26,10 +27,19 @@ public class WeatherInfo implements ServletContextListener {
 
         //Find the last inserted weather Data
 
-        Query<Weather> query = mongoDatastore.createQuery(Weather.class);
+        /*Query<Weather> query = mongoDatastore.createQuery(Weather.class);
         query.criteria("country").equal(city);
         List<Weather> weathers = query.asList();
-        return weathers.get(weathers.size()-1).getGoodWeather();
+        return weathers.get(weathers.size()-1).getGoodWeather();*/
+
+        DBCollection weatherInfo = mongoDatastore.getDB().getCollection("WeatherInfo");
+        BasicDBObject TripQuery = new BasicDBObject();
+        TripQuery.put("country", city);
+        BasicDBObject fields = new BasicDBObject();
+        fields.put("GoodWeather", 1);
+
+        List<DBObject> trip = weatherInfo.find(TripQuery, fields).sort(new BasicDBObject("$natural", -1)).limit(1).toArray();
+        return  Boolean.valueOf(trip.get(0).get("GoodWeather").toString());
     }
 
     public static boolean isHistoricalWeatherNice(Float lat, Float lon, Integer start, Integer end) throws Exception {
