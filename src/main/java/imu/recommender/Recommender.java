@@ -842,7 +842,7 @@ public class Recommender {
 					AddGraph = Boolean.TRUE;
 				}
 			} else if (strategy.equals("self-monitoring")) {
-				if ((user.getMode_usage_last_week().getWalk_percent() > 0.0 || user.getMode_usage_last_week().getBike_percent() > 0.0 || user.getMode_usage_last_week().getCar_percent() > 0.0 || user.getMode_usage_last_week().getPt_percent() > 0.0 || user.getMode_usage_previous_week().getWalk_percent() > 0.0 || user.getMode_usage_previous_week().getBike_percent() > 0.0 || user.getMode_usage_previous_week().getCar_percent() > 0.0 || user.getMode_usage_previous_week().getPt_percent() > 0.0)) {
+				if ( user.getMode_usage_last_week().getWalk_percent() > 0.0 || user.getMode_usage_last_week().getBike_percent() > 0.0 || user.getMode_usage_last_week().getCar_percent() > 0.0 || user.getMode_usage_last_week().getPt_percent() > 0.0 || user.getMode_usage_previous_week().getWalk_percent() > 0.0 || user.getMode_usage_previous_week().getBike_percent() > 0.0 || user.getMode_usage_previous_week().getCar_percent() > 0.0 || user.getMode_usage_previous_week().getPt_percent() > 0.0) {
 					AddGraph = Boolean.TRUE;
 				}
 			}
@@ -1016,7 +1016,7 @@ public class Recommender {
 		else {
 			logger.debug(request.get(0).get("Timestamp"));
 			String dateString = request.get(0).get("Timestamp").toString();
-			DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.ENGLISH);
+			DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy",Locale.ENGLISH);
 			try {
 				Date date = format.parse(dateString);
 				long milliseconds = abs(date.getTime() - now.getTime());

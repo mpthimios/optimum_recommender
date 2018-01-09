@@ -563,10 +563,10 @@ public class CalculateMessageUtilities {
         BasicDBObject TripQuery = new BasicDBObject();
         TripQuery.put("userId", userId);
         TripQuery.put("body.additionalInfo.additionalProperties.strategy", strategy);
+        TripQuery.put("body.additionalInfo.additionalProperties.messageId",new BasicDBObject("$exists", true));
         BasicDBObject fields = new BasicDBObject();
         fields.put("createdat", 1);
         fields.put("body.additionalInfo.additionalProperties.messageId",1);
-
         List<DBObject> request = routes.find(TripQuery, fields).sort(new BasicDBObject("$natural", -1)).limit(10).toArray();
         List<String> DisplayedMessages = new ArrayList<String>();
 
