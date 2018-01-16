@@ -266,9 +266,10 @@ public class Recommender {
 
 	public void addMessage(User user, Datastore mongoDatastore, Integer N){
 
-		if (check_if_we_need_to_add_message(user,mongoDatastore,N)) {
+		/*if (check_if_we_need_to_add_message(user,mongoDatastore,N)) {
 			selectTargetRouteandAddMessageForUser(user, mongoDatastore);
-		}
+		}*/
+		selectTargetRouteandAddMessageForUser(user, mongoDatastore);
 	}
 	
 	private void rankBasedonBehaviouralModel(List<RouteModel> routes){
@@ -504,7 +505,15 @@ public class Recommender {
 		List<String> contextList = new ArrayList<>();
 		List<String> FinaltargetList = new ArrayList<>();
 		for (int i = 0; i < targetList.size(); i++) {
-			for (RouteModel route : routes) {
+			/*for (Iterator<String> i = someList.iterator(); i.hasNext();) {
+				String item = i.next();
+				System.out.println(item);
+			}*/
+			for (Iterator<RouteModel> routeItem = routes.iterator(); routeItem.hasNext();) {
+				logger.debug("------");
+				logger.debug(routes.size());
+				RouteModel route = routeItem.next();
+				logger.debug(route.getRoute().getAdditionalInfo().get("mode"));
 				if (route.getRoute().getAdditionalInfo().get("mode") == targetList.get(i)) {
 					target = targetList.get(i);
 					try {
@@ -526,7 +535,9 @@ public class Recommender {
 			while (message.isEmpty() && j < FinaltargetList.size() && !SetMessage) {
 				target = FinaltargetList.get(j);
 				rankedRoutes2 = new ArrayList<RouteModel>();
-				for (RouteModel route : routes) {
+				for (Iterator<RouteModel> routeItem = routes.iterator(); routeItem.hasNext();) {
+					//for (RouteModel route : routes) {
+					RouteModel route = routeItem.next();
 					if (route.getRoute().getAdditionalInfo().get("mode") == target && !SetMessage) {
 						try {
 							contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore);
@@ -847,6 +858,7 @@ public class Recommender {
 				}
 			}
 
+			//if (AddGraph.equals(Boolean.TRUE)) {
 			if (check_graph(strategy, mongoDatastore).equals(Boolean.TRUE) && AddGraph.equals(Boolean.TRUE)) {
 
 				String graphTitle = "";
@@ -988,6 +1000,29 @@ public class Recommender {
 				requestPerGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
 				//requestPerGroup.setRequestId();
 				mongoDatastore.save(requestPerGroup);
+				/*ArrayList<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
+				Integer i = 0;
+				for (Iterator<RouteModel> routeItem = routes.iterator(); routeItem.hasNext();) {
+					//for (RouteModel route : routes) {
+					//RouteModel route = routeItem.next();
+					RouteModel route = routes.get(i);
+					logger.debug(i);
+					if (i==2) {
+						route.setMessage(" ");
+						route.setStrategy("");
+						route.setMessageId("");
+
+						//set popup_display false
+						route.setPopup(user.getFeedback(user.getId(),mongoDatastore));
+						logger.debug("-------Feedback----"+user.getFeedback(user.getId(),mongoDatastore));
+
+					}
+					i++;
+					routeItem.next();
+					rankedRoutes2.add(route);
+				}
+				routes.clear();
+				routes = rankedRoutes2;*/
 
 
 			}
@@ -1029,7 +1064,7 @@ public class Recommender {
 		}
 	}
 
-	public Boolean check_if_we_need_to_add_message(User user,Datastore mongoDatastore, Integer N) {
+	/*public Boolean check_if_we_need_to_add_message(User user,Datastore mongoDatastore, Integer N) {
 
 		DBCollection routes = mongoDatastore.getDB().getCollection("UserRoute");
 		BasicDBObject TripQuery = new BasicDBObject();
@@ -1061,7 +1096,7 @@ public class Recommender {
 			return Boolean.TRUE;
 		}
 
-	}
+	}*/
 
 	public String getPurpose() {
 		String purpose = "non-leisure";
