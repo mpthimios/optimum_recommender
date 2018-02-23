@@ -1,5 +1,6 @@
 package imu.recommender.models.message;
 
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 
 /**
@@ -12,6 +13,7 @@ public class MessageThrottling {
     private String messageId;
     private String userId;
     private Integer count;
+    private ObjectId _id;
 
     public MessageThrottling(){
 
@@ -44,4 +46,9 @@ public class MessageThrottling {
     public void setCount(Integer count) {
         this.count = count;
     }
+
+    public ObjectId get_id() {
+        return _id;
+    }
+
 }

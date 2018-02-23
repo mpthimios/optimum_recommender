@@ -70,7 +70,7 @@ public class CalculateMessageUtilities {
         else{
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
-            PWalkGW = 25.0 + (int)Math.round(result * 100)/(double)100;;
+            PWalkGW = 50.0 + (int)Math.round(result * 100)/(double)100;;
             PercentageList.add("PWalkGW");
         }
         if (PBikeGW > GetProperties.getPBikeGW()){
@@ -79,7 +79,7 @@ public class CalculateMessageUtilities {
         else{
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
-            PBikeGW = 25.0 + (int)Math.round(result * 100)/(double)100;;
+            PBikeGW = 50.0 + (int)Math.round(result * 100)/(double)100;;
             PercentageList.add("PBikeGW");
         }
         if (PPtGW > GetProperties.getPPtGW()){
@@ -88,7 +88,7 @@ public class CalculateMessageUtilities {
         else{
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
-            PPtGW = 25.0 + (int)Math.round(result * 100)/(double)100;;
+            PPtGW = 50.0 + (int)Math.round(result * 100)/(double)100;;
             PercentageList.add("PPtGW");
         }
         if (MinWalked > GetProperties.getMinWalked()){
@@ -119,6 +119,7 @@ public class CalculateMessageUtilities {
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
             PWalkSD = 50.0 + (int)Math.round(result * 100)/(double)100;
+            logger.debug(PWalkSD);
             PercentageList.add("PWalkSD");
         }
         if (PBikeSD > GetProperties.getPBikeGW()){
@@ -127,7 +128,9 @@ public class CalculateMessageUtilities {
         else{
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
-            PBikeSD = 50.0 + (int)Math.round(result * 100)/(double)100;;
+            logger.debug(result);
+            PBikeSD = 50.0 + (int) Math.round(result * 100)/(double)100;
+            logger.debug(PBikeSD);
             PercentageList.add("PBikeSD");
         }
         PercentageList.add("no");
@@ -300,9 +303,11 @@ public class CalculateMessageUtilities {
             }
             if ("PWalkSD".equals(selected_message_params)){
                 if(user.getWalkUsageComparedToOthers() > GetProperties.getPWalkGW()) {
+                    logger.debug(user.getWalkUsageComparedToOthers());
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(user.getWalkUsageComparedToOthers())));
                 }
                 else {
+                    logger.debug("----else"+PWalkSD);
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PWalkSD)));
                 }
             }
@@ -626,7 +631,7 @@ public class CalculateMessageUtilities {
 
         String messageId = message.getId();
 
-        DBCollection routes = mongoDatastore.getDB().getCollection("UserRoute");
+        DBCollection routes = mongoDatastore.getDB().getCollection("UserTrip");
         BasicDBObject TripQuery = new BasicDBObject();
         TripQuery.put("userId", user.getId());
         TripQuery.put("body.additionalInfo.additionalProperties.messageId",messageId);
@@ -639,9 +644,10 @@ public class CalculateMessageUtilities {
         DBCursor cursor =routes.find(TripQuery,fields);
         while (cursor.hasNext()) {
             String requestId = cursor.next().get("requestId").toString();
-            System.out.println(cursor.next().get("requestId"));
+            logger.debug(requestId);
             RequestIds.add(requestId);
         }
+        logger.debug(RequestIds);
 
         DBCollection feedback = mongoDatastore.getDB().getCollection("UserRoute");
 
@@ -657,8 +663,11 @@ public class CalculateMessageUtilities {
         FeedbackQuery2.put("userId", user.getId());
         FeedbackQuery2.put("route_feedback.helpful", Boolean.FALSE);
         Integer negativeFeedback = feedback.find(FeedbackQuery2).size();
-
+        logger.debug(negativeFeedback);
+        logger.debug(positiveFeedback);
         Integer no_answer= abs(negativeFeedback - positiveFeedback);
+        logger.debug(no_answer);
+        DBCollection messageThrottlingDb = mongoDatastore.getDB().getCollection("MessageThrottling");
         if (mongoDatastore.createQuery(MessageThrottling.class).field("userId").equal(user.getId()).field("messageId").equal(messageId).asList().isEmpty()) {
             MessageThrottling messageThrottling = new MessageThrottling();
             messageThrottling.setCount(1);
@@ -674,11 +683,14 @@ public class CalculateMessageUtilities {
             if (message_display.equals(0)){
                 count=1;
                 messageThrottling.setCount(count);
+                messageThrottlingDb.update(new BasicDBObject("_id", messageThrottling.get_id()),new BasicDBObject("$set", new BasicDBObject("count", count)));
                 return Boolean.TRUE;
             }
             else {
                 count++;
                 messageThrottling.setCount(count);
+                messageThrottlingDb.update(new BasicDBObject("_id", messageThrottling.get_id()),new BasicDBObject("$set", new BasicDBObject("count", count)));
+                logger.debug(count);
                 return Boolean.FALSE;
             }
         }

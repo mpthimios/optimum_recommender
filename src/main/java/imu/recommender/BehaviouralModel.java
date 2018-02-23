@@ -24,7 +24,8 @@ public class BehaviouralModel {
 		for (int j = 0; j < route.getRoute().getSegments().size(); j++) {
 			RouteSegment segment = route.getRoute().getSegments().get(j);
 			try {
-				segment_cost = (double)segment.getAdditionalInfo().get("estimatedCost");
+				//segment_cost = (double)segment.getAdditionalInfo().get("estimatedCost");
+				segment_cost =  Double.parseDouble(segment.getAdditionalInfo().get("additionalProperties").toString().split("estimatedCost=")[1].split("}")[0]);
 
 			}
 			catch (Exception e){

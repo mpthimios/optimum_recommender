@@ -15,7 +15,7 @@
             <cron>
                 <name>CalculateModeUsePercentages</name>
                 <job-name>CalculateModeUsePercentages</job-name>
-                <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+                <cron-expression>0 0 3 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
@@ -27,7 +27,7 @@
             <cron>
                 <name>CalculateEmissions</name>
                 <job-name>CalculateEmissions</job-name>
-                <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+                <cron-expression>0 0 3 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
@@ -39,7 +39,7 @@
             <cron>
                 <name>UpdateStrategiesProbabilities</name>
                 <job-name>UpdateStrategiesProbabilities</job-name>
-                <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+                <cron-expression>0 0 3 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
@@ -51,7 +51,7 @@
             <cron>
                 <name>CalculateReduceDrivingPercentage</name>
                 <job-name>CalculateReduceDrivingPercentage</job-name>
-                <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+                <cron-expression>0 0 3 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
@@ -64,7 +64,7 @@
             <cron>
                 <name>CalculateModeUsageLastWeek</name>
                 <job-name>CalculateModeUsageLastWeek</job-name>
-                <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+                <cron-expression>0 0 3 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
@@ -91,10 +91,24 @@
             <cron>
                 <name>PersuasiveMessages</name>
                 <job-name>PersuasiveMessages</job-name>
-                <cron-expression>0 0 12 1/1 * ? *</cron-expression>
+                <cron-expression>0 0 3 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
+
+        <job>
+            <name>PredictWorkHomeLocation</name>
+            <job-class>imu.recommender.jobs.PredictWorkHomeLocation</job-class>
+        </job>
+        <trigger>
+            <cron>
+                <name>PredictWorkHomeLocation</name>
+                <job-name>PredictWorkHomeLocation</job-name>
+                <cron-expression>0 0 3 1/1 * ? *</cron-expression>
+                <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
+            </cron>
+        </trigger>
+
 
     </schedule>
 

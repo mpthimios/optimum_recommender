@@ -72,6 +72,14 @@ public class User {
 	private String persuasion;
 	private String group;
 	private Integer count;
+	private Integer total_commuting;
+	private Integer total_leisure;
+
+	private Integer displayed_commuting;
+	private Integer displayed_leisure;
+
+	private String[] predictedHome;
+	private String[] predictedWork;
 
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
@@ -152,6 +160,10 @@ public class User {
 		this.total_activities = 0;
 		this.persuasion = "";
 		this.count = 0;
+		this.total_commuting=0;
+		this.total_leisure=0;
+		this.displayed_commuting=0;
+		this.displayed_leisure=0;
 
 	}
 	
@@ -976,5 +988,53 @@ public class User {
 
 	public void setCount(Integer count) {
 		this.count = count;
+	}
+
+	public Integer getTotal_commuting() {
+		return total_commuting;
+	}
+
+	public void setTotal_commuting(Integer total_commuting) {
+		this.total_commuting = total_commuting;
+	}
+
+	public Integer getTotal_leisure() {
+		return total_leisure;
+	}
+
+	public void setTotal_leisure(Integer total_leisure) {
+		this.total_leisure = total_leisure;
+	}
+
+	public Integer getDisplayed_commuting() {
+		return displayed_commuting;
+	}
+
+	public void setDisplayed_commuting(Integer displayed_commuting) {
+		this.displayed_commuting = displayed_commuting;
+	}
+
+	public Integer getDisplayed_leisure() {
+		return displayed_leisure;
+	}
+
+	public void setDisplayed_leisure(Integer displayed_leisure) {
+		this.displayed_leisure = displayed_leisure;
+	}
+
+	public String[] getPredictedHome() {
+		return predictedHome;
+	}
+
+	public void setPredictedHome(String[] predictedHome) {
+		this.predictedHome = predictedHome;
+	}
+
+	public String[] getPredictedWork() {
+		return predictedWork;
+	}
+
+	public void setPredictedWork(String[] predictedWork) {
+		this.predictedWork = predictedWork;
 	}
 }

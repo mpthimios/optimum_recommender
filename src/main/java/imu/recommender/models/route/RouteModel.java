@@ -178,6 +178,9 @@ public class RouteModel {
 		if ("CAR".equals(travel_mode) ){
 			emissions = ( (double)(distance*110)/1000 );
 		}
+		if ("MOTORHOME".equals(travel_mode) ){
+			emissions = ( (double)(distance*255)/1000 );
+		}
 
 		return emissions;
 
