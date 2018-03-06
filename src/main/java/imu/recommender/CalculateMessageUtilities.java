@@ -88,7 +88,7 @@ public class CalculateMessageUtilities {
         else{
             double random = new Random().nextDouble();
             double result = -0.5 + (random * (0.5 + 0.5));
-            PPtGW = 50.0 + (int)Math.round(result * 100)/(double)100;;
+            PPtGW = 50.0 + (int)Math.round(result * 100)/(double)100;
             PercentageList.add("PPtGW");
         }
         if (MinWalked > GetProperties.getMinWalked()){
@@ -675,21 +675,39 @@ public class CalculateMessageUtilities {
             messageThrottling.setUserId(user.getId());
             mongoDatastore.save(messageThrottling);
         }
+        //messageThrottlingDb.find();
+
+        /*Query<MessageThrottling> query = mongoDatastore.createQuery(MessageThrottling.class);
+        query.and(
+                query.criteria("userId").equal(user.getId()),
+                query.criteria("messageId").equal(messageId));*/
+        BasicDBObject query = new BasicDBObject();
+        query.put("userId", user.getId());
+        query.put("messageId", messageId);
+        BasicDBObject fields1 = new BasicDBObject();
+        fields.put("count", 1);
+        DBObject messageThr = messageThrottlingDb.findOne(query,fields1);
+        logger.debug(messageThr.toString());
+        //Integer count = query.get().getCount();
+        Integer count = Integer.parseInt(messageThr.get("count").toString());
         MessageThrottling messageThrottling = mongoDatastore.createQuery(MessageThrottling.class).field("userId").equal(user.getId()).field("messageId").equal(messageId).get();
-        Integer count = messageThrottling.getCount();
+        //Integer count = messageThrottling.getCount();
         logger.debug(no_answer);
-        if (no_answer>N){
-            Integer message_display= count%(no_answer-(N-1));
+        if (no_answer>0){
+            logger.debug("count"+count);
+            Integer message_display= (count%no_answer);
+            logger.debug("messageDisplay"+message_display);
             if (message_display.equals(0)){
                 count=1;
-                messageThrottling.setCount(count);
+                logger.debug(count);
                 messageThrottlingDb.update(new BasicDBObject("_id", messageThrottling.get_id()),new BasicDBObject("$set", new BasicDBObject("count", count)));
                 return Boolean.TRUE;
             }
             else {
                 count++;
-                messageThrottling.setCount(count);
-                messageThrottlingDb.update(new BasicDBObject("_id", messageThrottling.get_id()),new BasicDBObject("$set", new BasicDBObject("count", count)));
+                logger.debug(count);
+                BasicDBObject mes = new BasicDBObject("userId",user.getId()).append("messageId",messageId);
+                messageThrottlingDb.update(mes,new BasicDBObject("$set", new BasicDBObject("count", count)));
                 logger.debug(count);
                 return Boolean.FALSE;
             }

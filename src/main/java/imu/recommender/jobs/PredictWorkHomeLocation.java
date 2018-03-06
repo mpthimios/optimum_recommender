@@ -95,6 +95,8 @@ public class PredictWorkHomeLocation implements Job {
                 ArrayList<Integer> locationIds = new ArrayList<Integer>();
                 ArrayList<String> locationlat = new ArrayList<String>();
                 ArrayList<String> locationlong = new ArrayList<String>();
+                Integer maxWorkVisits=0;
+                Integer maxHomeVisits=0;
 
                 JSONArray sortedJsonArray = new JSONArray();
 
@@ -107,12 +109,12 @@ public class PredictWorkHomeLocation implements Job {
 
                     @Override
                     public int compare(JSONObject a, JSONObject b) {
-                        String valA = new String();
-                        String valB = new String();
+                        Integer valA = 0;
+                        Integer valB = 0;
 
                         try {
-                            valA = (String) a.get(KEY_NAME).toString();
-                            valB = (String) b.get(KEY_NAME).toString();
+                            valA = (Integer) Integer.parseInt(a.get(KEY_NAME).toString());
+                            valB = (Integer) Integer.parseInt(b.get(KEY_NAME).toString());
                         }
                         catch (JSONException e) {
                             //do something
@@ -137,8 +139,8 @@ public class PredictWorkHomeLocation implements Job {
                     else{
                         limit=1;
                     }
-
-                    for (int i = 0; i < limit; i++) {
+                    //limit
+                    for (int i = 0; i < sortedJsonArray.length(); i++) {
 
                         JSONObject object = sortedJsonArray.getJSONObject(i);
                         Integer locationId = Integer.parseInt(object.get("location_id").toString());
@@ -169,6 +171,7 @@ public class PredictWorkHomeLocation implements Job {
                         con2.setRequestProperty("location_id",locationIds.get(i).toString());
                         //String urlParameters = "location_id="+locationIds.get(i).toString();
                         //con2.setRequestProperty("urlParameters", urlParameters);
+                        logger.debug("location"+locationIds.get(i).toString());
 
                         int responseCode2 = con2.getResponseCode();
                         logger.debug("\nSending 'GET' request to URL : " + VisitByHoursUrl);
@@ -190,23 +193,52 @@ public class PredictWorkHomeLocation implements Job {
                         Integer total_daily_visits=0;
 
                         for (int j = 0; j < jsonObj2.length(); j++) {
-                            JSONObject object2 = jsonObj2.getJSONObject(i);
+                            JSONObject object2 = jsonObj2.getJSONObject(j);
+                            //logger.debug(object2);
                             Integer day_of_week = Integer.parseInt(object2.get("day_of_week").toString());
                             Integer hour_of_day = Integer.parseInt(object2.get("hour_of_day").toString());
                             Integer visit_count = Integer.parseInt(object2.get("visit_count").toString());
 
-                            if (day_of_week<5 && hour_of_day<7 && hour_of_day>22){
+                            if (day_of_week<5 && (hour_of_day<9 || hour_of_day>17)){
                                 total_visits=total_visits+visit_count;
                             }
 
-                            if (day_of_week<5 && hour_of_day>7 && hour_of_day<18){
+                            if (day_of_week<5 && (hour_of_day>9 || hour_of_day<17)){
                                 total_daily_visits=total_daily_visits+visit_count;
                             }
 
                         }
                         logger.debug(total_daily_visits);
                         logger.debug(total_visits);
-                        if (total_daily_visits > 5){
+                        if (total_daily_visits>total_visits){
+                            //work place
+                            if(total_daily_visits>maxWorkVisits){
+                                maxWorkVisits=total_daily_visits;
+                                String[] WorkLocation = {
+                                        locationlat.get(i),
+                                        locationlong.get(i)
+                                };
+                                Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
+                                UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("predictedWork", WorkLocation);
+                                mongoDatastore.update(query, ops);
+                                logger.debug(total_daily_visits+"----work---");
+                            }
+                        }
+                        else {
+                            //home place
+                            if(total_visits>maxHomeVisits) {
+                                maxHomeVisits = total_visits;
+                                String[] HomeLocation = {
+                                        locationlat.get(i),
+                                        locationlong.get(i)
+                                };
+                                Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
+                                UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("predictedHome", HomeLocation);
+                                mongoDatastore.update(query, ops);
+                                logger.debug(total_visits+"----home---");
+                            }
+                        }
+                        /*if (total_daily_visits > 5){
                             //work
                             String[] location = {
                                     locationlat.get(i),
@@ -231,7 +263,7 @@ public class PredictWorkHomeLocation implements Job {
                             mongoDatastore.update(query, ops);
                             logger.debug("--home");
 
-                        }
+                        }*/
                     }
                 }
 
@@ -243,6 +275,25 @@ public class PredictWorkHomeLocation implements Job {
 
 
         }
+    }
+
+    public static double Distance( double lat1,double lat2, double lon1, double lon2, double el1, double el2) {
+
+        final int R = 6371; // Radius of the earth
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+
+        double height = el1 - el2;
+
+        distance = Math.pow(distance, 2) + Math.pow(height, 2);
+
+        return Math.sqrt(distance);
     }
 
 }
