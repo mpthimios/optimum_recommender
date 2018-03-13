@@ -186,6 +186,36 @@ public class RouteModel {
 
 	}
 
+	public Integer calculateWalkingDuration(){
+		int total_walk_time = 0;
+		for (RouteSegment segment :  this.route.getSegments()){
+			if ("FOOT".equals(segment.getModeOfTransport().getGeneralizedType().toString()) ){
+				total_walk_time = total_walk_time + segment.getDurationSeconds();
+			}
+		}
+		return total_walk_time/60;
+	}
+
+	public Integer calculateBikeDuration(){
+		int total_bike_time = 0;
+		for (RouteSegment segment :  this.route.getSegments()){
+			if ("BICYCLE".equals(segment.getModeOfTransport().getGeneralizedType().toString()) ){
+				total_bike_time = total_bike_time + segment.getDurationSeconds();
+			}
+		}
+		return total_bike_time/60;
+	}
+
+	public Integer calculatePtDuration(){
+		int total_pt_time = 0;
+		for (RouteSegment segment :  this.route.getSegments()){
+			if ("PUBLIC_TRANSPORT".equals(segment.getModeOfTransport().getGeneralizedType().toString()) ){
+				total_pt_time = total_pt_time + segment.getDurationSeconds();
+			}
+		}
+		return total_pt_time/60;
+	}
+
 	public Route getRoute() {
 		return route;
 	}

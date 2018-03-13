@@ -20,13 +20,14 @@ public class Context {
 
     public static final Logger logger = Logger.getLogger(Context.class);
 
-    public static List<String> getRelevantContextForUser(Recommender route, RouteModel trip, User user, Datastore mongoDatastore) throws Exception {
+    public static List<String> getRelevantContextForUser(Recommender route, RouteModel trip, User user, Datastore mongoDatastore, Double rewardPoints) throws Exception {
 
     	String Duration = "Duration";
         String TooManyCarRoutes = "TooManyCarRoutes";       
         String NiceWeather = "NiceWeather";
         String TooManyTransportRoutes = "TooManyTransportRoutes";
         String emissionsIncreasing = "emissionsIncreasing";
+        String ReachingPrizeTarget = "ReachingPrizeTarget";
 
         //Get trip properties
         Integer routeDistance = trip.getRoute().getDistanceMeters();
@@ -74,6 +75,12 @@ public class Context {
                 contextList.add(TooManyTransportRoutes);
             }
         }
+
+        //Check if the distance of route is walking
+        if (CheckReachingPrizeTarget(user, rewardPoints)){
+            contextList.add("ReachingTarget");
+        }
+
 
         //Check if the distance of route is walking
         if (withinWalkingDistance(routeDistance)) {
@@ -202,5 +209,98 @@ public class Context {
 
         }
         return cartrip;
+    }
+    public static boolean CheckReachingPrizeTarget(User user, Double rewardPoints) {
+        try {
+            String city = user.getPilot();
+            //Get user points
+            Double points = user.getPoints();
+            if (city.equals("BRI")) {
+                if (points < 1140) {
+                    if (points + rewardPoints > 1140.0) {
+                        return Boolean.TRUE;
+                    } else {
+                        return Boolean.FALSE;
+                    }
+
+                } else if (points > 1140 && points < 2280) {
+                    if (points + rewardPoints > 2280) {
+                        return Boolean.TRUE;
+                    } else {
+                        return Boolean.FALSE;
+                    }
+                } else if (points >= 2280) {
+                    Double new_points = points - 2280;
+                    while (new_points > 2280) {
+                        new_points = new_points - 2280;
+                    }
+                    if (new_points < 1140) {
+                        if (new_points + rewardPoints > 1140) {
+                            return Boolean.TRUE;
+                        } else {
+                            return Boolean.FALSE;
+                        }
+
+                    } else if (new_points > 1140 && new_points < 2280) {
+                        if (new_points + rewardPoints > 2280) {
+                            return Boolean.TRUE;
+                        } else {
+                            return Boolean.FALSE;
+                        }
+                    }
+                    else {
+                        return Boolean.FALSE;
+                    }
+                }
+                else {
+                    return Boolean.FALSE;
+                }
+
+            }
+            else if (city.equals("LJU")) {
+                if (points<7400) {
+                    if (points + rewardPoints > 7400) {
+                        return Boolean.TRUE;
+                    } else {
+                        return Boolean.FALSE;
+                    }
+                }else{
+                    Double new_points = points - 7400;
+                    while (new_points > 7400) {
+                        new_points=new_points-7400;
+                    }
+                    if (new_points + rewardPoints > 7400) {
+                        return Boolean.TRUE;
+                    } else {
+                        return Boolean.FALSE;
+                    }
+                }
+            }
+            else if (city.equals("VIE")) {
+                if (points<1000) {
+                    if (points + rewardPoints > 1000 ) {
+                        return Boolean.TRUE;
+                    } else {
+                        return Boolean.FALSE;
+                    }
+                }else{
+                    Double new_points = points - 1000;
+                    while (new_points > 1000) {
+                        new_points=new_points-1000;
+                    }
+                    if (new_points + rewardPoints >1000) {
+                        return Boolean.TRUE;
+                    } else {
+                        return Boolean.FALSE;
+                    }
+                }
+            }
+            else {
+                return Boolean.FALSE;
+            }
+        } catch (Exception e) {
+            return Boolean.FALSE;
+        }
+
     }
 }

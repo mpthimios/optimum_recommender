@@ -25,7 +25,7 @@ public class CalculateMessageUtilities {
 
 	private static Logger logger = Logger.getLogger(CalculateMessageUtilities.class);
 
-    public static String calculateForUser(List<String> contextList, User user, String target, Datastore mongoDatastore) throws Exception {
+    public static String calculateForUser(List<String> contextList, User user, String target, Datastore mongoDatastore, double RewardPoints) throws Exception {
 
         //Get personality of user
         String personality = user.getUserPersonalityType(user.getId(), mongoDatastore);
@@ -34,6 +34,7 @@ public class CalculateMessageUtilities {
         String strategy = strategies.get(0);
         //Get user language
         String lang = user.getLanguage();
+
 
         //Get the id of the displayed messages during last X hours
         List<String> DisplayedMessages = get_presented_messages(user.getId(),strategy, mongoDatastore);
@@ -60,6 +61,16 @@ public class CalculateMessageUtilities {
         double PBikeSD = user.getBikeUsageComparedToOthers();
 
         //Initialize all percentage values in order to solve the cold start  problem
+
+        //Get user reward points
+        Double points = user.getPoints();
+        if (RewardPoints>0.0){
+            PercentageList.add("points");
+        }
+
+        if (contextList.contains("ReachingTarget")){
+            PercentageList.add("prize");
+        }
 
         if (PCar > GetProperties.getPCar()){
             PercentageList.add("PCar");
@@ -319,6 +330,28 @@ public class CalculateMessageUtilities {
                     selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(PBikeSD)));
                 }
             }
+            if ("points".equals(selected_message_params)){
+                selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(RewardPoints)));
+            }
+            if ("prize".equals(selected_message_params)){
+                if (points < 1140){
+                    selected_message_text = selected_message_text.replace("X", "shopping voucher of 5£");
+                }
+                else if (points > 1140 && points < 2280){
+                    selected_message_text = selected_message_text.replace("X", "swift card of 10£");
+                }
+                else if (points > 2280){
+                    Double new_points = points - 2280;
+                    while (new_points > 2280) {
+                        new_points = new_points - 2280;
+                    }
+                    if (new_points < 1140) {
+                        selected_message_text = selected_message_text.replace("X", "shopping voucher of 5£");
+                    } else if (new_points > 1140 && new_points < 2280) {
+                        selected_message_text = selected_message_text.replace("X", "swift card of 10£");
+                    }
+                }
+            }
         }
 
         logger.debug(selected_message_text);
@@ -381,6 +414,18 @@ public class CalculateMessageUtilities {
                 user_attempts = user_attempts + 1;
                 mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", user_attempts));
             }
+            if (strategy.equals("reward") ) {
+                try {
+                    user_attempts = userQuery.get().getRewAttempts();
+                }
+                catch (Exception e){
+                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("rewAttempts", 0));
+                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("rewSuccess", 0));
+                    user_attempts = userQuery.get().getSelfAttempts();
+                }
+                user_attempts = user_attempts + 1;
+                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("rewAttempts", user_attempts));
+            }
             selected_message_text = selected_message_text + "_" +strategy+ "_" +selectedMessageId;
             return selected_message_text;
 
@@ -405,41 +450,48 @@ public class CalculateMessageUtilities {
         String NiceWeather = "NiceWeather";
         String TooManyTransportRoutes = "TooManyTransportRoutes";
         String emissionsIncreasing = "emissionsIncreasing";
+        String ReachingPrizeTarget = "ReachingTarget";
 
 
         if ("walk".equals(mode)) {
             if (user.tooManyCarRoutes()) {
                 if (WalkDistance.equals(context)) {
-                    utility = 0.4218;
+                    utility = 0.3515;
                 }
                 if (Duration.equals(context)) {
-                    utility = 0.3228;
+                    utility = 0.2382;
                 }
                 if (TooManyCarRoutes.equals(context)) {
-                    utility = 0.0456;
+                    utility = 0.0389;
                 }
                 if (EmissionComparetoOthers.equals(context)) {
-                    utility = 0.0777;
+                    utility = 0.0625;
                 }
                 if (NiceWeather.equals(context)) {
-                    utility = 0.1321;
+                    utility = 0.1011;
+                }
+                if (ReachingPrizeTarget.equals(context)) {
+                    utility = 0.2081;
                 }
             }
             if (user.tooManyPublicTransportRoutes()) {
                 if (WalkDistance.equals(context)) {
-                    utility = 0.4074;
+                    utility = 0.3324;
                 }
                 if (Duration.equals(context)) {
-                    utility = 0.3157;
+                    utility = 0.2343;
                 }
                 if (TooManyTransportRoutes.equals(context)) {
-                    utility = 0.0353;
+                    utility = 0.0344;
                 }
                 if (EmissionComparetoOthers.equals(context)) {
-                    utility = 0.0776;
+                    utility = 0.0621;
                 }
                 if (NiceWeather.equals(context)) {
-                    utility = 0.164;
+                    utility = 0.1123;
+                }
+                if (ReachingPrizeTarget.equals(context)) {
+                    utility = 0.2245;
                 }
             } else {
                 if (WalkDistance.equals(context)) {
@@ -452,6 +504,9 @@ public class CalculateMessageUtilities {
                     utility = 0.1;
                 }
                 if (NiceWeather.equals(context)) {
+                    utility = 0.1;
+                }
+                if (ReachingPrizeTarget.equals(context)) {
                     utility = 0.1;
                 }
 
@@ -460,19 +515,22 @@ public class CalculateMessageUtilities {
         else if ("bicycle".equals(mode) || "bikeSharing".equals(mode)) {
             if (user.tooManyCarRoutes()) {
                 if (BikeDistance.equals(context)) {
-                    utility = 0.422;
+                    utility = 0.3512;
                 }
                 if (Duration.equals(context)) {
-                    utility = 0.3228;
+                    utility = 0.2382;
                 }
                 if (TooManyCarRoutes.equals(context)) {
-                    utility = 0.0456;
+                    utility = 0.0389;
                 }
                 if (EmissionComparetoOthers.equals(context)) {
-                    utility = 0.0777;
+                    utility = 0.0625;
                 }
                 if (NiceWeather.equals(context)) {
-                    utility = 0.1321;
+                    utility = 0.1011;
+                }
+                if (ReachingPrizeTarget.equals(context)) {
+                    utility = 0.2081;
                 }
             }
             if (user.tooManyPublicTransportRoutes()) {
@@ -491,18 +549,24 @@ public class CalculateMessageUtilities {
                 if (NiceWeather.equals(context)) {
                     utility = 0.164;
                 }
+                if (ReachingPrizeTarget.equals(context)) {
+                    utility = 0.2245;
+                }
             } else {
                 if (BikeDistance.equals(context)) {
                     utility = 0.4;
                 }
                 if (Duration.equals(context)) {
-                    utility = 0.3;
+                    utility = 0.1;
                 }
                 if (EmissionComparetoOthers.equals(context)) {
                     utility = 0.1;
                 }
                 if (NiceWeather.equals(context)) {
-                    utility = 0.2;
+                    utility = 0.1;
+                }
+                if (ReachingPrizeTarget.equals(context)) {
+                    utility = 0.3;
                 }
 
             }
@@ -510,30 +574,36 @@ public class CalculateMessageUtilities {
         else if("bike&ride".equals(mode)) {
             if (user.tooManyCarRoutes()) {
                 if (Duration.equals(context)) {
-                    utility = 0.5152;
+                    utility = 0.4376;
                 }
                 if (TooManyCarRoutes.equals(context)) {
-                    utility = 0.0901;
+                    utility = 0.0557;
                 }
                 if (EmissionComparetoOthers.equals(context)) {
-                    utility = 0.179;
+                    utility = 0.1282;
                 }
                 if (NiceWeather.equals(context)) {
-                    utility = 0.2157;
+                    utility = 0.2043;
+                }
+                if (ReachingPrizeTarget.equals(context)) {
+                    utility = 0.1742;
                 }
             }
             if (user.tooManyPublicTransportRoutes()) {
                 if (Duration.equals(context)) {
-                    utility = 0.5193;
+                    utility = 0.4385;
                 }
-                if (TooManyCarRoutes.equals(context)) {
-                    utility = 0.049;
+                if (TooManyTransportRoutes.equals(context)) {
+                    utility = 0.0296;
                 }
                 if (EmissionComparetoOthers.equals(context)) {
-                    utility = 0.1958;
+                    utility = 0.1334;
                 }
                 if (NiceWeather.equals(context)) {
-                    utility = 0.2359;
+                    utility = 0.2243;
+                }
+                if (ReachingPrizeTarget.equals(context)) {
+                    utility = 0.1742;
                 }
             } else {
                 if (BikeDistance.equals(context)) {
@@ -548,35 +618,44 @@ public class CalculateMessageUtilities {
                 if (NiceWeather.equals(context)) {
                     utility = 0.1321;
                 }
+                if (ReachingPrizeTarget.equals(context)) {
+                    utility = 0.1;
+                }
             }
         }
         else if ("pt".equals(mode)) {
             if (Duration.equals(context)) {
-                utility = 0.5125;
+                utility = 0.4323;
             }
             if (emissionsIncreasing.equals(context)) {
-                utility = 0.315;
+                utility = 0.1935;
             }
             if (NiceWeather.equals(context)) {
-                utility = 0.0775;
+                utility = 0.0361;
             }
             if (TooManyCarRoutes.equals(context)) {
-                utility = 0.0949;
+                utility = 0.0845;
+            }
+            if (ReachingPrizeTarget.equals(context)) {
+                utility = 0.2536;
             }
 
         }
         else if ("park&ride".equals(mode)){
             if (Duration.equals(context)) {
-                utility = 0.5152;
+                utility = 0.4376;
             }
             if (EmissionComparetoOthers.equals(context)) {
-                utility = 0.179;
+                utility = 0.1282;
             }
             if (NiceWeather.equals(context)) {
-                utility = 0.2157;
+                utility = 0.2043;
             }
             if (TooManyCarRoutes.equals(context)) {
-                utility = 0.0901;
+                utility = 0.0557;
+            }
+            if (ReachingPrizeTarget.equals(context)) {
+                utility = 0.1742;
             }
         }
 
@@ -714,6 +793,61 @@ public class CalculateMessageUtilities {
         }
         else {
             return Boolean.TRUE;
+        }
+
+    }
+
+    public Double GetRemainingPoints(User user) {
+        try {
+            String city = user.getPilot();
+            Double new_points=0.0;
+            //Get user points
+            Double points = user.getPoints();
+            if (city.equals("BRI")) {
+                if (points < 1140) {
+                    new_points = 1140.0- points;
+                    }
+
+                } else if (points > 1140 && points < 2280) {
+                    new_points=2280.0-points;
+                } else if (points >= 2280) {
+                new_points = points - 2280.0;
+                while (new_points > 2280) {
+                    new_points = new_points - 2280;
+                }
+                if (new_points < 1140) {
+                    new_points = 1140.0-new_points;
+
+                } else if (new_points > 1140 && new_points < 2280) {
+                    new_points = 2280.0-new_points;
+                }
+            }
+            else if (city.equals("LJU")) {
+                if (points<7400) {
+                    new_points = 7400.0-points;
+                }else{
+                    new_points = points - 7400.0;
+                    while (new_points > 7400) {
+                        new_points=new_points-7400;
+                    }
+                    new_points = 7400-new_points;
+                }
+            }
+            else if (city.equals("VIE")) {
+                if (points<1000) {
+                    new_points = 1000.0 - points;
+                    }
+                }else{
+                    new_points = points - 1000.0;
+                    while (new_points > 1000) {
+                        new_points=new_points-1000;
+                    }
+                    new_points = 1000 - new_points;
+
+                }
+            return new_points;
+        } catch (Exception e) {
+            return 0.0;
         }
 
     }

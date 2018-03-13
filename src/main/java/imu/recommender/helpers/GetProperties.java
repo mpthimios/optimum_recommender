@@ -54,6 +54,11 @@ public class GetProperties implements ServletContextListener {
     private static Boolean TestGraphs;
     private static String client_id;
     private static String client_secret;
+    private static double RewEx;
+    private static double RewAg;
+    private static double RewCons;
+    private static double RewN;
+    private static double RewOp;
 
     public static double getPCar() {
         return PCar;
@@ -173,6 +178,46 @@ public class GetProperties implements ServletContextListener {
 
     public static void setClient_secret(String client_secret) {
         GetProperties.client_secret = client_secret;
+    }
+
+    public static double getRewEx() {
+        return RewEx;
+    }
+
+    public static void setRewEx(double rewEx) {
+        RewEx = rewEx;
+    }
+
+    public static double getRewAg() {
+        return RewAg;
+    }
+
+    public static void setRewAg(double rewAg) {
+        RewAg = rewAg;
+    }
+
+    public static double getRewCons() {
+        return RewCons;
+    }
+
+    public static void setRewCons(double rewCons) {
+        RewCons = rewCons;
+    }
+
+    public static double getRewN() {
+        return RewN;
+    }
+
+    public static void setRewN(double rewN) {
+        RewN = rewN;
+    }
+
+    public static double getRewOp() {
+        return RewOp;
+    }
+
+    public static void setRewOp(double rewOp) {
+        RewOp = rewOp;
     }
 
     public String getUsernameValues() throws IOException {
@@ -371,6 +416,26 @@ public class GetProperties implements ServletContextListener {
             String client_secret = sc.getInitParameter("client_secret");
             logger.debug("client_secret: " + client_secret);
             GetProperties.client_secret = String.valueOf (client_secret);
+
+            String RewEx = sc.getInitParameter("RewEx");
+            logger.debug("RewEx: " + RewEx);
+            GetProperties.RewEx = Double.parseDouble(RewEx);
+
+            String RewAg = sc.getInitParameter("RewAg");
+            logger.debug("RewAg: " + RewAg);
+            GetProperties.RewAg = Double.parseDouble(RewAg);
+
+            String RewCons = sc.getInitParameter("RewCons");
+            logger.debug("RewCons: " + RewCons);
+            GetProperties.RewCons = Double.parseDouble(RewCons);
+
+            String RewN = sc.getInitParameter("RewN");
+            logger.debug("RewN: " + RewN);
+            GetProperties.RewN = Double.parseDouble(RewN);
+
+            String RewOp = sc.getInitParameter("RewOp");
+            logger.debug("RewOp: " + RewOp);
+            GetProperties.RewOp = Double.parseDouble(RewOp);
 
         }
 		catch (Exception e){

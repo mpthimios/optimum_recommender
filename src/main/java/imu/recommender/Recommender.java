@@ -370,6 +370,8 @@ public class Recommender {
 			int ManyPT = boolToInt(user.tooManyPublicTransportRoutes());
 			int ManyCar = boolToInt(user.tooManyCarRoutes());
 			int Emissions = boolToInt(user.emissionsIncreasing());
+			Double rewardPoints = calculatePoints(route, user);
+			int ReachingPriceTarget = boolToInt(Context.CheckReachingPrizeTarget(user, rewardPoints));
 			//double NiceWeather = boolToDouble(WeatherInfo.isWeatherNice(lat, lon, city))
 			double NiceWeather = 1.0;
 			double Duration = 0.0;
@@ -381,13 +383,13 @@ public class Recommender {
 			switch (mode) {
 				case (int)RecommenderModes.WALK:
 					if (ManyCar == 1){
-						context_utility = ( 0.4218*WalkDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
+						context_utility = ( 0.3512*WalkDistance + 0.2382*Duration + 0.0389*ManyCar + 0.0625*Emissions +0.1011*NiceWeather +0.2081*ReachingPriceTarget)/6.0;
 					}
 					else if (ManyPT == 1){
-						context_utility = ( 0.4074*WalkDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
+						context_utility = ( 0.3324*WalkDistance + 0.2343*Duration + 0.0344*ManyPT + 0.0621*Emissions +0.1123*NiceWeather+ 0.2245*ReachingPriceTarget)/6.0;
 					}
 					else {
-						context_utility = ( 0.4*WalkDistance + 0.3*Duration + 0.1*Emissions +0.2*NiceWeather)/4.0;
+						context_utility = ( 0.4*WalkDistance + 0.3*Duration + 0.1*Emissions +0.1*NiceWeather+ 0.1*ReachingPriceTarget)/5.0;
 					}
 					emissions_utility = 0.0;
 					utility = (context_utility + (1-emissions_utility) )/2;
@@ -397,13 +399,13 @@ public class Recommender {
 				case (int)RecommenderModes.BICYCLE:
 				case (int)RecommenderModes.BIKE_SHARING:					
 					if (ManyCar == 1){
-						context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0456*ManyCar + 0.0777*Emissions +0.1321*NiceWeather)/5.0;
+						context_utility = ( 0.3512*BikeDistance + 0.2382*Duration + 0.0389*ManyCar + 0.0625*Emissions +0.1011*NiceWeather+0.2081*ReachingPriceTarget)/6.0;
 					}
 					else if (ManyPT == 1){
-						context_utility = ( 0.4074*BikeDistance + 0.3157*Duration + 0.0353*ManyPT + 0.0776*Emissions +0.164*NiceWeather)/5.0;
+						context_utility = ( 0.3324*BikeDistance + 0.2343*Duration + 0.0344*ManyPT + 0.0621*Emissions +0.1123*NiceWeather+0.2245*ReachingPriceTarget)/6.0;
 					}
 					else {
-						context_utility = ( 0.4*BikeDistance + 0.3*Duration + 0.1*Emissions +0.2*NiceWeather)/4.0;
+						context_utility = ( 0.4*BikeDistance + 0.3*Duration + 0.1*Emissions +0.1*NiceWeather+ 0.1*ReachingPriceTarget)/5.0;
 					}
 					emissions_utility = 0.0;
 					utility = (context_utility + (1-emissions_utility) )/2;					
@@ -411,13 +413,13 @@ public class Recommender {
 					break;
 				case (int)RecommenderModes.BIKE_AND_RIDE:
 					if (ManyCar == 1) {
-						context_utility = (0.0901 * ManyCar + 0.5152 * Duration + 0.179 * Emissions + 0.2157 * NiceWeather) / 4.0;
+						context_utility = (0.0557 * ManyCar + 0.4376 * Duration + 0.1282 * Emissions + 0.2043 * NiceWeather+0.1742*ReachingPriceTarget) / 5.0;
 					}
 					else if (ManyPT == 1) {
-						context_utility = (0.049 * ManyCar + 0.5193 * Duration + 0.1958 * Emissions + 0.2359 * NiceWeather) / 4.0;
+						context_utility = (0.0296 * ManyPT + 0.4385 * Duration + 0.1334 * Emissions + 0.2243 * NiceWeather+0.1742*ReachingPriceTarget) / 5.0;
 					}
 					else{
-						context_utility = ( 0.422*BikeDistance + 0.3228*Duration + 0.0777*Emissions +0.1321*NiceWeather)/4.0;
+						context_utility = ( 0.4*BikeDistance + 0.3*Duration + 0.1*Emissions +0.1*NiceWeather + 0.1*ReachingPriceTarget)/5.0;
 					}
 					emissions_utility = route.getEmissions()/maxEmissions;
 					utility = (context_utility + (1-emissions_utility) )/2;
@@ -425,7 +427,7 @@ public class Recommender {
 					rankedRoutesMap.put(route, utility);
 					break;
 				case (int)RecommenderModes.PUBLIC_TRANSPORT:
-					context_utility = ( 0.5125*Duration + 0.0949*ManyCar + 0.315*Emissions +0.0775*NiceWeather)/4.0;
+					context_utility = ( 0.4323*Duration + 0.0845*ManyCar + 0.1935*Emissions +0.0361*NiceWeather+25.36*ReachingPriceTarget)/5.0;
 					emissions_utility = route.getEmissions()/maxEmissions;
 					utility = (context_utility + (1-emissions_utility) )/2;
 					//rankedRoutesMap.put( RecommenderModes.PUBLIC_TRANSPORT, utility);
@@ -433,7 +435,7 @@ public class Recommender {
 					break;
 				case (int)RecommenderModes.PARK_AND_RIDE:
 				case (int)RecommenderModes.PARK_AND_RIDE_WITH_BIKE:
-					context_utility = ( 0.5152*Duration + 0.0901*ManyCar + 0.179*Emissions +0.2157*NiceWeather)/4.0;
+					context_utility = ( 0.4376*Duration + 0.05571*ManyCar + 0.1282*Emissions +0.2043*NiceWeather+0.1742*ReachingPriceTarget)/5.0;
 					emissions_utility = route.getEmissions()/maxEmissions;
 					utility = (context_utility + (1-emissions_utility) )/2;
 					//rankedRoutesMap.put( RecommenderModes.PARK_AND_RIDE, utility);
@@ -534,7 +536,8 @@ public class Recommender {
 				if (route.getRoute().getAdditionalInfo().get("mode") == targetList.get(i)) {
 					target = targetList.get(i);
 					try {
-						contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore);
+						Double rewardPoints = calculatePoints(route, user);
+						contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore, rewardPoints);
 					} catch (Exception e) {
 						logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 					}
@@ -557,8 +560,10 @@ public class Recommender {
 					RouteModel route = routeItem.next();
 					if (route.getRoute().getAdditionalInfo().get("mode") == target && !SetMessage) {
 						try {
-							contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore);
-							mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore);
+							Double rewardPoints = calculatePoints(route, user);
+							logger.debug("reward points"+rewardPoints);
+							contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore, rewardPoints);
+							mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore, rewardPoints);
 							message = mes.split("_")[0];
 							strategy = mes.split("_")[1];
 							messageId = mes.split("_")[2];
@@ -843,8 +848,11 @@ public class Recommender {
 				//Get the most convincing persuasive strategy
 				List<String> strategies = user.getBestPersuasiveStrategy(personality);
 				strategy = strategies.get(0);
-				if (strategy.equals("suggestion")) {
+				if (strategy.equals("suggestion") || strategy.equals("reward")) {
 					strategy = strategies.get(1);
+					if (strategy.equals("suggestion") || strategy.equals("reward")) {
+						strategy = strategies.get(2);
+					}
 				}
 
 			} catch (UnknownHostException e) {
@@ -1411,6 +1419,30 @@ public class Recommender {
 		}
 
 		return purpose;
+	}
+
+	public Double calculatePoints(RouteModel route,User user){
+		Double rewardPoints=0.0;
+		String pilot = user.getPilot();
+
+		if (pilot==null){
+			return rewardPoints;
+		}
+		Integer bikeTime = route.calculateBikeDuration();
+		Integer PtTime = route.calculatePtDuration();
+		Integer walkTime = route.calculateWalkingDuration();
+		if(pilot.equals("VIE")){
+			rewardPoints = 1.25*PtTime+2.5*bikeTime+2.5*walkTime;
+		}
+		if(pilot.equals("LJU")){
+			rewardPoints = 3.0*PtTime+6.0*bikeTime+6.0*walkTime;
+		}
+		if(pilot.equals("BRI")){
+			rewardPoints = 2.0*PtTime+4.0*bikeTime+4.0*walkTime;
+		}
+		logger.debug(rewardPoints);
+		return rewardPoints;
+
 	}
 
 

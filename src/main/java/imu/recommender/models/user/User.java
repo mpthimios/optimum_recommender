@@ -7,6 +7,8 @@ import imu.recommender.helpers.GetProperties;
 import imu.recommender.helpers.MongoConnectionHelper;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
@@ -14,6 +16,12 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -54,12 +62,15 @@ public class User {
 	private  double sugProb;
 	private  double compProb;
 	private  double selfProb;
+	private double rewProb;
 	private Integer sugSuccess;
 	private Integer compSuccess;
 	private Integer selfSuccess;
+	private Integer rewSuccess;
 	private Integer sugAttempts;
 	private Integer compAttempts;
 	private Integer selfAttempts;
+	private Integer rewAttempts;
 	private  double MinWalked;
 	private double MinBiked;
 	private double MinPT;
@@ -80,6 +91,8 @@ public class User {
 
 	private String[] predictedHome;
 	private String[] predictedWork;
+
+	private String pilot;
 
 
 	private ArrayList<OwnedVehicle> owned_vehicles;
@@ -147,6 +160,9 @@ public class User {
 		this.selfProb = 0.0;
 		this.selfAttempts = 0;
 		this.selfSuccess = 0;
+		this.rewProb =0.0;
+		this.rewAttempts = 0;
+		this.rewSuccess= 0;
 		this.MinWalked = 0.0;
 		this.MinPT = 0.0;
 		this.MinDrived = 0.0;
@@ -603,87 +619,101 @@ public class User {
 		Double Suggestion = 0.0;
 		Double Comparison = 0.0;
 		Double SelfMonitoring = 0.0;
+		Double Reward = 0.0;
 
 		Double UserSug;
 		Double UserComp;
 		Double UserSelf;
+		Double UserRew;
 
 		try {
 			UserSug = this.sugProb;
 			UserComp = this.compProb;
 			UserSelf = this.selfProb;
+			UserRew = this.rewProb;
 
 		} catch (Exception e) {
 			UserSug = 0.0;
 			UserComp = 0.0;
 			UserSelf = 0.0;
+			UserRew = 0.0;
 			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 		}
 
 		String strategy = "";
 		switch (personality) {
 			case "Extraversion":
-				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0)) {
+				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0) & valueEquals(UserRew, 0.0)) {
 					Suggestion = GetProperties.getSugEx();
 					Comparison = GetProperties.getCompEx();
 					SelfMonitoring = GetProperties.getSelfEx();
+					Reward = GetProperties.getRewEx();
 
 				} else {
 					Suggestion = UserSug;
 					Comparison = UserComp;
 					SelfMonitoring = UserSelf;
+					Reward = UserRew;
 				}
 				break;
 			case "Agreeableness":
 
-				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0)) {
+				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0) & valueEquals(UserRew, 0.0)) {
 					Suggestion = GetProperties.getSugAg();
 					Comparison = GetProperties.getCompAg();
 					SelfMonitoring = GetProperties.getSelfAg();
+					Reward = GetProperties.getRewAg();
 
 				} else {
 					Suggestion = UserSug;
 					Comparison = UserComp;
 					SelfMonitoring = UserSelf;
+					Reward = UserRew;
 				}
 				break;
 			case "Openness":
 
-				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0)) {
+				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0) & valueEquals(UserRew, 0.0)) {
 					Suggestion = GetProperties.getSugOp();
 					Comparison = GetProperties.getCompOp();
 					SelfMonitoring = GetProperties.getSelfOp();
+					Reward = GetProperties.getRewOp();
 
 				} else {
 					Suggestion = UserSug;
 					Comparison = UserComp;
 					SelfMonitoring = UserSelf;
+					Reward = UserRew;
 				}
 				break;
 			case "Conscientiousness":
 
-				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0)) {
+				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0) & valueEquals(UserRew, 0.0)) {
 					Suggestion = GetProperties.getSugCons();
 					Comparison = GetProperties.getCompCons();
 					SelfMonitoring = GetProperties.getSelfCons();
+					Reward = GetProperties.getRewCons();
 
 				} else {
 					Suggestion = UserSug;
 					Comparison = UserComp;
 					SelfMonitoring = UserSelf;
+					Reward = UserRew;
 				}
 				break;
 			case "Neuroticism":
 
-				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0)) {
+				if (valueEquals(UserSug, 0.0) & valueEquals(UserComp, 0.0) & valueEquals(UserSelf, 0.0) & valueEquals(UserRew, 0.0)) {
 					Suggestion = GetProperties.getSugN();
 					Comparison = GetProperties.getCompN();
 					SelfMonitoring = GetProperties.getSelfN();
+					Reward = GetProperties.getRewN();
 
 				} else {
 					Suggestion = UserSug;
 					Comparison = UserComp;
 					SelfMonitoring = UserSelf;
+					Reward = UserRew;
 				}
 				break;
 		}
@@ -695,6 +725,7 @@ public class User {
         rankedStrategiesMap.put("suggestion", Suggestion);
         rankedStrategiesMap.put("comparison", Comparison);
         rankedStrategiesMap.put("self-monitoring",SelfMonitoring);
+		rankedStrategiesMap.put("reward",Reward);
 
 		rankedStrategiesMap = entriesSortedByValues(rankedStrategiesMap);
 
@@ -1036,5 +1067,80 @@ public class User {
 
 	public void setPredictedWork(String[] predictedWork) {
 		this.predictedWork = predictedWork;
+	}
+
+	public Integer getRewAttempts() {
+		return rewAttempts;
+	}
+
+	public void setRewAttempts(Integer rewAttempts) {
+		this.rewAttempts = rewAttempts;
+	}
+
+	public Integer getRewSuccess() {
+		return rewSuccess;
+	}
+
+	public void setRewSuccess(Integer rewSuccess) {
+		this.rewSuccess = rewSuccess;
+	}
+
+	public double getPoints(){
+
+		String pilot= this.pilot;
+		if (pilot==null){
+			return 0;
+		}
+		String PointsUrl = "http://optimum-dashboard.imu-projects.eu/totalrewardstats/"+this.getId()+"/"+pilot;
+		HttpURLConnection con;
+
+		try{
+
+			URL obj = new URL(PointsUrl);
+			con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("GET");
+			con.setRequestProperty("token",this.id);
+
+			//con.setRequestProperty("user", (String) id.toString());
+			int responseCode = con.getResponseCode();
+			logger.debug("\nSending 'GET' request to URL : " + PointsUrl);
+			logger.debug("Response Code : " + responseCode);
+
+			BufferedReader in = new BufferedReader(
+					new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+			JSONObject jsonObj  = null;
+			try {
+				jsonObj = new JSONObject(response.toString());
+				Double rewardPoints = jsonObj.getDouble("total_points");
+				return rewardPoints;
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return 0.0;
+			}
+
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
+			return 0;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
+			return 0;
+		}
+
+	}
+
+	public String getPilot() {
+		return pilot;
+	}
+
+	public void setPilot(String pilot) {
+		this.pilot = pilot;
 	}
 }
