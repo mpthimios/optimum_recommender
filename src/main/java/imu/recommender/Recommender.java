@@ -826,238 +826,236 @@ public class Recommender {
 
 	public void addGraph(User user, Datastore mongoDatastore) throws JSONException {
 
-		List<String> userIds = Arrays.asList("Z5k9EDo9CRIAz7vSDxc6z4QLpf4dVS3T", "ab6nG6ZEX1ESMGDHzlpTQscGZsdvBG0Z", "GWqXKjq4tlc20oT0L0ZZ4wGMpw316Isi", "hqtpnR0Zbp5AD7Ue4HRYCrcbu9HWWOBy");
 
-		if (userIds.contains(user.getId()) ) {
+		JSONObject graph = new JSONObject();
 
-			JSONObject graph = new JSONObject();
+		graph.put("type", "horizontalBar");
 
-			graph.put("type", "horizontalBar");
-
-			JSONArray datasets = new JSONArray();
-			//Map<String, Object> datasets =new HashMap<String, Object>();
+		JSONArray datasets = new JSONArray();
+		//Map<String, Object> datasets =new HashMap<String, Object>();
 
 
-			JSONArray labels = new JSONArray();
+		JSONArray labels = new JSONArray();
 
-			//Get personality of user
-			String personality = null;
-			String strategy = null;
-			try {
-				personality = user.getUserPersonalityType(user.getId(), mongoDatastore);
-				//Get the most convincing persuasive strategy
-				List<String> strategies = user.getBestPersuasiveStrategy(personality);
-				strategy = strategies.get(0);
+		//Get personality of user
+		String personality = null;
+		String strategy = null;
+		try {
+			personality = user.getUserPersonalityType(user.getId(), mongoDatastore);
+			//Get the most convincing persuasive strategy
+			List<String> strategies = user.getBestPersuasiveStrategy(personality);
+			strategy = strategies.get(0);
+			if (strategy.equals("suggestion") || strategy.equals("reward")) {
+				strategy = strategies.get(1);
 				if (strategy.equals("suggestion") || strategy.equals("reward")) {
-					strategy = strategies.get(1);
-					if (strategy.equals("suggestion") || strategy.equals("reward")) {
-						strategy = strategies.get(2);
-					}
+					strategy = strategies.get(2);
 				}
+			}
 
-			} catch (UnknownHostException e) {
+		} catch (UnknownHostException e) {
+			strategy = "comparison";
+		}
+
+		if (GetProperties.getTestGraphs().equals(Boolean.TRUE)) {
+
+			DBCollection routes = mongoDatastore.getDB().getCollection("UserRouteLog");
+			BasicDBObject TripQuery = new BasicDBObject();
+			TripQuery.put("userId", user.getId());
+			BasicDBObject fields = new BasicDBObject();
+			fields.put("recommendedResults.additionalInfo.strategy", 1);
+
+			List<DBObject> trip = routes.find(TripQuery, fields).sort(new BasicDBObject("$natural", -1)).limit(10).toArray();
+			String previous_strategy = trip.get(0).get("recommendedResults").toString();
+			if (previous_strategy.contains("comparison")) {
+				strategy = "self-monitoring";
+			}
+			if (previous_strategy.contains("self-monitoring")) {
 				strategy = "comparison";
 			}
-
-			if (GetProperties.getTestGraphs().equals(Boolean.TRUE)) {
-
-				DBCollection routes = mongoDatastore.getDB().getCollection("UserRouteLog");
-				BasicDBObject TripQuery = new BasicDBObject();
-				TripQuery.put("userId", user.getId());
-				BasicDBObject fields = new BasicDBObject();
-				fields.put("recommendedResults.additionalInfo.strategy", 1);
-
-				List<DBObject> trip = routes.find(TripQuery, fields).sort(new BasicDBObject("$natural", -1)).limit(10).toArray();
-				String previous_strategy = trip.get(0).get("recommendedResults").toString();
-				if (previous_strategy.contains("comparison")) {
-					strategy = "self-monitoring";
-				}
-				if (previous_strategy.contains("self-monitoring")) {
-					strategy = "comparison";
-				}
+		}
+		Boolean AddGraph = Boolean.FALSE;
+		if (strategy.equals("comparison")) {
+			Double transportUsage = user.getMode_usage().getPt_percent() + user.getMode_usage().getBike_percent() + user.getMode_usage().getWalk_percent();
+			Double othersUsage = user.getPtUsageComparedToOthers() + user.getWalkUsageComparedToOthers() + user.getBikeUsageComparedToOthers();
+			if (transportUsage > 0.0 || othersUsage > 0.0) {
+				AddGraph = Boolean.TRUE;
 			}
-			Boolean AddGraph = Boolean.FALSE;
-			if (strategy.equals("comparison")) {
-				Double transportUsage = user.getMode_usage().getPt_percent() + user.getMode_usage().getBike_percent() + user.getMode_usage().getWalk_percent();
-				Double othersUsage = user.getPtUsageComparedToOthers() + user.getWalkUsageComparedToOthers() + user.getBikeUsageComparedToOthers();
-				if (transportUsage > 0.0 || othersUsage > 0.0) {
-					AddGraph = Boolean.TRUE;
-				}
-			} else if (strategy.equals("self-monitoring")) {
-				if ( user.getMode_usage_last_week().getWalk_percent() > 0.0 || user.getMode_usage_last_week().getBike_percent() > 0.0 || user.getMode_usage_last_week().getCar_percent() > 0.0 || user.getMode_usage_last_week().getPt_percent() > 0.0 || user.getMode_usage_previous_week().getWalk_percent() > 0.0 || user.getMode_usage_previous_week().getBike_percent() > 0.0 || user.getMode_usage_previous_week().getCar_percent() > 0.0 || user.getMode_usage_previous_week().getPt_percent() > 0.0) {
-					AddGraph = Boolean.TRUE;
-				}
-			}
-
-			//if (AddGraph.equals(Boolean.TRUE)) {
-			if (check_graph(strategy, mongoDatastore).equals(Boolean.TRUE) && AddGraph.equals(Boolean.TRUE)) {
-
-				String graphTitle = "";
-
-
-				if (strategy.equals("comparison")) {
-
-					JSONArray you = new JSONArray();
-					you.put("You");
-					you.put("");
-					labels.put(you);
-					JSONArray others = new JSONArray();
-					others.put("Optimum");
-					others.put("Users");
-					labels.put(others);
-
-					JSONObject dataset = new JSONObject();
-					dataset.put("label", "Use of green transportation modes");
-
-					JSONArray data = new JSONArray();
-					data.put((user.getMode_usage().getPt_percent() + user.getMode_usage().getBike_percent() + user.getMode_usage().getWalk_percent()) / 3.0);
-					data.put((user.getPtUsageComparedToOthers() + user.getWalkUsageComparedToOthers() + user.getBikeUsageComparedToOthers()) / 3.0);
-					dataset.put("data", data);
-
-					JSONArray background = new JSONArray();
-					background.put("rgba(255, 99, 132, 0.2)");
-					background.put("rgba(54, 162, 235, 0.2)");
-
-					dataset.put("backgroundColor", background);
-
-					JSONArray border = new JSONArray();
-					border.put("rgba(255,99,132,1)");
-					border.put("rgba(54, 162, 235, 1)");
-
-					dataset.put("borderColor", border);
-					dataset.put("borderWidth", "1");
-
-					datasets.put(dataset);
-
-					graphTitle = "Your green transportation behaviour vs others";
-				} else if (strategy.equals("self-monitoring") && AddGraph.equals(Boolean.TRUE)) {
-					labels.put("This week");
-					labels.put("Last week");
-
-					JSONObject dataset1 = new JSONObject();
-					dataset1.put("label", "Walk");
-					dataset1.put("backgroundColor", "rgb(255, 159, 64)");
-					JSONArray data = new JSONArray();
-					data.put(user.getMode_usage_last_week().getWalk_percent());
-					data.put(user.getMode_usage_previous_week().getWalk_percent());
-					dataset1.put("data", data);
-
-					//bicycle data
-					datasets.put(dataset1);
-
-					JSONObject dataset2 = new JSONObject();
-					dataset2.put("label", "Bicycle");
-					dataset2.put("backgroundColor", "rgb(75, 192, 192)");
-					JSONArray data2 = new JSONArray();
-					data2.put(user.getMode_usage_last_week().getBike_percent());
-					data2.put(user.getMode_usage_previous_week().getBike_percent());
-					dataset2.put("data", data2);
-
-					datasets.put(dataset2);
-
-					//pt data
-					JSONObject dataset3 = new JSONObject();
-					dataset3.put("label", "Public transport");
-					dataset3.put("backgroundColor", "rgb(54, 162, 235)");
-					JSONArray data3 = new JSONArray();
-					data3.put(user.getMode_usage_last_week().getPt_percent());
-					data3.put(user.getMode_usage_previous_week().getPt_percent());
-					dataset3.put("data", data3);
-
-					datasets.put(dataset3);
-
-					//car data
-					JSONObject dataset4 = new JSONObject();
-					dataset4.put("label", "Car");
-					dataset4.put("backgroundColor", "rgb(255, 99, 132)");
-
-					JSONArray data4 = new JSONArray();
-					data4.put(user.getMode_usage_last_week().getCar_percent());
-					data4.put(user.getMode_usage_previous_week().getCar_percent());
-					dataset4.put("data", data4);
-
-					datasets.put(dataset4);
-
-					graphTitle = "Your transportation behavior over the last two weeks";
-				}
-
-					JSONObject beginAtZeroYAxes = new JSONObject();
-					beginAtZeroYAxes.put("beginAtZero", "true");
-
-					JSONObject ticks = new JSONObject();
-					ticks.put("ticks", beginAtZeroYAxes);
-
-					JSONArray yAxes = new JSONArray();
-					yAxes.put(ticks);
-
-					JSONObject scales = new JSONObject();
-					scales.put("yAxes", yAxes);
-
-
-					JSONObject title = new JSONObject();
-					title.put("display", "true");
-					title.put("text", graphTitle);
-
-					scales.put("yAxes", yAxes);
-
-					JSONObject options = new JSONObject();
-					options.put("maintainAspectRatio", "false");
-					options.put("responsive", "false");
-					options.put("scales", scales);
-					options.put("title", title);
-
-					JSONObject data = new JSONObject();
-					data.put("labels", labels);
-					data.put("datasets", datasets);
-
-					JSONObject item = new JSONObject();
-					item.put("type", "horizontalBar");
-					item.put("data", data);
-					item.put("options", options);
-
-					Map<String, java.lang.Object> map = new TreeMap<String, java.lang.Object>();
-					java.lang.Object m = item.toString();
-
-					Map<String, Object> additionalInfo = originalRouteFormatRoutes.getAdditionalInfo();
-					additionalInfo.put("graphData", m);
-					additionalInfo.put("strategy", strategy);
-					originalRouteFormatRoutes.setAdditionalInfo(additionalInfo);
-
-				//Update UserRequestPerGroup Collection
-				UserRequestPerGroup requestPerGroup = new UserRequestPerGroup();
-				requestPerGroup.setGroup(user.getGroup());
-				requestPerGroup.setStrategy(strategy);
-				requestPerGroup.setUserId(user.getId());
-				requestPerGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
-				//requestPerGroup.setRequestId();
-				mongoDatastore.save(requestPerGroup);
-				/*ArrayList<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
-				Integer i = 0;
-				for (Iterator<RouteModel> routeItem = routes.iterator(); routeItem.hasNext();) {
-					//for (RouteModel route : routes) {
-					//RouteModel route = routeItem.next();
-					RouteModel route = routes.get(i);
-					logger.debug(i);
-					if (i==2) {
-						route.setMessage(" ");
-						route.setStrategy("");
-						route.setMessageId("");
-
-						//set popup_display false
-						route.setPopup(user.getFeedback(user.getId(),mongoDatastore));
-						logger.debug("-------Feedback----"+user.getFeedback(user.getId(),mongoDatastore));
-
-					}
-					i++;
-					routeItem.next();
-					rankedRoutes2.add(route);
-				}
-				routes.clear();
-				routes = rankedRoutes2;*/
-
-
+		} else if (strategy.equals("self-monitoring")) {
+			if ( user.getMode_usage_last_week().getWalk_percent() > 0.0 || user.getMode_usage_last_week().getBike_percent() > 0.0 || user.getMode_usage_last_week().getCar_percent() > 0.0 || user.getMode_usage_last_week().getPt_percent() > 0.0 || user.getMode_usage_previous_week().getWalk_percent() > 0.0 || user.getMode_usage_previous_week().getBike_percent() > 0.0 || user.getMode_usage_previous_week().getCar_percent() > 0.0 || user.getMode_usage_previous_week().getPt_percent() > 0.0) {
+				AddGraph = Boolean.TRUE;
 			}
 		}
+
+		//if (AddGraph.equals(Boolean.TRUE)) {
+		if (check_graph(strategy, mongoDatastore).equals(Boolean.TRUE) && AddGraph.equals(Boolean.TRUE)) {
+
+			String graphTitle = "";
+
+
+			if (strategy.equals("comparison")) {
+
+				JSONArray you = new JSONArray();
+				you.put("You");
+				you.put("");
+				labels.put(you);
+				JSONArray others = new JSONArray();
+				others.put("Optimum");
+				others.put("Users");
+				labels.put(others);
+
+				JSONObject dataset = new JSONObject();
+				dataset.put("label", "Use of green transportation modes");
+
+				JSONArray data = new JSONArray();
+				data.put((user.getMode_usage().getPt_percent() + user.getMode_usage().getBike_percent() + user.getMode_usage().getWalk_percent()) / 3.0);
+				data.put((user.getPtUsageComparedToOthers() + user.getWalkUsageComparedToOthers() + user.getBikeUsageComparedToOthers()) / 3.0);
+				dataset.put("data", data);
+
+				JSONArray background = new JSONArray();
+				background.put("rgba(255, 99, 132, 0.2)");
+				background.put("rgba(54, 162, 235, 0.2)");
+
+				dataset.put("backgroundColor", background);
+
+				JSONArray border = new JSONArray();
+				border.put("rgba(255,99,132,1)");
+				border.put("rgba(54, 162, 235, 1)");
+
+				dataset.put("borderColor", border);
+				dataset.put("borderWidth", "1");
+
+				datasets.put(dataset);
+
+				graphTitle = "Your green transportation behaviour vs others";
+			} else if (strategy.equals("self-monitoring") && AddGraph.equals(Boolean.TRUE)) {
+				labels.put("This week");
+				labels.put("Last week");
+
+				JSONObject dataset1 = new JSONObject();
+				dataset1.put("label", "Walk");
+				dataset1.put("backgroundColor", "rgb(255, 159, 64)");
+				JSONArray data = new JSONArray();
+				data.put(user.getMode_usage_last_week().getWalk_percent());
+				data.put(user.getMode_usage_previous_week().getWalk_percent());
+				dataset1.put("data", data);
+
+				//bicycle data
+				datasets.put(dataset1);
+
+				JSONObject dataset2 = new JSONObject();
+				dataset2.put("label", "Bicycle");
+				dataset2.put("backgroundColor", "rgb(75, 192, 192)");
+				JSONArray data2 = new JSONArray();
+				data2.put(user.getMode_usage_last_week().getBike_percent());
+				data2.put(user.getMode_usage_previous_week().getBike_percent());
+				dataset2.put("data", data2);
+
+				datasets.put(dataset2);
+
+				//pt data
+				JSONObject dataset3 = new JSONObject();
+				dataset3.put("label", "Public transport");
+				dataset3.put("backgroundColor", "rgb(54, 162, 235)");
+				JSONArray data3 = new JSONArray();
+				data3.put(user.getMode_usage_last_week().getPt_percent());
+				data3.put(user.getMode_usage_previous_week().getPt_percent());
+				dataset3.put("data", data3);
+
+				datasets.put(dataset3);
+
+				//car data
+				JSONObject dataset4 = new JSONObject();
+				dataset4.put("label", "Car");
+				dataset4.put("backgroundColor", "rgb(255, 99, 132)");
+
+				JSONArray data4 = new JSONArray();
+				data4.put(user.getMode_usage_last_week().getCar_percent());
+				data4.put(user.getMode_usage_previous_week().getCar_percent());
+				dataset4.put("data", data4);
+
+				datasets.put(dataset4);
+
+				graphTitle = "Your transportation behavior over the last two weeks";
+			}
+
+				JSONObject beginAtZeroYAxes = new JSONObject();
+				beginAtZeroYAxes.put("beginAtZero", "true");
+
+				JSONObject ticks = new JSONObject();
+				ticks.put("ticks", beginAtZeroYAxes);
+
+				JSONArray yAxes = new JSONArray();
+				yAxes.put(ticks);
+
+				JSONObject scales = new JSONObject();
+				scales.put("yAxes", yAxes);
+
+
+				JSONObject title = new JSONObject();
+				title.put("display", "true");
+				title.put("text", graphTitle);
+
+				scales.put("yAxes", yAxes);
+
+				JSONObject options = new JSONObject();
+				options.put("maintainAspectRatio", "false");
+				options.put("responsive", "false");
+				options.put("scales", scales);
+				options.put("title", title);
+
+				JSONObject data = new JSONObject();
+				data.put("labels", labels);
+				data.put("datasets", datasets);
+
+				JSONObject item = new JSONObject();
+				item.put("type", "horizontalBar");
+				item.put("data", data);
+				item.put("options", options);
+
+				Map<String, java.lang.Object> map = new TreeMap<String, java.lang.Object>();
+				java.lang.Object m = item.toString();
+
+				Map<String, Object> additionalInfo = originalRouteFormatRoutes.getAdditionalInfo();
+				additionalInfo.put("graphData", m);
+				additionalInfo.put("strategy", strategy);
+				additionalInfo.put("userGroup",user.getGroup());
+				originalRouteFormatRoutes.setAdditionalInfo(additionalInfo);
+
+			//Update UserRequestPerGroup Collection
+			UserRequestPerGroup requestPerGroup = new UserRequestPerGroup();
+			requestPerGroup.setGroup(user.getGroup());
+			requestPerGroup.setStrategy(strategy);
+			requestPerGroup.setUserId(user.getId());
+			requestPerGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
+			//requestPerGroup.setRequestId();
+			mongoDatastore.save(requestPerGroup);
+			/*ArrayList<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
+			Integer i = 0;
+			for (Iterator<RouteModel> routeItem = routes.iterator(); routeItem.hasNext();) {
+				//for (RouteModel route : routes) {
+				//RouteModel route = routeItem.next();
+				RouteModel route = routes.get(i);
+				logger.debug(i);
+				if (i==2) {
+					route.setMessage(" ");
+					route.setStrategy("");
+					route.setMessageId("");
+
+					//set popup_display false
+					route.setPopup(user.getFeedback(user.getId(),mongoDatastore));
+					logger.debug("-------Feedback----"+user.getFeedback(user.getId(),mongoDatastore));
+
+				}
+				i++;
+				routeItem.next();
+				rankedRoutes2.add(route);
+			}
+			routes.clear();
+			routes = rankedRoutes2;*/
+
+
+		}
+
 
 	}
 

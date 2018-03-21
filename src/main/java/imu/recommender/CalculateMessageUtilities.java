@@ -34,6 +34,7 @@ public class CalculateMessageUtilities {
         String strategy = strategies.get(0);
         //Get user language
         String lang = user.getLanguage();
+        String pilot = user.getPilot();
 
 
         //Get the id of the displayed messages during last X hours
@@ -334,21 +335,62 @@ public class CalculateMessageUtilities {
                 selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(RewardPoints)));
             }
             if ("prize".equals(selected_message_params)){
-                if (points < 1140){
-                    selected_message_text = selected_message_text.replace("X", "shopping voucher of 5£");
-                }
-                else if (points > 1140 && points < 2280){
-                    selected_message_text = selected_message_text.replace("X", "swift card of 10£");
-                }
-                else if (points > 2280){
-                    Double new_points = points - 2280;
-                    while (new_points > 2280) {
-                        new_points = new_points - 2280;
+                selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(RewardPoints)));
+                Integer prize = getPrize(user,RewardPoints);
+                logger.debug(prize);
+                if ("de".equals(lang)) {
+                    if(pilot.equals("BRI")) {
+                        selected_message_text = selected_message_text.replace("Y", "zu verdienen und damit Wertkarten für Einkäufe im Wert von "+prize+"£ zu erhalten");
                     }
-                    if (new_points < 1140) {
-                        selected_message_text = selected_message_text.replace("X", "shopping voucher of 5£");
-                    } else if (new_points > 1140 && new_points < 2280) {
-                        selected_message_text = selected_message_text.replace("X", "swift card of 10£");
+                    else if(pilot.equals("VIE")) {
+                        selected_message_text = selected_message_text.replace("Y", "im Wert von "+prize+"€ zu verdienen");
+                    }
+                    else if(pilot.equals("LJU")) {
+                        if (prize.equals(1)){
+                            selected_message_text = selected_message_text.replace("Y", "für eine Monatskarte zu verdienen");
+                        }
+                        else if (prize>1){
+                            selected_message_text = selected_message_text.replace("Y", "für eine "+prize+" Monatskarten zu verdienen");
+                        }
+
+                    }
+                }
+                else if("sl".equals(lang)){
+                    if(pilot.equals("BRI")) {
+                        selected_message_text = selected_message_text.replace("Y", "ki ti prinesejo kupone v vrednosti "+prize+"£ ali Swift kartico");
+                    }
+                    else if(pilot.equals("VIE")) {
+                        selected_message_text = selected_message_text.replace("Y", "ki ti prinesejo "+prize+"€");
+                    }
+                    else if(pilot.equals("LJU")) {
+                        if (prize.equals(1)) {
+                            selected_message_text = selected_message_text.replace("Y", "za mesečno vozovnico");
+                        }
+                        else if (prize.equals(2)){
+                            selected_message_text = selected_message_text.replace("Y", "mesečni vozovnici");
+                        }
+                        else if (prize.equals(3) || prize.equals(4)){
+                            selected_message_text = selected_message_text.replace("Y", "mesečne vozovnice");
+                        }
+                        else if (prize>4){
+                            selected_message_text = selected_message_text.replace("Y", "mesečnih vozovnic");
+                        }
+                    }
+                }
+                else {
+                    if(pilot.equals("BRI")) {
+                        selected_message_text = selected_message_text.replace("Y", "getting "+prize+"£ worth of shopping vouchers/switch cards");
+                    }
+                    else if(pilot.equals("VIE")) {
+                        selected_message_text = selected_message_text.replace("Y", "getting "+prize+"€");
+                    }
+                    else if(pilot.equals("LJU")) {
+                        if (prize.equals(1)){
+                            selected_message_text = selected_message_text.replace("Y", "getting a monthly pass");
+                        }
+                        else if (prize>1){
+                            selected_message_text = selected_message_text.replace("Y", "getting "+prize+" monthly passes");
+                        }
                     }
                 }
             }
@@ -795,6 +837,31 @@ public class CalculateMessageUtilities {
             return Boolean.TRUE;
         }
 
+    }
+
+    private static Integer getPrize(User user, Double rewardPoints) {
+        Integer prize = 0;
+
+        try {
+            String city = user.getPilot();
+            //Get user points
+            Double points = user.getPoints();
+            points=points+rewardPoints;
+            logger.debug("points"+points);
+            logger.debug("city"+city);
+            if (city.equals("BRI")) {
+                prize = (points.intValue()/1140)*5;
+            }
+            else if (city.equals("LJU")) {
+                prize = points.intValue()/7400;
+            }
+            else if (city.equals("VIE")) {
+                prize = (points.intValue() / 1000) * 5;
+            }
+        } catch (Exception e) {
+            return 0;
+        }
+        return prize;
     }
 
     public Double GetRemainingPoints(User user) {
