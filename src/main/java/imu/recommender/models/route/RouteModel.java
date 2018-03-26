@@ -29,6 +29,7 @@ public class RouteModel {
 	private boolean popup = false;
 	private int walkingDistance = 0;
 	private int bikeDistance = 0;
+	private String feature = "";
 
 	
 	public RouteModel (Route route){
@@ -370,5 +371,16 @@ public class RouteModel {
 
 	public void setContext(List<String> context) {
 		this.context = context;
+	}
+
+	public String getFeature() {
+		return feature;
+	}
+
+	public void setFeature(String feature) {
+		this.feature = feature;
+		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
+		additionalInfo.put("feature", feature);
+		this.route.setAdditionalInfo(additionalInfo);
 	}
 }

@@ -125,7 +125,7 @@ public class RequestHandler extends HttpServlet{
 						recommenderRoutes.addPersuasiveFeature(user, mongoDatastore);
 					}
 					//Add Graph
-					recommenderRoutes.addGraph(user, mongoDatastore);
+					//recommenderRoutes.addGraph(user, mongoDatastore,"");
 					
 					recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 				}

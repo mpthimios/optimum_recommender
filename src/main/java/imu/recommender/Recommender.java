@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.round;
 
 
 public class Recommender {
@@ -90,7 +91,8 @@ public class Recommender {
 		LinkedHashMap<String, RouteModel> uniquesHash = new LinkedHashMap<>();
 		try{
 			for (RouteModel route : routes){
-				String key = String.valueOf(route.getRoute().getDistanceMeters()) + mapper.writeValueAsString(route.getRoute().getSegments());
+				//String key = String.valueOf(round(route.getRoute().getDistanceMeters()/1000.0)) + mapper.writeValueAsString(route.getRoute().getSegments());
+				String key = String.valueOf(round(route.getRoute().getDistanceMeters()/1000.0)) + mapper.writeValueAsString(route.getRoute().getAdditionalInfo().get("mode"));
 				if (!uniquesHash.containsKey(key)){
 					uniquesHash.put(key, route);
 					logger.debug("non duplicate route found");
@@ -259,6 +261,10 @@ public class Recommender {
 				FinalRankedRoutes.set(routeIndex+1, route);
 			}
 		}
+		else if (RankedRoutes.size()==1) {
+
+			FinalRankedRoutes.set(1,RankedRoutes.get(0));
+		}
 		logger.debug(FinalRankedRoutes);
 
 		routes.clear();
@@ -266,12 +272,12 @@ public class Recommender {
 	}
 
 
-	public void addMessage(User user, Datastore mongoDatastore, String tripPurpose){
+	public void addMessage(User user, Datastore mongoDatastore, String tripPurpose, Boolean graph) throws JSONException {
 
 		/*if (check_if_we_need_to_add_message(user,mongoDatastore,N)) {
 			selectTargetRouteandAddMessageForUser(user, mongoDatastore);
 		}*/
-		selectTargetRouteandAddMessageForUser(user, mongoDatastore, tripPurpose);
+		selectTargetRouteandAddMessageForUser(user, mongoDatastore, tripPurpose, graph);
 	}
 	
 	private void rankBasedonBehaviouralModel(List<RouteModel> routes){
@@ -305,39 +311,134 @@ public class Recommender {
 		List<RouteModel> rankedRoutes = new ArrayList<>();
 
 		TreeMap<Double, Integer> userPreferedModes = new TreeMap<>();
+
 		try {
-			userPreferedModes.put(user.getMode_usage().getCar_percent(), RecommenderModes.CAR);
-			userPreferedModes.put(user.getMode_usage().getBike_percent(), RecommenderModes.BICYCLE);
-			userPreferedModes.put(user.getMode_usage().getWalk_percent(), RecommenderModes.WALK);
-			userPreferedModes.put(user.getMode_usage().getPt_percent(), RecommenderModes.PUBLIC_TRANSPORT);
-//			userPreferedModes.put(10.0, RecommenderModes.BIKE_AND_RIDE);
-//			userPreferedModes.put(12.0, RecommenderModes.PARK_AND_RIDE_WITH_BIKE);
-//			userPreferedModes.put(6.0, RecommenderModes.PARK_AND_RIDE);
+			Boolean car= Boolean.FALSE;
+			Boolean walk= Boolean.FALSE;
+			Boolean bike= Boolean.FALSE;
+			Boolean pt= Boolean.FALSE;
+			if (user.getMode_usage().getCar_percent()>0.0){
+				userPreferedModes.put(user.getMode_usage().getCar_percent(), RecommenderModes.CAR);
+				car=Boolean.TRUE;
+			}
+			if (user.getMode_usage().getBike_percent()>0.0){
+				userPreferedModes.put(user.getMode_usage().getBike_percent(), RecommenderModes.BICYCLE);
+				bike=Boolean.TRUE;
+			}
+			if (user.getMode_usage().getWalk_percent()>0.0){
+				userPreferedModes.put(user.getMode_usage().getWalk_percent(), RecommenderModes.WALK);
+				walk=Boolean.TRUE;
+			}
+			if (user.getMode_usage().getPt_percent()>0.0){
+				userPreferedModes.put(user.getMode_usage().getPt_percent(), RecommenderModes.PUBLIC_TRANSPORT);
+				pt=Boolean.TRUE;
+			}
+			if (user.getLanguage().equals("de")){
+				if(pt.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.004,RecommenderModes.PUBLIC_TRANSPORT);
+				}
+				if(walk.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.003,RecommenderModes.WALK);
+				}
+				if(car.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.002,RecommenderModes.CAR);
+				}
+				if(bike.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.001,RecommenderModes.BICYCLE);
+				}
+			}
+			else if (user.getLanguage().equals("slo")){
+				if(car.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.004,RecommenderModes.CAR);
+				}
+				if(walk.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.003,RecommenderModes.WALK);
+				}
+				if(pt.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.002,RecommenderModes.PUBLIC_TRANSPORT);
+				}
+				if(bike.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.001,RecommenderModes.BICYCLE);
+				}
+			}
+			else if (user.getLanguage().equals("en")){
+				if(car.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.004,RecommenderModes.CAR);
+				}
+
+				if(walk.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.003,RecommenderModes.WALK);
+				}
+				if(pt.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.002,RecommenderModes.PUBLIC_TRANSPORT);
+				}
+				if(bike.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.001,RecommenderModes.BICYCLE);
+				}
+			}
+			else {
+				if(pt.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.004,RecommenderModes.PUBLIC_TRANSPORT);
+				}
+				if(walk.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.003,RecommenderModes.WALK);
+				}
+				if(car.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.002,RecommenderModes.CAR);
+				}
+				if(bike.equals(Boolean.FALSE)){
+					userPreferedModes.put(0.001,RecommenderModes.BICYCLE);
+				}
+			}
 		}
 		catch (Exception e){
 			//if there are no preferences for any time of day get the default
-			int i = 0;
-			for (Integer order : RecommenderModes.recommenderModesOrder){
-				userPreferedModes.put((double) order, i);
-				i++;
+			if (user.getLanguage().equals("de")){
+				userPreferedModes.put(20.0,RecommenderModes.PUBLIC_TRANSPORT);
+				userPreferedModes.put(19.0,RecommenderModes.WALK);
+				userPreferedModes.put(18.0,RecommenderModes.CAR);
+				userPreferedModes.put(17.0,RecommenderModes.BICYCLE);
+
+			}
+			if (user.getLanguage().equals("slo")){
+				userPreferedModes.put(20.0,RecommenderModes.CAR);
+				userPreferedModes.put(19.0,RecommenderModes.WALK);
+				userPreferedModes.put(18.0,RecommenderModes.PUBLIC_TRANSPORT);
+				userPreferedModes.put(17.0,RecommenderModes.BICYCLE);
+
+			}
+			if (user.getLanguage().equals("en")){
+				userPreferedModes.put(20.0,RecommenderModes.CAR);
+				userPreferedModes.put(19.0,RecommenderModes.WALK);
+				userPreferedModes.put(18.0,RecommenderModes.PUBLIC_TRANSPORT);
+				userPreferedModes.put(17.0,RecommenderModes.BICYCLE);
+
+			}
+			else {
+				userPreferedModes.put(20.0,RecommenderModes.PUBLIC_TRANSPORT);
+				userPreferedModes.put(19.0,RecommenderModes.WALK);
+				userPreferedModes.put(18.0,RecommenderModes.CAR);
+				userPreferedModes.put(17.0,RecommenderModes.BICYCLE);
 			}
 			logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 		}
 		
-		Map<Integer, RouteModel> rankedRoutesMap = new LinkedHashMap<>();
-		for (Map.Entry<Double, Integer> entry : userPreferedModes.entrySet()){
-			logger.debug("preference: " + entry.getKey() + " mode: " + entry.getValue());
-			rankedRoutesMap.put(entry.getValue(), routes.get(0));
-		}
-		
+		Map<Double, RouteModel> rankedRoutesMap = new LinkedHashMap<>();
+
+		Double utility=0.0;
 		for (RouteModel route : routes){
-			logger.debug(route);
 			Integer number = route.getMode();
-			rankedRoutesMap.replace(number,route);			
+			for (Map.Entry<Double, Integer> entry : userPreferedModes.entrySet()){
+				//logger.debug("preference: " + entry.getKey() + " mode: " + entry.getValue());
+				if (entry.getValue().equals(number)) {
+					utility=entry.getKey();
+				}
+			}
+			rankedRoutesMap.put(utility,route);
 		}
-		
-		double userPreferenceRank = 1.0;
-		for (Map.Entry<Integer, RouteModel> entry : rankedRoutesMap.entrySet()){
+
+		double userPreferenceRank = 0.0;
+		for (Map.Entry<Double, RouteModel> entry : rankedRoutesMap.entrySet()){
 			RouteModel route = entry.getValue();
 			route.setUserPreferenceRank(userPreferenceRank);
 			rankedRoutes.add(route);
@@ -383,68 +484,68 @@ public class Recommender {
 			switch (mode) {
 				case (int)RecommenderModes.WALK:
 					if (ManyCar == 1){
-						context_utility = ( 0.3512*WalkDistance + 0.2382*Duration + 0.0389*ManyCar + 0.0625*Emissions +0.1011*NiceWeather +0.2081*ReachingPriceTarget)/6.0;
+						context_utility = 0.3512*WalkDistance + 0.2382*Duration + 0.0389*ManyCar + 0.0625*Emissions +0.1011*NiceWeather +0.2081*ReachingPriceTarget;
 					}
 					else if (ManyPT == 1){
-						context_utility = ( 0.3324*WalkDistance + 0.2343*Duration + 0.0344*ManyPT + 0.0621*Emissions +0.1123*NiceWeather+ 0.2245*ReachingPriceTarget)/6.0;
+						context_utility = 0.3324*WalkDistance + 0.2343*Duration + 0.0344*ManyPT + 0.0621*Emissions +0.1123*NiceWeather+ 0.2245*ReachingPriceTarget;
 					}
 					else {
-						context_utility = ( 0.4*WalkDistance + 0.3*Duration + 0.1*Emissions +0.1*NiceWeather+ 0.1*ReachingPriceTarget)/5.0;
+						context_utility = 0.4*WalkDistance + 0.3*Duration + 0.1*Emissions +0.1*NiceWeather+ 0.1*ReachingPriceTarget;
 					}
 					emissions_utility = 0.0;
-					utility = (context_utility + (1-emissions_utility) )/2;
+					utility = (1/3.0)*context_utility + (1-emissions_utility)*(2/3.0);
 					//rankedRoutesMap.put(RecommenderModes.WALK, utility);
 					rankedRoutesMap.put(route, utility);
 					break;
 				case (int)RecommenderModes.BICYCLE:
 				case (int)RecommenderModes.BIKE_SHARING:					
 					if (ManyCar == 1){
-						context_utility = ( 0.3512*BikeDistance + 0.2382*Duration + 0.0389*ManyCar + 0.0625*Emissions +0.1011*NiceWeather+0.2081*ReachingPriceTarget)/6.0;
+						context_utility = 0.3512*BikeDistance + 0.2382*Duration + 0.0389*ManyCar + 0.0625*Emissions +0.1011*NiceWeather+0.2081*ReachingPriceTarget;
 					}
 					else if (ManyPT == 1){
-						context_utility = ( 0.3324*BikeDistance + 0.2343*Duration + 0.0344*ManyPT + 0.0621*Emissions +0.1123*NiceWeather+0.2245*ReachingPriceTarget)/6.0;
+						context_utility = 0.3324*BikeDistance + 0.2343*Duration + 0.0344*ManyPT + 0.0621*Emissions +0.1123*NiceWeather+0.2245*ReachingPriceTarget;
 					}
 					else {
-						context_utility = ( 0.4*BikeDistance + 0.3*Duration + 0.1*Emissions +0.1*NiceWeather+ 0.1*ReachingPriceTarget)/5.0;
+						context_utility = 0.4*BikeDistance + 0.3*Duration + 0.1*Emissions +0.1*NiceWeather+ 0.1*ReachingPriceTarget;
 					}
 					emissions_utility = 0.0;
-					utility = (context_utility + (1-emissions_utility) )/2;					
+					utility = (1/3.0)*context_utility + (1-emissions_utility)*(2/3.0);
 					rankedRoutesMap.put(route, utility);
 					break;
 				case (int)RecommenderModes.BIKE_AND_RIDE:
 					if (ManyCar == 1) {
-						context_utility = (0.0557 * ManyCar + 0.4376 * Duration + 0.1282 * Emissions + 0.2043 * NiceWeather+0.1742*ReachingPriceTarget) / 5.0;
+						context_utility = 0.0557 * ManyCar + 0.4376 * Duration + 0.1282 * Emissions + 0.2043 * NiceWeather+0.1742*ReachingPriceTarget;
 					}
 					else if (ManyPT == 1) {
-						context_utility = (0.0296 * ManyPT + 0.4385 * Duration + 0.1334 * Emissions + 0.2243 * NiceWeather+0.1742*ReachingPriceTarget) / 5.0;
+						context_utility = 0.0296 * ManyPT + 0.4385 * Duration + 0.1334 * Emissions + 0.2243 * NiceWeather+0.1742*ReachingPriceTarget;
 					}
 					else{
-						context_utility = ( 0.4*BikeDistance + 0.3*Duration + 0.1*Emissions +0.1*NiceWeather + 0.1*ReachingPriceTarget)/5.0;
+						context_utility = 0.4*BikeDistance + 0.3*Duration + 0.1*Emissions +0.1*NiceWeather + 0.1*ReachingPriceTarget;
 					}
 					emissions_utility = route.getEmissions()/maxEmissions;
-					utility = (context_utility + (1-emissions_utility) )/2;
+					utility = (1/3.0)*context_utility + (1-emissions_utility)*(2/3.0);
 					//rankedRoutesMap.put( RecommenderModes.BIKE_AND_RIDE, utility);
 					rankedRoutesMap.put(route, utility);
 					break;
 				case (int)RecommenderModes.PUBLIC_TRANSPORT:
-					context_utility = ( 0.4323*Duration + 0.0845*ManyCar + 0.1935*Emissions +0.0361*NiceWeather+25.36*ReachingPriceTarget)/5.0;
+					context_utility =  0.4323*Duration + 0.0845*ManyCar + 0.1935*Emissions +0.0361*NiceWeather+25.36*ReachingPriceTarget;
 					emissions_utility = route.getEmissions()/maxEmissions;
-					utility = (context_utility + (1-emissions_utility) )/2;
+					utility = (1/3.0)*context_utility + (1-emissions_utility)*(2/3.0);
 					//rankedRoutesMap.put( RecommenderModes.PUBLIC_TRANSPORT, utility);
 					rankedRoutesMap.put(route, utility);
 					break;
 				case (int)RecommenderModes.PARK_AND_RIDE:
 				case (int)RecommenderModes.PARK_AND_RIDE_WITH_BIKE:
-					context_utility = ( 0.4376*Duration + 0.05571*ManyCar + 0.1282*Emissions +0.2043*NiceWeather+0.1742*ReachingPriceTarget)/5.0;
+					context_utility = 0.4376*Duration + 0.05571*ManyCar + 0.1282*Emissions +0.2043*NiceWeather+0.1742*ReachingPriceTarget;
 					emissions_utility = route.getEmissions()/maxEmissions;
-					utility = (context_utility + (1-emissions_utility) )/2;
+					utility = (1/3.0)*context_utility + (1-emissions_utility)*(2/3.0);
 					//rankedRoutesMap.put( RecommenderModes.PARK_AND_RIDE, utility);
 					rankedRoutesMap.put(route, utility);
 					break;
 				case (int)RecommenderModes.CAR:
 					context_utility = 0.0001;
 					emissions_utility = route.getEmissions()/maxEmissions;
-					utility = (context_utility + (1-emissions_utility) )/2;
+					utility = (1/3.0)*context_utility + (1-emissions_utility)*(2/3.0);
 					//rankedRoutesMap.put( RecommenderModes.CAR,utility);
 					rankedRoutesMap.put(route, utility);
 					break;
@@ -456,16 +557,15 @@ public class Recommender {
 			//prepei na ta pros8esw ola pairnei mono an exoun allh timh
 			//rankedRoutesMap.put(route,utility);
 		}		
-		
+
 		rankedRoutesMap = entriesSortedByValues(rankedRoutesMap);
 		
 		double rank = 0.0;
-		for (Map.Entry<RouteModel, Double> entry : rankedRoutesMap.entrySet()){		
+		for (Map.Entry<RouteModel, Double> entry : rankedRoutesMap.entrySet()){
 			entry.getKey().setSystemRank(rank);
 			rankedRoutes.add(entry.getKey());
 			rank++;			
 		}
-
 	}
 
 
@@ -497,7 +597,7 @@ public class Recommender {
 		
 	}
 	
-	private void selectTargetRouteandAddMessageForUser(User user, Datastore mongoDatastore, String tripPurpose){
+	private void selectTargetRouteandAddMessageForUser(User user, Datastore mongoDatastore, String tripPurpose, Boolean graph) throws JSONException {
 		//Select target route and add message and strategy.
 		List<String> targetList = user.getTargetList();
 		logger.debug(targetList);
@@ -555,19 +655,19 @@ public class Recommender {
 			while (message.isEmpty() && j < FinaltargetList.size() && !SetMessage) {
 				target = FinaltargetList.get(j);
 				rankedRoutes2 = new ArrayList<RouteModel>();
-				for (Iterator<RouteModel> routeItem = routes.iterator(); routeItem.hasNext();) {
+				for (Iterator<RouteModel> routeItem = routes.iterator(); routeItem.hasNext(); ) {
 					//for (RouteModel route : routes) {
 					RouteModel route = routeItem.next();
 					if (route.getRoute().getAdditionalInfo().get("mode") == target && !SetMessage) {
 						try {
 							Double rewardPoints = calculatePoints(route, user);
-							logger.debug("reward points"+rewardPoints);
+							logger.debug("reward points" + rewardPoints);
 							contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore, rewardPoints);
 							mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore, rewardPoints);
 							message = mes.split("_")[0];
 							strategy = mes.split("_")[1];
 							messageId = mes.split("_")[2];
-							logger.debug(messageId+"----");
+							logger.debug(messageId + "----");
 						} catch (Exception e) {
 							logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 						}
@@ -577,14 +677,28 @@ public class Recommender {
 						messageId = "";
 					}
 					if (!message.isEmpty()) {
-
+						Boolean displayGraph = Boolean.FALSE;
 						Boolean displayMessage = check_if_we_need_to_add_message(user, mongoDatastore, route, tripPurpose, cost, duration);
-						logger.debug("Display"+displayMessage);
-						if (displayMessage) {
+						logger.debug("Display" + displayMessage);
+						if (graph.equals(Boolean.TRUE)) {
+							displayGraph = addGraph(user, mongoDatastore, strategy);
+						}
+						if (displayMessage && displayGraph) {
 							route.setMessage(message);
 							route.setStrategy(strategy);
 							route.setMessageId(messageId);
 							route.setContext(contextList);
+							route.setFeature("MessageAndGraph");
+							//set popup_display false
+							route.setPopup(user.getFeedback(user.getId(), mongoDatastore));
+							logger.debug("-------Feedback----" + user.getFeedback(user.getId(), mongoDatastore));
+							SetMessage = true;
+						} else if (displayMessage) {
+							route.setMessage(message);
+							route.setStrategy(strategy);
+							route.setMessageId(messageId);
+							route.setContext(contextList);
+							route.setFeature("message");
 							//set popup_display false
 							route.setPopup(user.getFeedback(user.getId(), mongoDatastore));
 							logger.debug("-------Feedback----" + user.getFeedback(user.getId(), mongoDatastore));
@@ -598,6 +712,26 @@ public class Recommender {
 			}
 			routes.clear();
 			routes = rankedRoutes2;
+			if (SetMessage == false && graph.equals(Boolean.TRUE)) {
+				Boolean displayGraph = addGraph(user, mongoDatastore, "");
+				if (displayGraph.equals(Boolean.TRUE)) {
+					Boolean SetGraph = Boolean.FALSE;
+					int k =0;
+					for (Iterator<RouteModel> routeItem = routes.iterator(); routeItem.hasNext(); ) {
+						target = targetList.get(k);
+						RouteModel route = routeItem.next();
+						if (route.getRoute().getAdditionalInfo().get("mode") == target && !SetGraph) {
+							route.setMessage("");
+							route.setFeature("graph");
+							SetGraph = Boolean.TRUE;
+						}
+						rankedRoutes2.add(route);
+						k++;
+					}
+					routes.clear();
+					routes = rankedRoutes2;
+				}
+			}
 		}
 		else{
 			logger.debug("NO TARGET FOR MESSAGE");
@@ -725,7 +859,7 @@ public class Recommender {
 				  new ArrayList<Map.Entry<K, V>>(map.entrySet());
 		Collections.sort(entries, new Comparator<Map.Entry<K, V>>() {
 		  public int compare(Map.Entry<K, V> a, Map.Entry<K, V> b){
-		    return a.getValue().compareTo(b.getValue());
+		    return b.getValue().compareTo(a.getValue());
 		  }
 		});
 		LinkedHashMap<K, V> sortedEntries = new LinkedHashMap<K, V>();
@@ -735,7 +869,7 @@ public class Recommender {
 		return sortedEntries;
 	}
 
-	public void addPersuasiveFeature(User user,  Datastore mongoDatastore){
+	public void addPersuasiveFeature(User user,  Datastore mongoDatastore) throws JSONException {
 
 		String purpose = getPurpose();
 		logger.debug(purpose);
@@ -799,32 +933,44 @@ public class Recommender {
 		logger.debug(user.getGroup());
 		//groupA ---> Combination,  groupB ----> Graph,  groupC ----->Message
 
+
 		if(group.equals("groupA")){
 			//Combination of Graph and Message
-			try {
-				addGraph(user,mongoDatastore);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			addMessage(user,mongoDatastore,purpose);
+			addMessage(user,mongoDatastore,purpose,Boolean.TRUE);
 
 		}
 		else if(group.equals("groupB")){
-			//Graph only
-			try {
-				addGraph(user, mongoDatastore);
-			} catch(JSONException e) {
-				e.printStackTrace();
+			ArrayList rankedRoutes2 = new ArrayList<RouteModel>();
+			List targetList = user.getTargetList();
+
+			Boolean displayGraph = addGraph(user, mongoDatastore, "");
+			if (displayGraph.equals(Boolean.TRUE)) {
+				Boolean SetGraph = Boolean.FALSE;
+				Integer k=0;
+				for (Iterator<RouteModel> routeItem = routes.iterator(); routeItem.hasNext(); ) {
+					String target = targetList.get(k).toString();
+					RouteModel route = routeItem.next();
+					if (route.getRoute().getAdditionalInfo().get("mode") == target && !SetGraph) {
+						route.setMessage("");
+						route.setFeature("graph");
+						SetGraph = Boolean.TRUE;
+					}
+					rankedRoutes2.add(route);
+					k++;
+				}
+				routes.clear();
+				routes = rankedRoutes2;
+
 			}
 		}
 		else if(group.equals("groupC")){
 			//Message only
-			addMessage(user, mongoDatastore,purpose);
+			addMessage(user, mongoDatastore,purpose,Boolean.FALSE);
 
 		}
 	}
 
-	public void addGraph(User user, Datastore mongoDatastore) throws JSONException {
+	public Boolean addGraph(User user, Datastore mongoDatastore, String strategy) throws JSONException {
 
 
 		JSONObject graph = new JSONObject();
@@ -839,21 +985,24 @@ public class Recommender {
 
 		//Get personality of user
 		String personality = null;
-		String strategy = null;
-		try {
-			personality = user.getUserPersonalityType(user.getId(), mongoDatastore);
-			//Get the most convincing persuasive strategy
-			List<String> strategies = user.getBestPersuasiveStrategy(personality);
-			strategy = strategies.get(0);
-			if (strategy.equals("suggestion") || strategy.equals("reward")) {
-				strategy = strategies.get(1);
+
+		if (strategy.equals("") || strategy.equals("reward") || strategy.equals("suggestion")){
+			try {
+				personality = user.getUserPersonalityType(user.getId(), mongoDatastore);
+				//Get the most convincing persuasive strategy
+				List<String> strategies = user.getBestPersuasiveStrategy(personality);
+				strategy = strategies.get(0);
 				if (strategy.equals("suggestion") || strategy.equals("reward")) {
-					strategy = strategies.get(2);
+					strategy = strategies.get(1);
+					if (strategy.equals("suggestion") || strategy.equals("reward")) {
+						strategy = strategies.get(2);
+					}
 				}
+
+			} catch (UnknownHostException e) {
+				strategy = "comparison";
 			}
 
-		} catch (UnknownHostException e) {
-			strategy = "comparison";
 		}
 
 		if (GetProperties.getTestGraphs().equals(Boolean.TRUE)) {
@@ -877,11 +1026,11 @@ public class Recommender {
 		if (strategy.equals("comparison")) {
 			Double transportUsage = user.getMode_usage().getPt_percent() + user.getMode_usage().getBike_percent() + user.getMode_usage().getWalk_percent();
 			Double othersUsage = user.getPtUsageComparedToOthers() + user.getWalkUsageComparedToOthers() + user.getBikeUsageComparedToOthers();
-			if (transportUsage > 0.0 || othersUsage > 0.0) {
+			if (transportUsage > 0.0 && othersUsage > 0.0 && othersUsage>transportUsage) {
 				AddGraph = Boolean.TRUE;
 			}
 		} else if (strategy.equals("self-monitoring")) {
-			if ( user.getMode_usage_last_week().getWalk_percent() > 0.0 || user.getMode_usage_last_week().getBike_percent() > 0.0 || user.getMode_usage_last_week().getCar_percent() > 0.0 || user.getMode_usage_last_week().getPt_percent() > 0.0 || user.getMode_usage_previous_week().getWalk_percent() > 0.0 || user.getMode_usage_previous_week().getBike_percent() > 0.0 || user.getMode_usage_previous_week().getCar_percent() > 0.0 || user.getMode_usage_previous_week().getPt_percent() > 0.0) {
+			if ( (user.getMode_usage_last_week().getWalk_percent() > 0.0 || user.getMode_usage_last_week().getBike_percent() > 0.0 || user.getMode_usage_last_week().getCar_percent() > 0.0 || user.getMode_usage_last_week().getPt_percent() > 0.0 ) && ( user.getMode_usage_previous_week().getWalk_percent() > 0.0 || user.getMode_usage_previous_week().getBike_percent() > 0.0 || user.getMode_usage_previous_week().getCar_percent() > 0.0 || user.getMode_usage_previous_week().getPt_percent() > 0.0) ) {
 				AddGraph = Boolean.TRUE;
 			}
 		}
@@ -1029,6 +1178,7 @@ public class Recommender {
 			requestPerGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
 			//requestPerGroup.setRequestId();
 			mongoDatastore.save(requestPerGroup);
+			return Boolean.TRUE;
 			/*ArrayList<RouteModel> rankedRoutes2 = new ArrayList<RouteModel>();
 			Integer i = 0;
 			for (Iterator<RouteModel> routeItem = routes.iterator(); routeItem.hasNext();) {
@@ -1054,6 +1204,9 @@ public class Recommender {
 			routes = rankedRoutes2;*/
 
 
+		}
+		else {
+			return Boolean.FALSE;
 		}
 
 
