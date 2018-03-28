@@ -43,18 +43,6 @@
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
-        <job>
-            <name>CalculateReduceDrivingPercentage</name>
-            <job-class>imu.recommender.jobs.CalculateReduceDrivingPercentage</job-class>
-        </job>
-        <trigger>
-            <cron>
-                <name>CalculateReduceDrivingPercentage</name>
-                <job-name>CalculateReduceDrivingPercentage</job-name>
-                <cron-expression>0 0 3 1/1 * ? *</cron-expression>
-                <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
-            </cron>
-        </trigger>
 
         <job>
             <name>CalculateModeUsageLastWeek</name>
@@ -66,33 +54,46 @@
                 <job-name>CalculateModeUsageLastWeek</job-name>
                 <cron-expression>0 0 3 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
+           </cron>
+       </trigger>
+
+
+       <job>
+           <name>UpdateWeather</name>
+           <job-class>imu.recommender.jobs.UpdateWeather</job-class>
+       </job>
+       <trigger>
+           <cron>
+               <name>UpdateWeather</name>
+               <job-name>UpdateWeather</job-name>
+               <cron-expression>0 0/30 * * * ?</cron-expression>
+               <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
 
-
         <job>
-            <name>UpdateWeather</name>
-            <job-class>imu.recommender.jobs.UpdateWeather</job-class>
+            <name>CalculateReduceDrivingPercentage</name>
+            <job-class>imu.recommender.jobs.CalculateReduceDrivingPercentage</job-class>
         </job>
         <trigger>
             <cron>
-                <name>UpdateWeather</name>
-                <job-name>UpdateWeather</job-name>
-                <cron-expression>0 0/30 * * * ?</cron-expression>
-                <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
-            </cron>
-        </trigger>
-
-        <job>
-            <name>PersuasiveMessages</name>
-            <job-class>imu.recommender.jobs.PersuasiveMessages</job-class>
-        </job>
-        <trigger>
-            <cron>
-                <name>PersuasiveMessages</name>
-                <job-name>PersuasiveMessages</job-name>
+                <name>CalculateReduceDrivingPercentage</name>
+                <job-name>CalculateReduceDrivingPercentage</job-name>
                 <cron-expression>0 0 3 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
+           </cron>
+       </trigger>
+
+       <job>
+           <name>PersuasiveMessages</name>
+           <job-class>imu.recommender.jobs.PersuasiveMessages</job-class>
+       </job>
+       <trigger>
+           <cron>
+               <name>PersuasiveMessages</name>
+               <job-name>PersuasiveMessages</job-name>
+               <cron-expression>0 0 3 1/1 * ? *</cron-expression>
+               <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>
         </trigger>
 
@@ -104,6 +105,19 @@
             <cron>
                 <name>PredictWorkHomeLocation</name>
                 <job-name>PredictWorkHomeLocation</job-name>
+                <cron-expression>0 0 3 1/1 * ? *</cron-expression>
+                <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
+            </cron>
+        </trigger>
+
+        <job>
+            <name>CountRequestGroup</name>
+            <job-class>imu.recommender.jobs.CountRequestGroup</job-class>
+        </job>
+        <trigger>
+            <cron>
+                <name>CountRequestGroup</name>
+                <job-name>CountRequestGroup</job-name>
                 <cron-expression>0 0 3 1/1 * ? *</cron-expression>
                 <!--<cron-expression>0/5 * * * * ?</cron-expression>-->
             </cron>

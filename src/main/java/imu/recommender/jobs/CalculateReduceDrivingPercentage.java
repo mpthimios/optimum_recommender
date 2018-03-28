@@ -222,6 +222,17 @@ public class CalculateReduceDrivingPercentage implements Job {
                 }
             }catch (Exception e) {
                 logger.debug(e);
+                Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
+
+                //percentages should be saved to mongo
+                ModeUsagePreviousWeek modeUsage = new ModeUsagePreviousWeek();
+                modeUsage.setWalk_percent(0.0);
+                modeUsage.setPt_percent(0.0);
+                modeUsage.setCar_percent(0.0);
+                modeUsage.setBike_percent(0.0);
+
+                UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage_previous_week", modeUsage);
+                mongoDatastore.update(query, ops, true);
             }
         }
 
@@ -239,7 +250,7 @@ public class CalculateReduceDrivingPercentage implements Job {
                                     Query<User> user = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
                                     if (!((String) current_id).equals((String) id)) {
                                         try {
-                                            double CarPercentagePreviousWeek = user.get().getCarPercentagePreviousWeek();
+                                            double CarPercentagePreviousWeek = user.get().getMode_usage_previous_week().getCar_percent();
                                             double Car_percent = total_emissions + user.get().getMode_usage().getCar_percent();
                                             if (Car_percent - CarPercentagePreviousWeek < 3) {
                                                 users_reduce_driving++;

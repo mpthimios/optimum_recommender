@@ -4,10 +4,13 @@ import at.ac.ait.ariadne.routeformat.Route;
 import at.ac.ait.ariadne.routeformat.RouteSegment;
 import imu.recommender.helpers.RecommenderModes;
 import org.apache.log4j.Logger;
+import uk.recurse.geocoding.reverse.Country;
+import uk.recurse.geocoding.reverse.ReverseGeocoder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class RouteModel {
 
@@ -215,6 +218,30 @@ public class RouteModel {
 			}
 		}
 		return total_pt_time/60;
+	}
+
+	public String findCountry(){
+		//Get coordinates
+		String[] coordinates = {
+				this.route.getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(0).toString(),
+				this.route.getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(1).toString()
+		};
+
+		String city = "Vienna";
+		ReverseGeocoder geocoder = new ReverseGeocoder();
+		Optional country = geocoder.getCountry(Double.parseDouble(coordinates[1]), Double.parseDouble(coordinates[0]));
+		if (country.isPresent()) {
+			String location = ((Country) country.get()).iso();
+			logger.debug("Request from: " + location);
+			if (location.matches("GB")) {
+				city = "Birmingham";
+			} else if (location.matches("AT")) {
+				city = "Vienna";
+			} else if (location.matches("SI")) {
+				city = "Ljubljana";
+			}
+		}
+		return city;
 	}
 
 	public Route getRoute() {

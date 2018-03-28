@@ -51,14 +51,14 @@ public class UpdateStrategiesProbabilities  implements Job{
         //Update the probabilities of each strategy based on all users.
         List strategies = m.distinct( "persuasive_strategy", new BasicDBObject());
 
-        //Get total popupdisplays and total helpful
+         //Get total popupdisplays and total helpful
         BasicDBObject RouteQuery = new BasicDBObject();
         RouteQuery.put("route_feedback.helpful", true);
 
         BasicDBObject fields = new BasicDBObject();
         fields.put("_id", 1);
         DBCursor requestIdsSuccess = routes.find(RouteQuery, fields );
-        List<String> requestId = new ArrayList<String>();
+        List<String> requestId= new ArrayList<String>();
         while (requestIdsSuccess.hasNext() ) {
             requestId.add(requestIdsSuccess.next().get("_id").toString());
         }

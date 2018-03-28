@@ -222,6 +222,16 @@ public class CalculateModeUsageLastWeek implements Job{
                     }
                 }catch (Exception e) {
                     logger.debug(e);
+                    Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) id);
+                    //percentages should be saved to mongo
+                    ModeUsageLastWeek modeUsage = new ModeUsageLastWeek();
+                    modeUsage.setWalk_percent(0.0);
+                    modeUsage.setPt_percent(0.0);
+                    modeUsage.setCar_percent(0.0);
+                    modeUsage.setBike_percent(0.0);
+
+                    UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("mode_usage_last_week", modeUsage);
+                    mongoDatastore.update(query, ops);
                 }
             }catch (Exception e){
                 logger.debug(e);

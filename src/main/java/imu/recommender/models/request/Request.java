@@ -12,6 +12,9 @@ public class Request {
     private Integer numberOfUsersGroupA;
     private Integer numberOfUsersGroupB;
     private Integer numberOfUsersGroupC;
+    private Integer numberOfMessages;
+    private Integer numberOfGraphs;
+    private Integer numberOfCombination;
 
     public Request(){
 
@@ -44,5 +47,29 @@ public class Request {
 
     public void setNumberOfUsersGroupC(Integer numberOfUsersGroupC) {
         this.numberOfUsersGroupC = numberOfUsersGroupC;
+    }
+
+    public Integer getNumberOfMessages() {
+        return numberOfMessages;
+    }
+
+    public void setNumberOfMessages(Integer numberOfMessages) {
+        this.numberOfMessages = numberOfMessages;
+    }
+
+    public Integer getNumberOfGraphs() {
+        return numberOfGraphs;
+    }
+
+    public void setNumberOfGraphs(Integer numberOfGraphs) {
+        this.numberOfGraphs = numberOfGraphs;
+    }
+
+    public Integer getNumberOfCombination() {
+        return numberOfCombination;
+    }
+
+    public void setNumberOfCombination(Integer numberOfCombination) {
+        this.numberOfCombination = numberOfCombination;
     }
 }

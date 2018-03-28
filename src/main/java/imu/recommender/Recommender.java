@@ -92,7 +92,7 @@ public class Recommender {
 		try{
 			for (RouteModel route : routes){
 				//String key = String.valueOf(round(route.getRoute().getDistanceMeters()/1000.0)) + mapper.writeValueAsString(route.getRoute().getSegments());
-				String key = String.valueOf(round(route.getRoute().getDistanceMeters()/1000.0)) + mapper.writeValueAsString(route.getRoute().getAdditionalInfo().get("mode"));
+				String key = String.valueOf(round(route.getRoute().getDistanceMeters()/1000.0)) + mapper.writeValueAsString(route.getRoute().getAdditionalInfo().get("mode")) + mapper.writeValueAsString(route.getRoute().getSegments().size());;
 				if (!uniquesHash.containsKey(key)){
 					uniquesHash.put(key, route);
 					logger.debug("non duplicate route found");
@@ -333,7 +333,7 @@ public class Recommender {
 				userPreferedModes.put(user.getMode_usage().getPt_percent(), RecommenderModes.PUBLIC_TRANSPORT);
 				pt=Boolean.TRUE;
 			}
-			if (user.getLanguage().equals("de")){
+			if (routes.get(0).findCountry().equals("Vienna")){
 				if(pt.equals(Boolean.FALSE)){
 					userPreferedModes.put(0.004,RecommenderModes.PUBLIC_TRANSPORT);
 				}
@@ -347,7 +347,7 @@ public class Recommender {
 					userPreferedModes.put(0.001,RecommenderModes.BICYCLE);
 				}
 			}
-			else if (user.getLanguage().equals("slo")){
+			else if (user.getLanguage().equals("Ljubljana")){
 				if(car.equals(Boolean.FALSE)){
 					userPreferedModes.put(0.004,RecommenderModes.CAR);
 				}
@@ -361,7 +361,7 @@ public class Recommender {
 					userPreferedModes.put(0.001,RecommenderModes.BICYCLE);
 				}
 			}
-			else if (user.getLanguage().equals("en")){
+			else if (user.getLanguage().equals("Birmingham")){
 				if(car.equals(Boolean.FALSE)){
 					userPreferedModes.put(0.004,RecommenderModes.CAR);
 				}

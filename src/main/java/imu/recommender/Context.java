@@ -6,12 +6,9 @@ import imu.recommender.models.route.RouteModel;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
-import uk.recurse.geocoding.reverse.Country;
-import uk.recurse.geocoding.reverse.ReverseGeocoder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by evangelie on 22/12/2016.
@@ -32,26 +29,8 @@ public class Context {
         //Get trip properties
         Integer routeDistance = trip.getRoute().getDistanceMeters();
 
-        //Get coordinates
-        String[] coordinates = {
-                trip.getRoute().getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(0).toString(),
-                trip.getRoute().getFrom().getCoordinate().getGeometry().getCoordinates().get().asNewList().get(1).toString()
-        };
-
-        String city = "Vienna";
-        ReverseGeocoder geocoder = new ReverseGeocoder();
-        Optional country = geocoder.getCountry(Double.parseDouble(coordinates[1]), Double.parseDouble(coordinates[0]));
-        if (country.isPresent()) {
-            String location = ((Country) country.get()).iso();
-            logger.debug("Request from: " + location);
-            if (location.matches("GB")) {
-                city = "Birmingham";
-            } else if (location.matches("AT")) {
-                city = "Vienna";
-            } else if (location.matches("SI")) {
-                city = "Ljubljana";
-            }
-        }
+        //Get city
+        String city =  trip.findCountry();
 
         Integer duration = trip.getRoute().getDurationSeconds();
 
