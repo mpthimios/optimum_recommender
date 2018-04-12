@@ -220,7 +220,7 @@ public class RequestHandler extends HttpServlet{
 						}
 						Map<String, Object> additionalInfoRouteRequest = new HashMap<>();
 						additionalInfoRouteRequest.put("mode", response_route.getRoutes().get(i).getAdditionalInfo().get("mode"));
-						additionalInfoRouteRequest.put("message", mes);
+						//additionalInfoRouteRequest.put("message", mes);
 						response_route.getRoutes().get(i).setAdditionalInfo(additionalInfoRouteRequest);
 					}
 					RouteFormatRoot final_route = new RouteFormatRoot()

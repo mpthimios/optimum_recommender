@@ -18,8 +18,11 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +42,17 @@ public class UpdateStrategiesProbabilities  implements Job{
             // TODO Auto-generated catch block
             logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
             return;
+        }
+
+
+        //Get success and feedback attempts
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat ("yyyy.MM.dd");
+        String date ="2018.04.02";
+        Date startDate = null;
+        try {
+            startDate = simpleDateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
         DBCollection m = mongoDatastore.getCollection( Strategy.class );
@@ -77,7 +91,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                 Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal(id.toString());
                 //Update the number of success
                 //Find all saved trips with persusasive message (suggestion)
-                BasicDBObject TripQuery = new BasicDBObject();
+                BasicDBObject TripQuery = new BasicDBObject("createdat",
+                        new BasicDBObject("$gte",startDate));
                 TripQuery.put("viewed", true);
                 TripQuery.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
                 List tripsIds = trips.distinct("requestId",TripQuery);
@@ -85,14 +100,16 @@ public class UpdateStrategiesProbabilities  implements Job{
                 mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_successes", success));
 
                 //Get total strategy success
-                BasicDBObject TripQuery2 = new BasicDBObject();
+                BasicDBObject TripQuery2 =  new BasicDBObject("createdat",
+                        new BasicDBObject("$gte",startDate));
                 TripQuery2.put("requestId", new BasicDBObject("$in", requestId));
                 TripQuery2.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
                 List StrategySucess = trips.distinct("requestId",TripQuery2);
                 Integer strategysucess = StrategySucess.size();
 
                 //Get total strategy fail
-                BasicDBObject TripQuery3 = new BasicDBObject();
+                BasicDBObject TripQuery3 = new BasicDBObject("createdat",
+                        new BasicDBObject("$gte",startDate));
                 TripQuery3.put("requestId", new BasicDBObject("$in", requestIdsFailed));
                 TripQuery3.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
                 List StrategyFail = trips.distinct("requestId",TripQuery3);
@@ -136,7 +153,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                         Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(userid);
 
                         //Get success and feedback attempts
-                        BasicDBObject TripQuery4 = new BasicDBObject();
+                        BasicDBObject TripQuery4 = new BasicDBObject("createdat",
+                                new BasicDBObject("$gte",startDate));
                         TripQuery4.put("requestId", new BasicDBObject("$in", requestId));
                         TripQuery4.put("userId",userid);
                         TripQuery4.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
@@ -144,7 +162,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                         Integer userFeedbackSucess = UserFeedbackSucess.size();
 
                         //Get total strategy fail
-                        BasicDBObject TripQuery5 = new BasicDBObject();
+                        BasicDBObject TripQuery5 =  new BasicDBObject("createdat",
+                                new BasicDBObject("$gte",startDate));
                         TripQuery5.put("requestId", new BasicDBObject("$in", requestIdsFailed));
                         TripQuery5.put("userId", userid);
                         TripQuery5.put("body.additionalInfo.additionalProperties.strategy", strategyQuery.get().getPersuasive_strategy());
@@ -164,7 +183,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                             else{
                                 //Get total attemps and total successes
                                 //Find all saved trips of current user with persusasive message (suggestion)
-                                BasicDBObject searchTripQuery = new BasicDBObject();
+                                BasicDBObject searchTripQuery =  new BasicDBObject("createdat",
+                                        new BasicDBObject("$gte",startDate));
                                 searchTripQuery.put("viewed", true);
                                 searchTripQuery.put("userId", userid);
                                 searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "suggestion");
@@ -257,7 +277,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                             else {
                                 //Get total attemps and successes
                                 //Find all saved trips of current user with persusasive message (suggestion)
-                                BasicDBObject searchTripQuery = new BasicDBObject();
+                                BasicDBObject searchTripQuery =  new BasicDBObject("createdat",
+                                        new BasicDBObject("$gte",startDate));
                                 searchTripQuery.put("viewed", true);
                                 searchTripQuery.put("userId", userid);
                                 searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "comparison");
@@ -349,7 +370,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                             else {
                                 //Get total attemps and successes
                                 //Find all saved trips of current user with persuasive message (suggestion)
-                                BasicDBObject searchTripQuery = new BasicDBObject();
+                                BasicDBObject searchTripQuery =  new BasicDBObject("createdat",
+                                        new BasicDBObject("$gte",startDate));
                                 searchTripQuery.put("viewed", true);
                                 searchTripQuery.put("userId", userid);
                                 searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "self-monitoring");
@@ -442,7 +464,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                             else {
                                 //Get total attemps and successes
                                 //Find all saved trips of current user with persuasive message (suggestion)
-                                BasicDBObject searchTripQuery = new BasicDBObject();
+                                BasicDBObject searchTripQuery = new BasicDBObject("createdat",
+                                        new BasicDBObject("$gte",startDate));
                                 searchTripQuery.put("viewed", true);
                                 searchTripQuery.put("userId", userid);
                                 searchTripQuery.put("body.additionalInfo.additionalProperties.strategy", "reward");
@@ -537,7 +560,8 @@ public class UpdateStrategiesProbabilities  implements Job{
                             //logger.debug(messageQuery.get().getMessage_text());
                             //Update the number of success
                             //Find all saved trips with persusasive message (suggestion)
-                            BasicDBObject TripQuery4 = new BasicDBObject();
+                            BasicDBObject TripQuery4 =  new BasicDBObject("createdat",
+                                    new BasicDBObject("$gte",startDate));
                             TripQuery4.put("body.additionalInfo.additionalProperties.messageId", mesId);
                             TripQuery4.put("requestId", new BasicDBObject("$in", requestId));
                             List tr = trips.find(TripQuery4).toArray();

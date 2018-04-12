@@ -7,6 +7,7 @@ import com.mongodb.DBObject;
 import imu.recommender.helpers.GetProperties;
 import imu.recommender.models.message.Message;
 import imu.recommender.models.message.MessageThrottling;
+import imu.recommender.models.message.MessageThrottlingContext;
 import imu.recommender.models.strategy.Strategy;
 import imu.recommender.models.user.User;
 import org.apache.log4j.Logger;
@@ -35,6 +36,16 @@ public class CalculateMessageUtilities {
         //Get user language
         String lang = user.getLanguage();
         String pilot = user.getPilot();
+
+        //Start date of pilots
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+        String date ="2018-04-04 12:18:43";
+        Date pilotStartDate = null;
+        try {
+            pilotStartDate = format.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
 
         //Get the id of the displayed messages during last X hours
@@ -178,6 +189,9 @@ public class CalculateMessageUtilities {
         //prepei na allaksei kai na epistrefei mia sortarismenh lista me ta messages apo ola ta context
         List<Message> messages = new ArrayList<>();
         LinkedHashMap<Message, Double> rankedMessagesMap = new LinkedHashMap<>();
+        List<Message> mesContext = new ArrayList<>();
+        ArrayList<String> context = new ArrayList<>();
+        LinkedHashMap<Message, Double> rankedMessagesContextMap = new LinkedHashMap<>();
         for (Message message : mes ) {
             //Calculate message utility based on context.
             Double messageUtility = calculateUtility(message.getContext(), target, user);
@@ -185,6 +199,13 @@ public class CalculateMessageUtilities {
             rankedMessagesMap.put(message, messageUtility);
             //Rank messages based on context
             rankedMessagesMap = entriesSortedByValues(rankedMessagesMap);
+            String con = message.getContext();
+            if (!context.contains(con)){
+                rankedMessagesContextMap.put(message,messageUtility);
+                //Rank messages based on context
+                rankedMessagesContextMap = entriesSortedByValues(rankedMessagesContextMap);
+                context.add(con);
+            }
 
             /*if (messageUtility > max_message_utility) {
                 max_message_utility = messageUtility;
@@ -198,42 +219,56 @@ public class CalculateMessageUtilities {
         for (Map.Entry<Message, Double> entry : rankedMessagesMap.entrySet()){
             messages.add(entry.getKey());
         }
+        for (Map.Entry<Message, Double> entry : rankedMessagesContextMap.entrySet()){
+            mesContext.add(entry.getKey());
+        }
 
         //Select the message that will be displayed on the user
         Double max_message_utility2 = 0.0;
-        for (Message m: messages) {
-            //If message didn't display during last X hours
-            if ( (!DisplayedMessages.contains(m.getId()) ) && selected_message_text.isEmpty()){
-                if (check_message(user,mongoDatastore, 3, m)){
-                    if ("de".equals(lang)) {
-                        selected_message_text = m.getMessage_text_german();
+        //groupA ---> Throttling with messageId,  groupB ----> Throttling with context
+        if (user.getThrottlingGroup().equals("groupA")){
+            for (Message m: messages) {
+                //If message didn't display during last X hours
+                if ( (!DisplayedMessages.contains(m.getId()) ) && selected_message_text.isEmpty()) {
+                    Boolean display = Boolean.FALSE;
+                    if (check_message(user, mongoDatastore, 3, m, pilotStartDate).equals(Boolean.TRUE)) {
+                        display = Boolean.TRUE;
                     }
-                    else if("sl".equals(lang)){
-                        selected_message_text = m.getMessage_text_slo();
+                    if (display) {
+                        if ("de".equals(lang)) {
+                            selected_message_text = m.getMessage_text_german();
+                        } else if ("sl".equals(lang)) {
+                            selected_message_text = m.getMessage_text_slo();
+                        } else {
+                            selected_message_text = m.getMessage_text();
+                        }
+                        selected_message_params = m.getParameters();
+                        selectedMessageId = m.getId();
                     }
-                    else {
-                        selected_message_text = m.getMessage_text();
-                    }
-                    selected_message_params = m.getParameters();
-                    selectedMessageId = m.getId();
                 }
-                //Set random messageUtility
-                /*Double messageUtility = Math.random();
-                m.setUtility(messageUtility);
-                if (messageUtility > max_message_utility2) {
-                    max_message_utility2 = messageUtility;
-                    if ("de".equals(lang)) {
-                        selected_message_text = m.getMessage_text_german();
+            }
+
+        }
+        else if (user.getThrottlingGroup().equals("groupB")) {
+            for (Message m: mesContext) {
+                //If message didn't display during last X hours
+                if ( (!DisplayedMessages.contains(m.getId()) ) && selected_message_text.isEmpty()) {
+                    Boolean display = Boolean.FALSE;
+                    if (check_message_context_throttling(user, mongoDatastore, 3, m, pilotStartDate).equals(Boolean.TRUE)) {
+                        display = Boolean.TRUE;
                     }
-                    else if("sl".equals(lang)){
-                        selected_message_text = m.getMessage_text_slo();
+                    if (display) {
+                        if ("de".equals(lang)) {
+                            selected_message_text = m.getMessage_text_german();
+                        } else if ("sl".equals(lang)) {
+                            selected_message_text = m.getMessage_text_slo();
+                        } else {
+                            selected_message_text = m.getMessage_text();
+                        }
+                        selected_message_params = m.getParameters();
+                        selectedMessageId = m.getId();
                     }
-                    else {
-                        selected_message_text = m.getMessage_text();
-                    }
-                    selected_message_params = m.getParameters();
-                    selectedMessageId = m.getId();
-                }*/
+                }
             }
 
         }
@@ -410,7 +445,6 @@ public class CalculateMessageUtilities {
             mongoDatastore.update(query2, mongoDatastore.createUpdateOperations(Message.class).set("number_of_times_sent",numberOfTimesMessageSent ));
             //increase the number_of_times_sent of the selected strategy
             Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal(strategy);
-            Strategy dbStrategy = strategyQuery.get();
             logger.debug("number of times sent: " + strategyQuery.get().getNumber_of_times_sent());
             Integer number_of_times_sent = strategyQuery.get().getNumber_of_times_sent();
             number_of_times_sent ++;
@@ -473,8 +507,6 @@ public class CalculateMessageUtilities {
 
         }
         catch(Exception e){
-            Strategy newStrategy = new Strategy();
-            mongoDatastore.save(newStrategy);
             logger.debug("Exception: "+e.getMessage(),e);
             selected_message_text = selected_message_text + "_" +strategy+ "_" +selectedMessageId;
             return selected_message_text;
@@ -748,12 +780,13 @@ public class CalculateMessageUtilities {
         }
     }
 
-    private static Boolean check_message(User user,Datastore mongoDatastore, Integer N, Message message) {
+    private static Boolean check_message(User user,Datastore mongoDatastore, Integer N, Message message, Date startDate ) {
 
         String messageId = message.getId();
 
         DBCollection routes = mongoDatastore.getDB().getCollection("UserTrip");
-        BasicDBObject TripQuery = new BasicDBObject();
+        BasicDBObject TripQuery = new BasicDBObject("createdat",
+                new BasicDBObject("$gte",startDate));
         TripQuery.put("userId", user.getId());
         TripQuery.put("body.additionalInfo.additionalProperties.messageId",messageId);
 
@@ -806,7 +839,7 @@ public class CalculateMessageUtilities {
         query.put("userId", user.getId());
         query.put("messageId", messageId);
         BasicDBObject fields1 = new BasicDBObject();
-        fields.put("count", 1);
+        fields1.put("count", 1);
         DBObject messageThr = messageThrottlingDb.findOne(query,fields1);
         logger.debug(messageThr.toString());
         //Integer count = query.get().getCount();
@@ -829,6 +862,103 @@ public class CalculateMessageUtilities {
                 logger.debug(count);
                 BasicDBObject mes = new BasicDBObject("userId",user.getId()).append("messageId",messageId);
                 messageThrottlingDb.update(mes,new BasicDBObject("$set", new BasicDBObject("count", count)));
+                logger.debug(count);
+                return Boolean.FALSE;
+            }
+        }
+        else {
+            return Boolean.TRUE;
+        }
+
+    }
+
+    private static Boolean check_message_context_throttling(User user,Datastore mongoDatastore, Integer N, Message message, Date startDate) {
+
+        String messageId = message.getId();
+        String context = message.getContext();
+        String strategy = message.getPersuasive_strategy();
+
+        DBCollection routes = mongoDatastore.getDB().getCollection("UserTrip");
+
+        BasicDBObject TripQuery = new BasicDBObject("createdat", new BasicDBObject("$gte",startDate));
+        TripQuery.put("userId", user.getId());
+        TripQuery.put("body.additionalInfo.additionalProperties.context",context);
+        TripQuery.put("body.additionalInfo.additionalProperties.strategy",strategy);
+        //TripQuery.put("createdat", new BasicDBObject("$gte",startDate));
+
+        logger.debug(context);
+        logger.debug(strategy);
+
+
+        BasicDBObject fields1 = new BasicDBObject();
+        fields1.put("requestId", 1);
+
+        List<String> RequestIds = new ArrayList <String>();
+
+        DBCursor cursor =routes.find(TripQuery,fields1);
+        while (cursor.hasNext()) {
+            String requestId = cursor.next().get("requestId").toString();
+            logger.debug(requestId);
+            RequestIds.add(requestId);
+        }
+        logger.debug(RequestIds);
+
+        DBCollection feedback = mongoDatastore.getDB().getCollection("UserRoute");
+
+        BasicDBObject FeedbackQuery = new BasicDBObject();
+        FeedbackQuery.put("_id",new BasicDBObject("$in", RequestIds));
+        FeedbackQuery.put("userId", user.getId());
+        FeedbackQuery.put("route_feedback.helpful", Boolean.TRUE);
+
+        Integer positiveFeedback = feedback.find(FeedbackQuery).size();
+
+        BasicDBObject FeedbackQuery2 = new BasicDBObject();
+        FeedbackQuery2.put("_id",new BasicDBObject("$in", RequestIds));
+        FeedbackQuery2.put("userId", user.getId());
+        FeedbackQuery2.put("route_feedback.helpful", Boolean.FALSE);
+        Integer negativeFeedback = feedback.find(FeedbackQuery2).size();
+        logger.debug(negativeFeedback);
+        logger.debug(positiveFeedback);
+        Integer no_answer= abs(negativeFeedback - positiveFeedback);
+        logger.debug(no_answer);
+        DBCollection messageThrottlingContextDb = mongoDatastore.getDB().getCollection("MessageThrottlingContext");
+        if (mongoDatastore.createQuery(MessageThrottlingContext.class).field("userId").equal(user.getId()).field("strategy").equal(strategy).field("context").equal(context).asList().isEmpty()) {
+            MessageThrottlingContext messageThrottlingContext = new MessageThrottlingContext();
+            messageThrottlingContext.setCount(1);
+            messageThrottlingContext.setContext(context);
+            messageThrottlingContext.setStrategy(strategy);
+            messageThrottlingContext.setUserId(user.getId());
+            mongoDatastore.save(messageThrottlingContext);
+        }
+
+        BasicDBObject query = new BasicDBObject();
+        query.put("userId", user.getId());
+        query.put("context", context);
+        query.put("strategy",strategy);
+        BasicDBObject fields2 = new BasicDBObject();
+        fields2.put("count", 1);
+        DBObject messageThr = messageThrottlingContextDb.findOne(query,fields2);
+        logger.debug(messageThr.toString());
+
+        Integer count = Integer.parseInt(messageThr.get("count").toString());
+        MessageThrottlingContext messageThrottlingContext = mongoDatastore.createQuery(MessageThrottlingContext.class).field("userId").equal(user.getId()).field("strategy").equal(strategy).field("context").equal(context).get();
+
+        logger.debug(no_answer);
+        if (no_answer>0){
+            logger.debug("count"+count);
+            Integer message_display= (count%no_answer);
+            logger.debug("messageDisplay"+message_display);
+            if (message_display.equals(0)){
+                count=1;
+                logger.debug(count);
+                messageThrottlingContextDb.update(new BasicDBObject("_id", messageThrottlingContext.get_id()),new BasicDBObject("$set", new BasicDBObject("count", count)));
+                return Boolean.TRUE;
+            }
+            else {
+                count++;
+                logger.debug(count);
+                BasicDBObject mes = new BasicDBObject("userId",user.getId()).append("context",context).append("strategy",strategy);
+                messageThrottlingContextDb.update(mes,new BasicDBObject("$set", new BasicDBObject("count", count)));
                 logger.debug(count);
                 return Boolean.FALSE;
             }

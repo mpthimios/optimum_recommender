@@ -885,9 +885,9 @@ public class Recommender {
 
 		Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal( user.getId());
 		String group;
-		if (!query.field("group").exists().asList().isEmpty()) {  // .asList().isEmpty()
+		if (!query.field("ThrottlingGroup").exists().asList().isEmpty()) {  // .asList().isEmpty()
 			//group = query.get().getGroup();
-			group=user.getGroup();
+			group=user.getThrottlingGroup();
 			logger.debug(group);
 		}
 		else {
@@ -898,7 +898,7 @@ public class Recommender {
 			}
 			Integer groupA = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupA();
 			Integer groupB = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupB();
-			Integer groupC = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupC();
+			//Integer groupC = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupC();
 
 			Integer minNumber = groupA;
 			group = "groupA";
@@ -906,12 +906,8 @@ public class Recommender {
 				minNumber = groupB;
 				group = "groupB";
 			}
-			if (minNumber > groupC) {
-				minNumber = groupC;
-				group = "groupC";
-			}
 			Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
-			mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("group", group), false);
+			mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("ThrottlingGroup", group), false);
 			if(group.equals("groupA")){
 				groupA=groupA+1;
 				Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
@@ -922,19 +918,14 @@ public class Recommender {
 				Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
 				mongoDatastore.update(requestQuery, mongoDatastore.createUpdateOperations(Request.class).set("numberOfUsersGroupB", groupB), false);
 			}
-			else if(group.equals("groupC")){
-				groupC=groupC+1;
-				mongoDatastore.createQuery(Request.class).get().setNumberOfUsersGroupC(groupC);
-				Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
-				mongoDatastore.update(requestQuery, mongoDatastore.createUpdateOperations(Request.class).set("numberOfUsersGroupC", groupC), false);
-			}
 		}
 
-		logger.debug(user.getGroup());
-		//groupA ---> Combination,  groupB ----> Graph,  groupC ----->Message
+		logger.debug(user.getThrottlingGroup());
 
+		//Combination of Graph and Message
+		addMessage(user,mongoDatastore,purpose,Boolean.TRUE);
 
-		if(group.equals("groupA")){
+		/*if(group.equals("groupA")){
 			//Combination of Graph and Message
 			addMessage(user,mongoDatastore,purpose,Boolean.TRUE);
 
@@ -967,7 +958,7 @@ public class Recommender {
 			//Message only
 			addMessage(user, mongoDatastore,purpose,Boolean.FALSE);
 
-		}
+		}*/
 	}
 
 	public Boolean addGraph(User user, Datastore mongoDatastore, String strategy) throws JSONException {
@@ -1167,12 +1158,12 @@ public class Recommender {
 				Map<String, Object> additionalInfo = originalRouteFormatRoutes.getAdditionalInfo();
 				additionalInfo.put("graphData", m);
 				additionalInfo.put("strategy", strategy);
-				additionalInfo.put("userGroup",user.getGroup());
+				additionalInfo.put("userGroup",user.getThrottlingGroup());
 				originalRouteFormatRoutes.setAdditionalInfo(additionalInfo);
 
 			//Update UserRequestPerGroup Collection
 			UserRequestPerGroup requestPerGroup = new UserRequestPerGroup();
-			requestPerGroup.setGroup(user.getGroup());
+			requestPerGroup.setGroup(user.getThrottlingGroup());
 			requestPerGroup.setStrategy(strategy);
 			requestPerGroup.setUserId(user.getId());
 			requestPerGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));

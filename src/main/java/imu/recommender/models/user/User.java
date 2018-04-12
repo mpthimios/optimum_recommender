@@ -81,7 +81,7 @@ public class User {
 	private Date fistLogin;
 	private Integer total_activities;
 	private String persuasion;
-	private String group;
+	private String ThrottlingGroup;
 	private Integer count;
 	private Integer total_commuting;
 	private Integer total_leisure;
@@ -989,14 +989,6 @@ public class User {
 		this.ptUsageComparedToOthersGW = ptUsageComparedToOthersGW;
 	}
 
-	public String getGroup() {
-		return group;
-	}
-
-	public void setGroup(String group) {
-		this.group = group;
-	}
-
 	public ModeUsageLastWeek getMode_usage_last_week() {
 		return mode_usage_last_week;
 	}
@@ -1142,5 +1134,13 @@ public class User {
 
 	public void setPilot(String pilot) {
 		this.pilot = pilot;
+	}
+
+	public String getThrottlingGroup() {
+		return ThrottlingGroup;
+	}
+
+	public void setThrottlingGroup(String throttlingGroup) {
+		ThrottlingGroup = throttlingGroup;
 	}
 }

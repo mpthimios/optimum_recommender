@@ -397,7 +397,11 @@ public class RouteModel {
 	}
 
 	public void setContext(List<String> context) {
+
 		this.context = context;
+		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
+		additionalInfo.put("context", context);
+		this.route.setAdditionalInfo(additionalInfo);
 	}
 
 	public String getFeature() {
