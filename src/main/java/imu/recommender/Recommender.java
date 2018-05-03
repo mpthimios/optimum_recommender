@@ -740,13 +740,15 @@ public class Recommender {
 			Integer integer = 0;
 			for (RouteModel route : routes) {
 				if (integer.equals(1)) {
-					message = "";
+					//message = "";
 					strategy = "";
 					messageId = "";
+					String noTarget = "noTarget";
 
-					route.setMessage(message);
+					//route.setMessage(message);
 					route.setStrategy(strategy);
 					route.setMessageId(messageId);
+					route.setTarget(noTarget);
 					//set popup_display false
 					route.setPopup(false);
 					//addMessage = Boolean.FALSE;
@@ -1263,16 +1265,19 @@ public class Recommender {
 		//Integer count = user.getCount();
 		Integer total_commuting=user.getTotal_commuting();
 		Integer total_leisure=user.getTotal_leisure();
+		Integer total_unknown = user.getTotal_unknown();
 
 		Integer displayed_commuting=user.getDisplayed_commuting();
 		Integer displayed_leisure=user.getDisplayed_leisure();
+		Integer displayed_unknown = user.getDisplayed_unknown();
+
 		logger.debug(vectorA[0]);
 		logger.debug(vectorB[0]);
 		logger.debug(vectorA[1]);
 		logger.debug(vectorB[1]);
 
 		if (tripPurpose.equals("leisure")){
-			if (cosineSimilarity(vectorA,vectorB)>0.7){
+			if (cosineSimilarity(vectorA,vectorB)>0.4){
 				logger.debug("Cosine similarity:"+cosineSimilarity(vectorA,vectorB));
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) user.getId());
 				UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("total_leisure", total_leisure).set("displayed_leisure", displayed_leisure);
@@ -1289,7 +1294,7 @@ public class Recommender {
 					return Boolean.TRUE;
 				}
 				else {
-					if (displayed_leisure / total_leisure < 0.5) {
+					if (displayed_leisure / total_leisure < 0.7) {
 						total_leisure = total_leisure + 1;
 						displayed_leisure = displayed_leisure + 1;
 						user.setTotal_leisure(total_leisure);
@@ -1308,7 +1313,7 @@ public class Recommender {
 			}
 		}
 		else if (tripPurpose.equals("non-leisure")){
-			if (cosineSimilarity(vectorA,vectorB)>0.7){
+			if (cosineSimilarity(vectorA,vectorB)>0.6){
 				logger.debug("Cosine similarity:"+cosineSimilarity(vectorA,vectorB));
 				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) user.getId());
 				UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("total_commuting", total_commuting).set("displayed_commuting", displayed_commuting);
@@ -1325,18 +1330,18 @@ public class Recommender {
 					return Boolean.TRUE;
 				}
 				else {
-					if ((double)displayed_commuting / total_commuting < 0.2) {
+					if ((double)displayed_commuting / total_commuting < 0.3) {
 						displayed_commuting = displayed_commuting + 1;
 						total_commuting = total_commuting + 1;
 						user.setDisplayed_commuting(displayed_commuting);
-						user.setDisplayed_commuting(total_commuting);
+						user.setTotal_commuting(total_commuting);
 						Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) user.getId());
 						UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("total_commuting", total_commuting).set("displayed_commuting", displayed_commuting);
 						mongoDatastore.update(query, ops);
 						return Boolean.TRUE;
 					} else {
 						total_commuting = total_commuting + 1;
-						user.setDisplayed_commuting(total_commuting);
+						user.setTotal_commuting(total_commuting);
 						Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) user.getId());
 						UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("total_commuting", total_commuting);
 						mongoDatastore.update(query, ops);
@@ -1346,7 +1351,43 @@ public class Recommender {
 			}
 		}
 		else {
-			return Boolean.TRUE;
+			if (cosineSimilarity(vectorA,vectorB)>0.5){
+				logger.debug("Cosine similarity:"+cosineSimilarity(vectorA,vectorB));
+				Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) user.getId());
+				UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("total_unknown", total_unknown).set("displayed_unknown", displayed_unknown);
+				mongoDatastore.update(query, ops);
+				return Boolean.TRUE;
+			}
+			else {
+				if(total_unknown==0){
+					displayed_unknown = displayed_unknown + 1;
+					total_unknown = total_unknown + 1;
+					Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) user.getId());
+					UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("total_unknown", total_unknown).set("displayed_unknown", displayed_unknown);
+					mongoDatastore.update(query, ops);
+					return Boolean.TRUE;
+				}
+				else {
+					if ((double)displayed_commuting / total_commuting < 0.5) {
+						displayed_unknown = displayed_unknown + 1;
+						total_unknown = total_unknown + 1;
+						user.setDisplayed_unknown(displayed_unknown);
+						user.setTotal_unknown(total_unknown);
+						Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) user.getId());
+						UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("total_unknown", total_unknown).set("displayed_unknown", displayed_unknown);
+						mongoDatastore.update(query, ops);
+						return Boolean.TRUE;
+					} else {
+						total_unknown = total_unknown + 1;
+						user.setTotal_unknown(total_unknown);
+						Query<User> query = mongoDatastore.createQuery(User.class).field("id").equal((String) user.getId());
+						UpdateOperations<User> ops = mongoDatastore.createUpdateOperations(User.class).set("total_unknown", total_unknown);
+						mongoDatastore.update(query, ops);
+						return Boolean.FALSE;
+					}
+				}
+			}
+			//return Boolean.TRUE;
 			/*total_unknown_purpose = total_unknown_purpose+1;
 			if (displayed_unknown_purpose/total_unknown_purpose>0.5){
 				displayed_unknown_purpose=displayed_unknown_purpose+1;

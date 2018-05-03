@@ -28,6 +28,7 @@ public class RouteModel {
 	private String message = "";
 	private String strategy = "";
 	private String messageId = "";
+	private String target = "";
 	private List<String> context = new ArrayList<>();
 	private boolean popup = false;
 	private int walkingDistance = 0;
@@ -412,6 +413,17 @@ public class RouteModel {
 		this.feature = feature;
 		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
 		additionalInfo.put("feature", feature);
+		this.route.setAdditionalInfo(additionalInfo);
+	}
+
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
+		Map<String, Object> additionalInfo = this.route.getAdditionalInfo();
+		additionalInfo.put("target", target);
 		this.route.setAdditionalInfo(additionalInfo);
 	}
 }

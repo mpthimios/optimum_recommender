@@ -47,7 +47,7 @@ public class UpdateStrategiesProbabilities  implements Job{
 
         //Get success and feedback attempts
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat ("yyyy.MM.dd");
-        String date ="2018.04.02";
+        String date ="2018.04.16";
         Date startDate = null;
         try {
             startDate = simpleDateFormat.parse(date);

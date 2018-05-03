@@ -39,7 +39,7 @@ public class CalculateMessageUtilities {
 
         //Start date of pilots
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
-        String date ="2018-04-04 12:18:43";
+        String date ="2018-04-16 00:00:43";
         Date pilotStartDate = null;
         try {
             pilotStartDate = format.parse(date);
@@ -766,8 +766,8 @@ public class CalculateMessageUtilities {
                 try {
                     Date date = format.parse(dateString);
                     long milliseconds = Math.abs(date.getTime() - now.getTime());
-                    int hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
-                    if (hours > X) {
+                    int hours = (int) ((milliseconds / (1000 * 60 * 60)));
+                    if (hours < X) {
                         String messageId = ((DBObject)((DBObject)((DBObject)request.get(i).get("body")).get("additionalInfo")).get("additionalProperties")).get("messageId").toString();
                         logger.debug(messageId);
                         DisplayedMessages.add(messageId);

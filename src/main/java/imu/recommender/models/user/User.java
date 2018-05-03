@@ -85,9 +85,11 @@ public class User {
 	private Integer count;
 	private Integer total_commuting;
 	private Integer total_leisure;
+	private Integer total_unknown;
 
 	private Integer displayed_commuting;
 	private Integer displayed_leisure;
+	private Integer displayed_unknown;
 
 	private String[] predictedHome;
 	private String[] predictedWork;
@@ -178,8 +180,10 @@ public class User {
 		this.count = 0;
 		this.total_commuting=0;
 		this.total_leisure=0;
+		this.total_unknown=0;
 		this.displayed_commuting=0;
 		this.displayed_leisure=0;
+		this.displayed_unknown=0;
 
 	}
 	
@@ -330,6 +334,7 @@ public class User {
 				}
 			}*/
 			if ("pt".equals(user_mode)){
+				target.add("pt");
 				target.add("bike&ride");
 				target.add("BikeSharing");
 				target.add("bicycle");
@@ -1142,5 +1147,21 @@ public class User {
 
 	public void setThrottlingGroup(String throttlingGroup) {
 		ThrottlingGroup = throttlingGroup;
+	}
+
+	public Integer getTotal_unknown() {
+		return total_unknown;
+	}
+
+	public void setTotal_unknown(Integer total_unknown) {
+		this.total_unknown = total_unknown;
+	}
+
+	public Integer getDisplayed_unknown() {
+		return displayed_unknown;
+	}
+
+	public void setDisplayed_unknown(Integer displayed_unknown) {
+		this.displayed_unknown = displayed_unknown;
 	}
 }
