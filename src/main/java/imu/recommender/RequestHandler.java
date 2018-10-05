@@ -68,6 +68,7 @@ public class RequestHandler extends HttpServlet{
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		String requestBody = "";
+		String recommendedRoutesStr= "";
 		try {
 			requestBody = getBody(request);
 		} catch (Exception e1) {
@@ -88,55 +89,70 @@ public class RequestHandler extends HttpServlet{
 			RouteFormatRoot recommendedRoutes;
 			RouteFormatRoot recommendedRoutes2;
 			Recommender recommenderRoutes= new Recommender(originalRoutes, user);
-			recommenderRoutes.filterDuplicates();
-			if (Baseline == Boolean.FALSE) {
-				if (Classification == Boolean.TRUE) {
-					//Create 2 groups of users. If user belongs to group A rank routes and add message
-					user.classify(user, mongoDatastore);
-					System.out.println(user.getPersuasion());
-					if ("A".equals(user.getPersuasion())) {
-						boolean filtered = recommenderRoutes.filterRoutesForUser(user);
-						if (NewFeature == Boolean.TRUE){
-							recommenderRoutes.rankRoutesForUserNew(user, mongoDatastore);
-						}
-						else {
-							recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
-						}
-						recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
-						if (filtered) {
-							recommenderRoutes.addPersuasiveFeature(user, mongoDatastore);
+			//The service returns the routes that gets as input from routing engine for specific userIds
+			if (userID.equals("EXdOQz2TLCIcGxryis70okIRREhGjmoj") || userID.equals("yXLL88xbA82rERJpN3eGjEv0lcViuNeI") || userID.equals("ILK2e8Qzk9VbpUihynQTkG5eGqG5XO94") ||userID.equals("onlDjIetnLGPpDjYKgfTWjTbLm7OfIRE") || userID.equals("t0ILWeYPptf2VrUGxBb3dY1atin6jWMD") ){
+				RouteFormatRoot response_route = recommenderRoutes.getOriginalRouteFormatRoutes();
+				RouteFormatRoot finalroute = new RouteFormatRoot()
+						.setRequestId(response_route.getRequestId())
+						.setRouteFormatVersion(response_route.getRouteFormatVersion())
+						.setProcessedTime(response_route.getProcessedTime())
+						.setStatus(response_route.getStatus())
+						.setCoordinateReferenceSystem(response_route.getCoordinateReferenceSystem())
+						.setRequest(response_route.getRequest().get())
+						.setRoutes(response_route.getRoutes());
+
+				recommendedRoutesStr = mapper.writeValueAsString(finalroute);
+			}
+			//The service filters duplicate routes and add persuasive features
+			else {
+				recommenderRoutes.filterDuplicates();
+				Double userPoints = user.getPoints();
+				if (Baseline == Boolean.FALSE) {
+					if (Classification == Boolean.TRUE) {
+						//Create 2 groups of users. If user belongs to group A rank routes and add message
+						user.classify(user, mongoDatastore);
+						System.out.println(user.getPersuasion());
+						if ("A".equals(user.getPersuasion())) {
+							boolean filtered = recommenderRoutes.filterRoutesForUser(user);
+							if (NewFeature == Boolean.TRUE) {
+								recommenderRoutes.rankRoutesForUserNew(user, mongoDatastore, userPoints);
+							} else {
+								recommenderRoutes.rankRoutesForUser(user, mongoDatastore, userPoints);
+							}
+							recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+							if (filtered) {
+								recommenderRoutes.addPersuasiveFeature(user, mongoDatastore, userPoints);
+							}
+						} else {
+							recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+
 						}
 					} else {
+						//Rank routes and add persuasive message
+						//recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+						boolean filtered = recommenderRoutes.filterRoutesForUser(user);
+						if (NewFeature == Boolean.TRUE) {
+							recommenderRoutes.rankRoutesForUserNew(user, mongoDatastore, userPoints);
+						} else {
+							recommenderRoutes.rankRoutesForUser(user, mongoDatastore, userPoints);
+						}
+						System.out.print(filtered);
+						if (filtered) {
+							recommenderRoutes.addPersuasiveFeature(user, mongoDatastore, userPoints);
+						}
+						//Add Graph
+						//recommenderRoutes.addGraph(user, mongoDatastore,"");
+
 						recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
-
 					}
-				}else {
-					//Rank routes and add persuasive message
-					//recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
-					boolean filtered = recommenderRoutes.filterRoutesForUser(user);
-					if (NewFeature == Boolean.TRUE){
-						recommenderRoutes.rankRoutesForUserNew(user, mongoDatastore);
-					}
-					else {
-						recommenderRoutes.rankRoutesForUser(user, mongoDatastore);
-					}					
-					System.out.print(filtered);
-					if (filtered) {
-						recommenderRoutes.addPersuasiveFeature(user, mongoDatastore);
-					}
-					//Add Graph
-					//recommenderRoutes.addGraph(user, mongoDatastore,"");
-					
+				} else {
 					recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
+
 				}
-			}
-			else {
-				recommendedRoutes = recommenderRoutes.getRankedRoutesResponse();
 
+				recommendedRoutesStr = mapper.writeValueAsString(recommendedRoutes);
 
 			}
-
-			String recommendedRoutesStr = mapper.writeValueAsString(recommendedRoutes);
 
 
 			//Calculate Persononalized routes and saved the result into RouteCriteriaViolation Collection of mongodb

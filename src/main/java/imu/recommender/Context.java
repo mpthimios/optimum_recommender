@@ -17,7 +17,7 @@ public class Context {
 
     public static final Logger logger = Logger.getLogger(Context.class);
 
-    public static List<String> getRelevantContextForUser(Recommender route, RouteModel trip, User user, Datastore mongoDatastore, Double rewardPoints) throws Exception {
+    public static List<String> getRelevantContextForUser(Recommender route, RouteModel trip, User user, Datastore mongoDatastore, Double rewardPoints, Double userPoints) throws Exception {
 
     	String Duration = "Duration";
         String TooManyCarRoutes = "TooManyCarRoutes";       
@@ -56,7 +56,7 @@ public class Context {
         }
 
         //Check if the distance of route is walking
-        if (CheckReachingPrizeTarget(user, rewardPoints)){
+        if (CheckReachingPrizeTarget(user, rewardPoints, userPoints)){
             contextList.add("ReachingTarget");
         }
 
@@ -189,11 +189,10 @@ public class Context {
         }
         return cartrip;
     }
-    public static boolean CheckReachingPrizeTarget(User user, Double rewardPoints) {
+    public static boolean CheckReachingPrizeTarget(User user, Double rewardPoints, Double points) {
         try {
             String city = user.getPilot();
-            //Get user points
-            Double points = user.getPoints();
+
             if (city.equals("BRI")) {
                 if (points < 1140) {
                     if (points + rewardPoints > 1140.0) {

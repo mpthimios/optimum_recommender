@@ -26,7 +26,7 @@ public class CalculateMessageUtilities {
 
 	private static Logger logger = Logger.getLogger(CalculateMessageUtilities.class);
 
-    public static String calculateForUser(List<String> contextList, User user, String target, Datastore mongoDatastore, double RewardPoints) throws Exception {
+    public static String calculateForUser(List<String> contextList, User user, String target, Datastore mongoDatastore, double RewardPoints, Double userPoints) throws Exception {
 
         //Get personality of user
         String personality = user.getUserPersonalityType(user.getId(), mongoDatastore);
@@ -73,9 +73,7 @@ public class CalculateMessageUtilities {
         double PBikeSD = user.getBikeUsageComparedToOthers();
 
         //Initialize all percentage values in order to solve the cold start  problem
-
-        //Get user reward points
-        Double points = user.getPoints();
+        
         if (RewardPoints>0.0){
             PercentageList.add("points");
         }
@@ -371,7 +369,7 @@ public class CalculateMessageUtilities {
             }
             if ("prize".equals(selected_message_params)){
                 selected_message_text = selected_message_text.replace("X", Double.toString(Math.round(RewardPoints)));
-                Integer prize = getPrize(user,RewardPoints);
+                Integer prize = getPrize(user,RewardPoints, userPoints);
                 logger.debug(prize);
                 if ("de".equals(lang)) {
                     if(pilot.equals("BRI")) {
@@ -434,82 +432,81 @@ public class CalculateMessageUtilities {
         logger.debug(selected_message_text);
         logger.debug("-"+strategy+"-");
         logger.debug("-"+selectedMessageId+"-");
-
-        try {
-            //increase the number_of_times_sent of the selected message
-            Query<Message> query2 = mongoDatastore.createQuery(Message.class);
-            query2.criteria("id").equal(selectedMessageId);
-            Message messageObj = query2.get();
-            Integer numberOfTimesMessageSent = messageObj.getNumber_of_times_sent();
-            numberOfTimesMessageSent++;
-            mongoDatastore.update(query2, mongoDatastore.createUpdateOperations(Message.class).set("number_of_times_sent",numberOfTimesMessageSent ));
-            //increase the number_of_times_sent of the selected strategy
-            Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal(strategy);
-            logger.debug("number of times sent: " + strategyQuery.get().getNumber_of_times_sent());
-            Integer number_of_times_sent = strategyQuery.get().getNumber_of_times_sent();
-            number_of_times_sent ++;
-            mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_times_sent", number_of_times_sent));
-            //Increase the number of attemps for the current user
-            Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
-            Integer user_attempts;
-            DBCollection trips = mongoDatastore.getDB().getCollection("UserTrip");
-            if (strategy.equals("suggestion") ) {
-                try {
-                    user_attempts = userQuery.get().getSugAttempts();
-                }
-                catch (Exception e){
-                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", 0));
-                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", 0));
-                    user_attempts = userQuery.get().getSugAttempts();
-                }
-                user_attempts = user_attempts + 1;
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", user_attempts));
-
-            }
-            else if (strategy.equals("comparison") ) {
-                try {
-                    user_attempts = userQuery.get().getCompAttempts();
-                }
-                catch (Exception e){
-                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", 0));
-                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", 0));
-                    user_attempts = userQuery.get().getCompAttempts();
-                }
-                user_attempts = user_attempts + 1;
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", user_attempts));
-            }
-            if (strategy.equals("self-monitoring") ) {
-                try {
-                    user_attempts = userQuery.get().getSelfAttempts();
-                }
-                catch (Exception e){
-                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", 0));
-                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", 0));
-                    user_attempts = userQuery.get().getSelfAttempts();
-                }
-                user_attempts = user_attempts + 1;
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", user_attempts));
-            }
-            if (strategy.equals("reward") ) {
-                try {
-                    user_attempts = userQuery.get().getRewAttempts();
-                }
-                catch (Exception e){
-                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("rewAttempts", 0));
-                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("rewSuccess", 0));
-                    user_attempts = userQuery.get().getSelfAttempts();
-                }
-                user_attempts = user_attempts + 1;
-                mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("rewAttempts", user_attempts));
-            }
-            selected_message_text = selected_message_text + "_" +strategy+ "_" +selectedMessageId;
+        if (selected_message_text==null || selected_message_text.isEmpty()){
             return selected_message_text;
-
         }
-        catch(Exception e){
-            logger.debug("Exception: "+e.getMessage(),e);
-            selected_message_text = selected_message_text + "_" +strategy+ "_" +selectedMessageId;
-            return selected_message_text;
+        else {
+
+            try {
+                //increase the number_of_times_sent of the selected message
+                Query<Message> query2 = mongoDatastore.createQuery(Message.class);
+                query2.criteria("id").equal(selectedMessageId);
+                Message messageObj = query2.get();
+                Integer numberOfTimesMessageSent = messageObj.getNumber_of_times_sent();
+                numberOfTimesMessageSent++;
+                mongoDatastore.update(query2, mongoDatastore.createUpdateOperations(Message.class).set("number_of_times_sent", numberOfTimesMessageSent));
+                //increase the number_of_times_sent of the selected strategy
+                Query<Strategy> strategyQuery = mongoDatastore.createQuery(Strategy.class).field("persuasive_strategy").equal(strategy);
+                logger.debug("number of times sent: " + strategyQuery.get().getNumber_of_times_sent());
+                Integer number_of_times_sent = strategyQuery.get().getNumber_of_times_sent();
+                number_of_times_sent++;
+                mongoDatastore.update(strategyQuery, mongoDatastore.createUpdateOperations(Strategy.class).set("number_of_times_sent", number_of_times_sent));
+                //Increase the number of attemps for the current user
+                Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
+                Integer user_attempts;
+                DBCollection trips = mongoDatastore.getDB().getCollection("UserTrip");
+                if (strategy.equals("suggestion")) {
+                    try {
+                        user_attempts = userQuery.get().getSugAttempts();
+                    } catch (Exception e) {
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", 0));
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugSuccess", 0));
+                        user_attempts = userQuery.get().getSugAttempts();
+                    }
+                    user_attempts = user_attempts + 1;
+                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("sugAttempts", user_attempts));
+
+                } else if (strategy.equals("comparison")) {
+                    try {
+                        user_attempts = userQuery.get().getCompAttempts();
+                    } catch (Exception e) {
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", 0));
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compSuccess", 0));
+                        user_attempts = userQuery.get().getCompAttempts();
+                    }
+                    user_attempts = user_attempts + 1;
+                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("compAttempts", user_attempts));
+                }
+                if (strategy.equals("self-monitoring")) {
+                    try {
+                        user_attempts = userQuery.get().getSelfAttempts();
+                    } catch (Exception e) {
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", 0));
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfSuccess", 0));
+                        user_attempts = userQuery.get().getSelfAttempts();
+                    }
+                    user_attempts = user_attempts + 1;
+                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("selfAttempts", user_attempts));
+                }
+                if (strategy.equals("reward")) {
+                    try {
+                        user_attempts = userQuery.get().getRewAttempts();
+                    } catch (Exception e) {
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("rewAttempts", 0));
+                        mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("rewSuccess", 0));
+                        user_attempts = userQuery.get().getSelfAttempts();
+                    }
+                    user_attempts = user_attempts + 1;
+                    mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("rewAttempts", user_attempts));
+                }
+                selected_message_text = selected_message_text + "_" + strategy + "_" + selectedMessageId;
+                return selected_message_text;
+
+            } catch (Exception e) {
+                logger.debug("Exception: " + e.getMessage(), e);
+                selected_message_text = selected_message_text + "_" + strategy + "_" + selectedMessageId;
+                return selected_message_text;
+            }
         }
 
     }
@@ -969,13 +966,11 @@ public class CalculateMessageUtilities {
 
     }
 
-    private static Integer getPrize(User user, Double rewardPoints) {
+    private static Integer getPrize(User user, Double rewardPoints, Double points) {
         Integer prize = 0;
 
         try {
             String city = user.getPilot();
-            //Get user points
-            Double points = user.getPoints();
             points=points+rewardPoints;
             logger.debug("points"+points);
             logger.debug("city"+city);

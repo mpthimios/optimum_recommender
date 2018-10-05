@@ -196,9 +196,9 @@ public class Recommender {
 		}
 	}
 	
-	public void rankRoutesForUser (User user, Datastore mongoDatastore){
+	public void rankRoutesForUser (User user, Datastore mongoDatastore, Double userPoints){
 		rankBasedonUserPreferences(user, routes);
-		rankBasedonSystemView(user, routes);
+		rankBasedonSystemView(user, routes, userPoints);
 		
 		rankBasedonBehaviouralModel(routes);
 				
@@ -222,7 +222,7 @@ public class Recommender {
 		routes = FinalRankedRoutes;
 	}
 
-	public void rankRoutesForUserNew (User user, Datastore mongoDatastore){
+	public void rankRoutesForUserNew (User user, Datastore mongoDatastore, Double userPoints){
 
 		List<RouteModel> FinalRankedRoutes = new ArrayList<>(Collections.nCopies(routes.size(), null));
 		List<RouteModel> RankedRoutes = new ArrayList<>(Collections.nCopies(routes.size()-1, null));
@@ -242,7 +242,7 @@ public class Recommender {
 
 			rankBasedonUserPreferences(user, RankedRoutes);
 
-			rankBasedonSystemView(user, RankedRoutes);
+			rankBasedonSystemView(user, RankedRoutes, userPoints);
 
 			rankBasedonBehaviouralModel(RankedRoutes);
 
@@ -272,12 +272,12 @@ public class Recommender {
 	}
 
 
-	public void addMessage(User user, Datastore mongoDatastore, String tripPurpose, Boolean graph) throws JSONException {
+	public void addMessage(User user, Datastore mongoDatastore, String tripPurpose, Boolean graph, Double userPoints) throws JSONException {
 
 		/*if (check_if_we_need_to_add_message(user,mongoDatastore,N)) {
 			selectTargetRouteandAddMessageForUser(user, mongoDatastore);
 		}*/
-		selectTargetRouteandAddMessageForUser(user, mongoDatastore, tripPurpose, graph);
+		selectTargetRouteandAddMessageForUser(user, mongoDatastore, tripPurpose, graph, userPoints);
 	}
 	
 	private void rankBasedonBehaviouralModel(List<RouteModel> routes){
@@ -447,7 +447,7 @@ public class Recommender {
 		
 	}
 
-	private void rankBasedonSystemView(User user, List<RouteModel> routes){
+	private void rankBasedonSystemView(User user, List<RouteModel> routes, Double userPoints){
 
 		List<RouteModel> rankedRoutes = new ArrayList<>();
 		LinkedHashMap<RouteModel, Double> rankedRoutesMap = new LinkedHashMap<>();
@@ -472,7 +472,7 @@ public class Recommender {
 			int ManyCar = boolToInt(user.tooManyCarRoutes());
 			int Emissions = boolToInt(user.emissionsIncreasing());
 			Double rewardPoints = calculatePoints(route, user);
-			int ReachingPriceTarget = boolToInt(Context.CheckReachingPrizeTarget(user, rewardPoints));
+			int ReachingPriceTarget = boolToInt(Context.CheckReachingPrizeTarget(user, rewardPoints, userPoints));
 			//double NiceWeather = boolToDouble(WeatherInfo.isWeatherNice(lat, lon, city))
 			double NiceWeather = 1.0;
 			double Duration = 0.0;
@@ -597,7 +597,7 @@ public class Recommender {
 		
 	}
 	
-	private void selectTargetRouteandAddMessageForUser(User user, Datastore mongoDatastore, String tripPurpose, Boolean graph) throws JSONException {
+	private void selectTargetRouteandAddMessageForUser(User user, Datastore mongoDatastore, String tripPurpose, Boolean graph, Double userPoints) throws JSONException {
 		//Select target route and add message and strategy.
 		List<String> targetList = user.getTargetList();
 		logger.debug(targetList);
@@ -637,7 +637,7 @@ public class Recommender {
 					target = targetList.get(i);
 					try {
 						Double rewardPoints = calculatePoints(route, user);
-						contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore, rewardPoints);
+						contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore, rewardPoints, userPoints);
 					} catch (Exception e) {
 						logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
 					}
@@ -662,11 +662,16 @@ public class Recommender {
 						try {
 							Double rewardPoints = calculatePoints(route, user);
 							logger.debug("reward points" + rewardPoints);
-							contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore, rewardPoints);
-							mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore, rewardPoints);
-							message = mes.split("_")[0];
-							strategy = mes.split("_")[1];
-							messageId = mes.split("_")[2];
+							contextList = Context.getRelevantContextForUser(this, route, user, mongoDatastore, rewardPoints, userPoints);
+							mes = CalculateMessageUtilities.calculateForUser(contextList, user, target, mongoDatastore, rewardPoints, userPoints);
+							if (mes == null || mes.isEmpty()) {
+								continue;
+							}
+							else {
+								message = mes.split("_")[0];
+								strategy = mes.split("_")[1];
+								messageId = mes.split("_")[2];
+							}
 							logger.debug(messageId + "----");
 						} catch (Exception e) {
 							logger.error("Exception while filtering duplicate routes: " + e.getMessage(), e);
@@ -871,7 +876,7 @@ public class Recommender {
 		return sortedEntries;
 	}
 
-	public void addPersuasiveFeature(User user,  Datastore mongoDatastore) throws JSONException {
+	public void addPersuasiveFeature(User user,  Datastore mongoDatastore, Double userPoints) throws JSONException {
 
 		String purpose = getPurpose();
 		logger.debug(purpose);
@@ -893,39 +898,44 @@ public class Recommender {
 			logger.debug(group);
 		}
 		else {
-			//Query<User> query1 = mongoDatastore.createQuery(User.class).field("id").equal( user.getId());
-			if (mongoDatastore.createQuery(Request.class).field("numberOfUsersGroupA").exists().asList().isEmpty()) {
-				Request request = new Request();
-				mongoDatastore.save(request);
-			}
-			Integer groupA = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupA();
-			Integer groupB = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupB();
-			//Integer groupC = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupC();
+			if (user.getId().equals("B1Tfut3NtUdOMY0BUDTQvw8oNHLkq7cZ") || user.getId().equals("zqWPSIOZTvh4J0Y9f6ealJhUg2KyJP9W") || user.getId().equals("32k8cDQJvU36ia78ds7MdDQND7GxHJI8") || user.getId().equals("byiyqnghZ4uZvmrPSQOmPyIkGPBV5ad8") || user.getId().equals("CJs7fzjWZdW3TXe0AAd7QwHKXhdk0YMf")) {
+				group = "groupA";
+				Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
+				mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("ThrottlingGroup", group), false);
+			} else {
 
-			Integer minNumber = groupA;
-			group = "groupA";
-			if (minNumber > groupB) {
-				minNumber = groupB;
-				group = "groupB";
-			}
-			Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
-			mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("ThrottlingGroup", group), false);
-			if(group.equals("groupA")){
-				groupA=groupA+1;
-				Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
-				mongoDatastore.update(requestQuery, mongoDatastore.createUpdateOperations(Request.class).set("numberOfUsersGroupA", groupA), false);
-			}
-			else if(group.equals("groupB")){
-				groupB=groupB+1;
-				Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
-				mongoDatastore.update(requestQuery, mongoDatastore.createUpdateOperations(Request.class).set("numberOfUsersGroupB", groupB), false);
+				if (mongoDatastore.createQuery(Request.class).field("numberOfUsersGroupA").exists().asList().isEmpty()) {
+					Request request = new Request();
+					mongoDatastore.save(request);
+				}
+				Integer groupA = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupA();
+				Integer groupB = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupB();
+				//Integer groupC = mongoDatastore.createQuery(Request.class).get().getNumberOfUsersGroupC();
+
+				Integer minNumber = groupA;
+				group = "groupA";
+				if (minNumber > groupB) {
+					minNumber = groupB;
+					group = "groupB";
+				}
+				Query<User> userQuery = mongoDatastore.createQuery(User.class).field("id").equal(user.getId());
+				mongoDatastore.update(userQuery, mongoDatastore.createUpdateOperations(User.class).set("ThrottlingGroup", group), false);
+				if (group.equals("groupA")) {
+					groupA = groupA + 1;
+					Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
+					mongoDatastore.update(requestQuery, mongoDatastore.createUpdateOperations(Request.class).set("numberOfUsersGroupA", groupA), false);
+				} else if (group.equals("groupB")) {
+					groupB = groupB + 1;
+					Query<Request> requestQuery = mongoDatastore.createQuery(Request.class);
+					mongoDatastore.update(requestQuery, mongoDatastore.createUpdateOperations(Request.class).set("numberOfUsersGroupB", groupB), false);
+				}
 			}
 		}
 
 		logger.debug(user.getThrottlingGroup());
 
 		//Combination of Graph and Message
-		addMessage(user,mongoDatastore,purpose,Boolean.TRUE);
+		addMessage(user,mongoDatastore,purpose,Boolean.TRUE, userPoints);
 
 		/*if(group.equals("groupA")){
 			//Combination of Graph and Message
@@ -1019,7 +1029,7 @@ public class Recommender {
 		if (strategy.equals("comparison")) {
 			Double transportUsage = user.getMode_usage().getPt_percent() + user.getMode_usage().getBike_percent() + user.getMode_usage().getWalk_percent();
 			Double othersUsage = user.getPtUsageComparedToOthers() + user.getWalkUsageComparedToOthers() + user.getBikeUsageComparedToOthers();
-			if (transportUsage > 0.0 && othersUsage > 0.0 && othersUsage>transportUsage) {
+			if (transportUsage > 0.0 && othersUsage > 0.0 && othersUsage>(transportUsage/100.0)) {
 				AddGraph = Boolean.TRUE;
 			}
 		} else if (strategy.equals("self-monitoring")) {
@@ -1050,7 +1060,7 @@ public class Recommender {
 
 				JSONArray data = new JSONArray();
 				data.put((user.getMode_usage().getPt_percent() + user.getMode_usage().getBike_percent() + user.getMode_usage().getWalk_percent()) / 3.0);
-				data.put((user.getPtUsageComparedToOthers() + user.getWalkUsageComparedToOthers() + user.getBikeUsageComparedToOthers()) / 3.0);
+				data.put((user.getPtUsageComparedToOthers()*100.0 + user.getWalkUsageComparedToOthers()*100.0 + user.getBikeUsageComparedToOthers()*100.0) / 3.0);
 				dataset.put("data", data);
 
 				JSONArray background = new JSONArray();
@@ -1207,34 +1217,37 @@ public class Recommender {
 
 	public Boolean check_graph(String strategy,Datastore mongoDatastore) {
 
-		//check if the graph displayed last X hours.
-		Integer X=GetProperties.getHours();
-		//get the current timestamp and the timestamp of the latestUpdate
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-		//Compare if the timestamp is less than X hours.
-		DBCollection routes = mongoDatastore.getDB().getCollection("UserRequestPerGroup");
-		BasicDBObject TripQuery = new BasicDBObject();
-		TripQuery.put("userId", user.getId());
-		TripQuery.put("Strategy", strategy);
-		BasicDBObject fields = new BasicDBObject();
-		fields.put("Timestamp", 1);
-
-		List<DBObject> request = routes.find(TripQuery, fields).sort(new BasicDBObject("$natural", -1)).limit(10).toArray();
-		if (request.isEmpty()){
+		if (user.getId().equals("B1Tfut3NtUdOMY0BUDTQvw8oNHLkq7cZ") || user.getId().equals("zqWPSIOZTvh4J0Y9f6ealJhUg2KyJP9W") || user.getId().equals("32k8cDQJvU36ia78ds7MdDQND7GxHJI8") ||user.getId().equals("byiyqnghZ4uZvmrPSQOmPyIkGPBV5ad8") || user.getId().equals("CJs7fzjWZdW3TXe0AAd7QwHKXhdk0YMf") || user.getId().equals("BR30iZjFBPbdKRGjEDoAXRwf3X9cGHwX") ){
 			return Boolean.TRUE;
 		}
-		else {
-			logger.debug(request.get(0).get("Timestamp"));
-			String dateString = request.get(0).get("Timestamp").toString();
-			DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy",Locale.ENGLISH);
-			try {
-				Date date = format.parse(dateString);
-				long milliseconds = abs(date.getTime() - now.getTime());
-				int hours   = (int) ((milliseconds / (1000*60*60)) % 24);
-				return hours > X;
-			} catch (ParseException e) {
-				e.printStackTrace();
-				return Boolean.FALSE;
+		else {//check if the graph displayed last X hours.
+			Integer X = GetProperties.getHours();
+			//get the current timestamp and the timestamp of the latestUpdate
+			Timestamp now = new Timestamp(System.currentTimeMillis());
+			//Compare if the timestamp is less than X hours.
+			DBCollection routes = mongoDatastore.getDB().getCollection("UserRequestPerGroup");
+			BasicDBObject TripQuery = new BasicDBObject();
+			TripQuery.put("userId", user.getId());
+			TripQuery.put("Strategy", strategy);
+			BasicDBObject fields = new BasicDBObject();
+			fields.put("Timestamp", 1);
+
+			List<DBObject> request = routes.find(TripQuery, fields).sort(new BasicDBObject("$natural", -1)).limit(10).toArray();
+			if (request.isEmpty()) {
+				return Boolean.TRUE;
+			} else {
+				logger.debug(request.get(0).get("Timestamp"));
+				String dateString = request.get(0).get("Timestamp").toString();
+				DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.ENGLISH);
+				try {
+					Date date = format.parse(dateString);
+					long milliseconds = abs(date.getTime() - now.getTime());
+					int hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
+					return hours > X;
+				} catch (ParseException e) {
+					e.printStackTrace();
+					return Boolean.FALSE;
+				}
 			}
 		}
 	}
