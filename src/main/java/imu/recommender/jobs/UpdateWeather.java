@@ -97,7 +97,13 @@ public class UpdateWeather implements Job{
 
                 Weather weatherInfo = new Weather();
                 weatherInfo.setWeatherInfo((DBObject) JSON.parse(response.toString()));
-                weatherInfo.setCountry(Countries.get(i));
+                if (Countries.get(i).equals("Birmingham,GB")){
+                    String country="Birmingham";
+                    weatherInfo.setCountry(country);
+                }
+                else {
+                    weatherInfo.setCountry(Countries.get(i));
+                }
                 weatherInfo.setGoodWeather(GoodWeather);
                 weatherInfo.setCreatedDate(new Date());
                 mongoDatastore.save(weatherInfo);
