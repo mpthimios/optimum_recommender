@@ -73,7 +73,7 @@ public class CalculateMessageUtilities {
         double PBikeSD = user.getBikeUsageComparedToOthers();
 
         //Initialize all percentage values in order to solve the cold start  problem
-        
+
         if (RewardPoints>0.0){
             PercentageList.add("points");
         }

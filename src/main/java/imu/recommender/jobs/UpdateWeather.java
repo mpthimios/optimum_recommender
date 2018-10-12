@@ -47,7 +47,7 @@ public class UpdateWeather implements Job{
         WeatherStatusResponse currentWeather;
         ArrayList<String> Countries = new ArrayList<>();
         Countries.add("Vienna");
-        Countries.add("Birmingham");
+        Countries.add("Birmingham,GB");
         Countries.add("Ljubljana");
 
         try {
@@ -83,7 +83,7 @@ public class UpdateWeather implements Job{
                 //System.out.println(js.getJSONArray("weather").get(1));
                 Boolean GoodWeather = Boolean.FALSE;
                 try {
-                    if(js.get("weather").toString().contains("Rain") ) {
+                    if(js.get("weather").toString().contains("Rain") || js.get("weather").toString().contains("rain")) {
                         GoodWeather =  Boolean.FALSE;
                     }
                     else{
